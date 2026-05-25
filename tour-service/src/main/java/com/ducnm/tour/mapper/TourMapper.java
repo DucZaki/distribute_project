@@ -15,7 +15,11 @@ public interface TourMapper {
     TourResponse toResponse(ChuyenDi entity);
 
     @Mapping(target = "diemDen", source = "diemDen")
+    @Mapping(target = "diemDon", source = "diemDonDefault")
+    @Mapping(target = "phuongTien", source = "phuongTien")
     TourSummary toSummary(ChuyenDi entity);
+
+    PhuongTienSummary toPhuongTienSummary(PhuongTien e);
 
     List<TourSummary> toSummaryList(List<ChuyenDi> entities);
 

@@ -23,13 +23,10 @@ public class PaymentEventListener {
     public void onPaymentSucceeded(PaymentSucceededEvent event) {
         log.info("Received PaymentSucceeded bookingId={} paymentId={}",
                 event.getBookingId(), event.getPaymentId());
-        bookingService.markConfirmed(event.getBookingId(), event.getPaymentId());
+        BookingConfirmedEvent confirmed = bookingService.markConfirmed(
+                event.getBookingId(), event.getPaymentId());
 
-        kafkaTemplate.send(Topics.BOOKING_CONFIRMED, String.valueOf(event.getBookingId()),
-                BookingConfirmedEvent.builder()
-                        .bookingId(event.getBookingId())
-                        .paymentId(event.getPaymentId())
-                        .build());
+        kafkaTemplate.send(Topics.BOOKING_CONFIRMED, String.valueOf(event.getBookingId()), confirmed);
     }
 
     @KafkaListener(topics = Topics.PAYMENT_FAILED, groupId = "booking-service")

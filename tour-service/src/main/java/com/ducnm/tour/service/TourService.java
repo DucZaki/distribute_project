@@ -123,6 +123,8 @@ public class TourService {
 
     private Sort.Order parseSort(String sort) {
         if (sort == null || sort.isBlank()) return Sort.Order.desc("id");
+        if ("priceAsc".equalsIgnoreCase(sort)) return Sort.Order.asc("gia");
+        if ("priceDesc".equalsIgnoreCase(sort)) return Sort.Order.desc("gia");
         String[] parts = sort.split(",");
         Sort.Direction dir = parts.length > 1 && "asc".equalsIgnoreCase(parts[1])
                 ? Sort.Direction.ASC : Sort.Direction.DESC;

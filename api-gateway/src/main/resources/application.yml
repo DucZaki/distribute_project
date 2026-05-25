@@ -22,6 +22,24 @@ spring:
           filters:
             - RewritePath=/api/auth/(?<seg>.*), /api/v1/auth/${seg}
 
+        # PUBLIC: destinations browse
+        - id: destination-public
+          uri: lb://tour-service
+          predicates:
+            - Path=/api/destinations/**
+            - Method=GET
+          filters:
+            - RewritePath=/api/destinations/(?<seg>.*), /api/v1/destinations/${seg}
+
+        # PUBLIC: promo validate
+        - id: booking-promo-public
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/bookings/promo/apply
+            - Method=POST
+          filters:
+            - RewritePath=/api/bookings/(?<seg>.*), /api/v1/bookings/${seg}
+
         # PUBLIC: read-only tour browse
         - id: tour-public
           uri: lb://tour-service
@@ -53,11 +71,11 @@ spring:
             - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
             - JwtAuthenticationFilter
 
-        # PROTECTED: bookings
+        # PROTECTED: bookings (check-in GET public via separate route)
         - id: booking
           uri: lb://booking-service
           predicates:
-            - Path=/api/bookings/**, /api/check-in/**, /api/admin/bookings/**, /api/admin/promos/**
+            - Path=/api/bookings/**, /api/admin/bookings/**, /api/admin/promos/**
           filters:
             - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
             - JwtAuthenticationFilter
@@ -65,6 +83,13 @@ spring:
               args:
                 name: bookingCB
                 fallbackUri: forward:/fallback/booking
+
+        - id: check-in-public
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/check-in/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
 
         # PROTECTED: payment
         - id: payment

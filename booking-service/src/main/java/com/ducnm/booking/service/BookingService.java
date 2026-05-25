@@ -8,6 +8,7 @@ import com.ducnm.booking.entity.DatCho;
 import com.ducnm.booking.entity.MaGiamGia;
 import com.ducnm.booking.repository.DatChoRepository;
 import com.ducnm.common.dto.PageResponse;
+import com.ducnm.common.event.BookingConfirmedEvent;
 import com.ducnm.common.event.BookingCreatedEvent;
 import com.ducnm.common.event.Topics;
 import com.ducnm.common.exception.BusinessException;
@@ -156,12 +157,29 @@ public class BookingService {
     }
 
     @Transactional
-    public void markConfirmed(Integer bookingId, Integer paymentId) {
+    public BookingConfirmedEvent markConfirmed(Integer bookingId, Integer paymentId) {
         DatCho b = bookingRepo.findById(bookingId)
                 .orElseThrow(() -> BusinessException.notFound("Booking", bookingId));
         b.setTrangThai("CONFIRMED");
         b.setPaymentId(paymentId);
         log.info("Booking confirmed id={} paymentId={}", bookingId, paymentId);
+
+        String tourTitle = null;
+        try {
+            TourClient.TourBrief tour = tourClient.getTour(b.getIdChuyenDi()).getData();
+            if (tour != null) tourTitle = tour.tieuDe();
+        } catch (Exception ex) {
+            log.warn("Could not load tour title for booking {}", bookingId);
+        }
+
+        return BookingConfirmedEvent.builder()
+                .bookingId(bookingId)
+                .paymentId(paymentId)
+                .maCheckIn(b.getMaCheckIn())
+                .userEmail(b.getEmail())
+                .userName(b.getHoTen())
+                .tourTitle(tourTitle)
+                .build();
     }
 
     @Transactional

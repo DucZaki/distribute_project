@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{layout/admin_layout :: head('Admin')}"></head>
+
+<body>
+    <header th:replace="~{layout/admin_layout:: header()}"></header>
+    <div class="d-flex">
+        <nav th:replace="~{layout/admin_layout :: nav()}"></nav>
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a th:href="@{'/admin/tour/' + ${source}}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+                <div>
+                    <a th:if="${source == 'active'}" th:href="@{'/admin/tour/edit/' + ${tour.id}}"
+                        class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Sửa
+                    </a>
+                    <a th:href="@{/admin/tour/delete/{id}(id=${tour.id},source=${source})}" onclick="return confirm('Bạn có chắc muốn xóa chuyến đi này?');" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Xóa
+                    </a>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-3" th:text="${tour.tieuDe}"></h3>
+            <ul class="nav nav-tabs" id="tourTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info"
+                        type="button" role="tab">Thông tin</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a th:href="@{'/admin/tour/' + ${tour.id} + '/ngay-khoi-hanh'}" class="nav-link">
+                        <i class="bi bi-calendar-event me-1"></i> Ngày khởi hành
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button">Lịch trình</button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="TabInfor">
+                <div class="tab-pane fade show active" id="info" role="tabpanel">
+                    <div class="row g-4">
+                        <div class="col-lg-4 text-center">
+                            <img th:src="@{${tour.hinhAnh}}" class="img-fluid rounded shadow"
+                                style="max-height:400px; object-fit:cover;">
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Tiêu đề</div>
+                                        <div class="col-md-8" th:text="${tour.tieuDe}"></div>
+                                    </div>
+                                    <hr>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Giá dịch vụ</div>
+                                        <div class="col-md-8 text-danger fw-bold"
+                                            th:text="${#numbers.formatDecimal(tour.gia,0,'POINT',0,'COMMA')} + ' ₫'">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Ngày khởi hành</div>
+                                        <div class="col-md-8"
+                                            th:text="${#temporals.format(tour.ngayKhoiHanh,'dd-MM-yyyy')}">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Ngày kết thúc</div>
+                                        <div class="col-md-8"
+                                            th:text="${#temporals.format(tour.ngayKetThuc,'dd-MM-yyyy')}">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Phương tiện</div>
+                                        <div class="col-md-8" th:text="${tour.idPhuongTien.loai}">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 fw-semibold text-muted">Điểm đến</div>
+                                        <div class="col-md-8" th:text="${tour.idDiemDen.thanhPho}">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-2 fw-semibold text-muted">Mô tả</div>
+                                    <div class="p-3 bg-light rounded" th:text="${tour.moTa}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="schedule">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-list-check"></i> Lịch trình tour
+                    </h5>
+                    <div th:if="${#lists.isEmpty(lichTrinhs)}">
+                        <div id="emptyBlock" class="text-center">
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-body py-4 text-muted">
+                                    Chưa có lịch trình nào cho chuyến đi này
+                                </div>
+                            </div>
+                            <div id="addBlockEmty"
+                                 class="card border-2 border-dashed text-center add-block"
+                                 onclick="openCreateForm()">
+                                <div class="card-body py-4">
+                                    <i class="bi bi-plus-circle fs-2 text-primary"></i>
+                                    <div class="fw-semibold">
+                                        Thêm ngày mới
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${!#lists.isEmpty(lichTrinhs)}">
+                        <div th:each="lich : ${lichTrinhs}" class="mb-4 pb-3 border-bottom">
+                            <div th:if="${editingId == lich.id}" class="card shadow-sm">
+                                <div class="card-body">
+                                    <form th:action="@{/admin/lich-trinh/update/{id}(id=${lich.id})}" method="post" autocomplete="off">
+                                        <input type="hidden" name="tourId" th:value="${tour.id}">
+                                        <input type="hidden" name="ngayThu" th:value="${lich.ngayThu}">
+                                        <div class="mb-3">
+                                            <label class="fw-semibold">
+                                                Ngày [[${lich.ngayThu}]]
+                                            </label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Tiêu đề / Tuyến đi</label>
+                                            <input type="text" name="tieuDe" class="form-control" th:value="${lich.tieuDe}"
+                                                   placeholder="VD: Tp.HCM – Nha Trang">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Bữa ăn</label>
+                                            <input type="text" name="soBuaAn" class="form-control" th:value="${lich.soBuaAn}"
+                                                   placeholder="VD: Ăn sáng, trưa, tối">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Hoạt động chính</label>
+                                            <input type="text" name="hoatDongChinh" class="form-control" th:value="${lich.hoatDongChinh}"
+                                                   placeholder="VD: Khám phá vịnh, tham quan hang động">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Ảnh minh họa (URL)</label>
+                                            <input type="text" name="hinhAnh" class="form-control" th:value="${lich.hinhAnh}"
+                                                   placeholder="https://... (để trống = dùng ảnh tour)">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Chi tiết hoạt động</label>
+                                            <textarea name="noiDung" rows="5" class="form-control" th:text="${lich.noiDung}"
+                                                      placeholder="Mỗi dòng = một hoạt động (hiển thị dạng bullet)"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Nghỉ đêm</label>
+                                            <input type="text" name="nghiDem" class="form-control" th:value="${lich.nghiDem}"
+                                                   placeholder="VD: Khách sạn Nha Trang">
+                                        </div>
+                                        <div class="text-end">
+                                            <button class="btn btn-success">Lưu</button>
+                                            <a th:href="@{/admin/tour/detail/{id}(id=${tour.id})}" class="btn btn-secondary">Huỷ</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div th:if="${editingId != lich.id}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="fw-bold mb-0">
+                                        Ngày [[${lich.ngayThu}]] - [[${lich.tieuDe}]]
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{/admin/lich-trinh/edit/{id}(id=${lich.id})}" class="btn btn-sm btn-warning" onclick="sessionStorage.setItem('tourTab','#schedule-tab')">
+                                            Sửa
+                                        </a>
+                                        <a th:href="@{/admin/lich-trinh/delete/{id}(id=${lich.id})}" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xoá?')">
+                                            Xoá
+                                        </a>
+                                    </div>
+                                </div>
+                                <p class="text-muted mb-2 small" th:if="${lich.soBuaAn}">
+                                    <i class="bi bi-cup-hot"></i>
+                                    [[${lich.soBuaAn}]]
+                                </p>
+                                <p class="fw-semibold small mb-1" th:if="${lich.hoatDongChinh}">
+                                    Hoạt động chính: [[${lich.hoatDongChinh}]]
+                                </p>
+                                <ul class="small mb-2 ps-3" th:if="${!#lists.isEmpty(lich.noiDungLines)}">
+                                    <li th:each="line : ${lich.noiDungLines}" th:text="${line}"></li>
+                                </ul>
+                                <p th:if="${#lists.isEmpty(lich.noiDungLines) and lich.noiDung != null}" th:text="${lich.noiDung}" class="small"></p>
+                                <div class="fw-semibold text-primary" th:if="${lich.nghiDem}">
+                                    <i class="bi bi-moon-stars"></i>
+                                    Nghỉ đêm: [[${lich.nghiDem}]]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div id="createForm" class="card mt-3 shadow-sm" style="display:none;">
+                            <div class="card-body">
+                                <form th:action="@{/admin/lich-trinh/save}" method="post" onsubmit="localStorage.setItem('tourTab','#schedule-tab')" autocomplete="off">
+                                    <input type="hidden" name="tourId" th:value="${tour.id}"/>
+                                    <input type="hidden" id="ngayThuInput" name="ngayThu" th:value="${#lists.size(lichTrinhs) + 1}" />
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">
+                                            <span id="dayPreview"></span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Tiêu đề / Tuyến đi</label>
+                                        <input type="text" name="tieuDe" class="form-control" required
+                                               placeholder="VD: Tp.HCM – Nha Trang">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Bữa ăn</label>
+                                        <input type="text" name="soBuaAn" class="form-control"
+                                               placeholder="VD: Ăn sáng, trưa, tối">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Hoạt động chính</label>
+                                        <input type="text" name="hoatDongChinh" class="form-control"
+                                               placeholder="VD: Khám phá vịnh, tham quan hang động">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Ảnh minh họa (URL)</label>
+                                        <input type="text" name="hinhAnh" class="form-control"
+                                               placeholder="https://... (để trống = dùng ảnh tour)">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Chi tiết hoạt động</label>
+                                        <textarea name="noiDung" rows="5" class="form-control"
+                                                  placeholder="Mỗi dòng = một hoạt động (hiển thị dạng bullet)"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Nghỉ đêm</label>
+                                        <input type="text" name="nghiDem" class="form-control"
+                                               placeholder="VD: Khách sạn Nha Trang">
+                                    </div>
+                                    <div class="text-end">
+                                        <button class="btn btn-success">Lưu</button>
+                                        <button type="button" class="btn btn-secondary" onclick="closeCreateForm()">Huỷ</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    <div th:if="${!#lists.isEmpty(lichTrinhs)}"
+                         id="addBlockList"
+                         class="card border-2 border-dashed text-center add-block"
+                         onclick="openCreateForm()">
+                            <div class="card-body py-4">
+                                <i class="bi bi-plus-circle fs-2 text-primary"></i>
+                                <div class="fw-semibold">
+                                    Thêm ngày mới
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        function openCreateForm() {
+            const form = document.getElementById("createForm");
+            const empty = document.getElementById("emptyBlock");
+            const addEmpty = document.getElementById("addBlockEmty");
+            const addList = document.getElementById("addBlockList");
+
+            form.style.display = "block";
+            if (empty) empty.style.display = "none";
+            if (addEmpty) addEmpty.style.display = "none";
+            if (addList) addList.style.display = "none";
+
+            const day = document.getElementById("ngayThuInput").value;
+            document.getElementById("dayPreview").innerText = "Day " + day;
+
+            form.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function closeCreateForm() {
+            const form = document.getElementById("createForm");
+            const empty = document.getElementById("emptyBlock");
+            const addEmpty = document.getElementById("addBlockEmty");
+            const addList = document.getElementById("addBlockList");
+
+            form.style.display = "none";
+            if (empty) empty.style.display = "block";
+            if (addEmpty) addEmpty.style.display = "block";
+            if (addList) addList.style.display = "block";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const savedTab = sessionStorage.getItem("tourTab");
+
+            if (savedTab) {
+                const tab = document.querySelector(savedTab);
+                if (tab) new bootstrap.Tab(tab).show();
+            } else {
+                new bootstrap.Tab(document.querySelector("#info-tab")).show();
+            }
+
+            document.querySelectorAll('#tourTab button').forEach(tab => {
+                tab.addEventListener("shown.bs.tab", function () {
+                    sessionStorage.setItem("tourTab", "#" + this.id);
+                });
+            });
+        });
+    </script>
+    <footer th:replace="~{layout/admin_layout :: footer()}"></footer>
+</body>

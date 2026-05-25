@@ -43,7 +43,20 @@ public class TourDtos {
         private BigDecimal gia;
         private String hinhAnh;
         private LocalDate ngayKhoiHanh;
+        private Boolean noiBat;
         private DiemDenSummary diemDen;
+        private PhuongTienSummary phuongTien;
+        private DiemDonDto diemDon;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhuongTienSummary {
+        private Integer id;
+        private String ten;
+        private String loai;
     }
 
     @Data
