@@ -1,0 +1,150 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+      routes:
+        # PUBLIC: auth endpoints (no JWT)
+        - id: identity-public
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<seg>.*), /api/v1/auth/${seg}
+
+        # PUBLIC: read-only tour browse
+        - id: tour-public
+          uri: lb://tour-service
+          predicates:
+            - Path=/api/tours/**
+            - Method=GET
+          filters:
+            - RewritePath=/api/tours/(?<seg>.*), /api/v1/tours/${seg}
+            - name: CircuitBreaker
+              args:
+                name: tourCB
+                fallbackUri: forward:/fallback/tour
+
+        # PROTECTED: identity (profile, admin user mgmt)
+        - id: identity-secured
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/users/**, /api/admin/users/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
+        # PROTECTED: tour admin write
+        - id: tour-admin
+          uri: lb://tour-service
+          predicates:
+            - Path=/api/admin/tours/**, /api/admin/destinations/**, /api/admin/schedules/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
+        # PROTECTED: bookings
+        - id: booking
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/bookings/**, /api/check-in/**, /api/admin/bookings/**, /api/admin/promos/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+            - name: CircuitBreaker
+              args:
+                name: bookingCB
+                fallbackUri: forward:/fallback/booking
+
+        # PROTECTED: payment
+        - id: payment
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
+        # PUBLIC: VNPay IPN callback (no JWT)
+        - id: payment-ipn
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/vnpay/ipn, /api/vnpay/return
+          filters:
+            - RewritePath=/api/vnpay/(?<seg>.*), /api/v1/vnpay/${seg}
+
+        # PROTECTED: reviews & favorites
+        - id: review
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/**, /api/favorites/**, /api/contacts/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
+        # PUBLIC: integrations (news, flights, chat)
+        - id: integration
+          uri: lb://integration-service
+          predicates:
+            - Path=/api/news/**, /api/flights/**, /api/chat/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      tourCB:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 5
+      bookingCB:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:bookingtour-super-secret-key-change-in-prod-min-256-bits-required-aaaa}
+    access-token-expiration-ms: 3600000
+    refresh-token-expiration-ms: 604800000
+    issuer: bookingtour
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.client: WARN
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
