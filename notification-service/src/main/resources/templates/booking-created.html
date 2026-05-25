@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Đơn đặt tour</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background:#1976d2;color:#fff;padding:20px;text-align:center;">
+    <h1 style="margin:0;">BookingTour</h1>
+</div>
+<div style="padding:20px;background:#fafafa;">
+    <p>Xin chào <strong th:text="${userName}">Quý khách</strong>,</p>
+    <p>Cảm ơn quý khách đã đặt tour. Đơn đặt #<strong th:text="${bookingId}"></strong> đã được tạo:</p>
+    <table style="width:100%;border-collapse:collapse;">
+        <tr><td style="padding:8px;border-bottom:1px solid #ddd;"><strong>Tour</strong></td><td style="padding:8px;border-bottom:1px solid #ddd;" th:text="${tourTitle}"></td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #ddd;"><strong>Số lượng</strong></td><td style="padding:8px;border-bottom:1px solid #ddd;" th:text="${soLuong}"></td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #ddd;"><strong>Tổng tiền</strong></td><td style="padding:8px;border-bottom:1px solid #ddd;color:#d32f2f;font-weight:bold;" th:text="${#numbers.formatDecimal(tongGia,0,'COMMA',0,'POINT')} + ' VNĐ'"></td></tr>
+    </table>
+    <p style="margin-top:24px;">Vui lòng thanh toán trong vòng 15 phút để giữ chỗ.</p>
+</div>
+<div style="background:#eee;padding:12px;text-align:center;font-size:12px;color:#666;">
+    © BookingTour. Vui lòng không trả lời email này.
+</div>
+</body>
+</html>

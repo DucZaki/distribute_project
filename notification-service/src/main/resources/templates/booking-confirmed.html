@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Xác nhận thanh toán</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background:#2e7d32;color:#fff;padding:20px;text-align:center;">
+    <h1 style="margin:0;">Thanh toán thành công</h1>
+</div>
+<div style="padding:20px;">
+    <p>Chào <strong th:text="${userName}">Quý khách</strong>,</p>
+    <p>Đơn #<strong th:text="${bookingId}"></strong> cho tour <em th:text="${tourTitle}"></em> đã được xác nhận.</p>
+    <p>Mã check-in của quý khách:</p>
+    <div style="text-align:center;margin:24px 0;">
+        <code style="background:#f5f5f5;padding:12px 24px;font-size:20px;letter-spacing:2px;border-radius:4px;" th:text="${maCheckIn}"></code>
+    </div>
+    <p>Quý khách có thể quét mã QR tại quầy check-in. Vui lòng giữ email này để làm bằng chứng đặt tour.</p>
+</div>
+</body>
+</html>

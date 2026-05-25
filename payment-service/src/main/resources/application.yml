@@ -1,0 +1,53 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: payment-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/bookingtour_payment?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:root}
+    password: ${DB_PASS:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+vnp:
+  pay-url: ${VNP_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+  return-url: ${VNP_RETURN_URL:http://localhost:8080/api/vnpay/return}
+  ipn-url: ${VNP_IPN_URL:http://localhost:8080/api/vnpay/ipn}
+  tmn-code: ${VNP_TMN_CODE:}
+  hash-secret: ${VNP_HASH_SECRET:}
+  api-url: ${VNP_API_URL:https://sandbox.vnpayment.vn/merchant_webapi/api/transaction}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>BookingTour</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background:#f7f7f7; }
+        header { background:#1976d2; color:#fff; padding:20px; text-align:center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .card { background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+        .card img { width:100%; height:160px; object-fit:cover; }
+        .card-body { padding: 14px; }
+        .price { color:#d32f2f; font-weight:bold; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>BookingTour - Microservices Edition</h1>
+    <p>Khám phá Việt Nam với những tour du lịch hấp dẫn</p>
+</header>
+<div class="container">
+    <h2>Tour nổi bật</h2>
+    <div class="grid">
+        <div class="card" th:each="t : ${featuredTours}">
+            <img th:src="${t.hinhAnh}" alt="" onerror="this.src='https://via.placeholder.com/400x200'"/>
+            <div class="card-body">
+                <h3 th:text="${t.tieuDe}">Tour</h3>
+                <p class="price" th:text="${#numbers.formatDecimal(t.gia,0,'COMMA',0,'POINT')} + ' VNĐ'"></p>
+                <a th:href="@{'/tours/' + ${t.id}}">Chi tiết</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

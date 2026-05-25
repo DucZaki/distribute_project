@@ -1,0 +1,271 @@
+name: bookingtour
+services:
+  # =========================
+  # INFRASTRUCTURE
+  # =========================
+  mysql:
+    image: mysql:8.4
+    container_name: bt-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bookingtour
+    ports: [ "3307:3306" ]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      retries: 10
+    networks: [ bt-net ]
+
+  redis:
+    image: redis:7-alpine
+    container_name: bt-redis
+    ports: [ "6379:6379" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      retries: 10
+    networks: [ bt-net ]
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: bt-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks: [ bt-net ]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: bt-kafka
+    depends_on: [ zookeeper ]
+    ports: [ "9092:9092", "29092:29092" ]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092" ]
+      interval: 10s
+      retries: 10
+    networks: [ bt-net ]
+
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: bt-zipkin
+    ports: [ "9411:9411" ]
+    networks: [ bt-net ]
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bt-prometheus
+    ports: [ "9090:9090" ]
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks: [ bt-net ]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bt-grafana
+    ports: [ "3000:3000" ]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [ prometheus ]
+    networks: [ bt-net ]
+
+  # =========================
+  # PLATFORM SERVICES
+  # =========================
+  discovery:
+    build: ./discovery-server
+    container_name: bt-discovery
+    ports: [ "8761:8761" ]
+    networks: [ bt-net ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 10
+
+  config:
+    build: ./config-server
+    container_name: bt-config
+    ports: [ "8888:8888" ]
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_REPO_PATH: /config-repo
+    volumes:
+      - ./config-repo:/config-repo:ro
+    depends_on:
+      discovery:
+        condition: service_healthy
+    networks: [ bt-net ]
+
+  gateway:
+    build: ./api-gateway
+    container_name: bt-gateway
+    ports: [ "8080:8080" ]
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      JWT_SECRET: bookingtour-super-secret-key-change-in-prod-min-256-bits-required-aaaa
+    depends_on:
+      discovery:
+        condition: service_healthy
+      config:
+        condition: service_started
+    networks: [ bt-net ]
+
+  # =========================
+  # DOMAIN SERVICES
+  # =========================
+  identity:
+    build: ./identity-service
+    container_name: bt-identity
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_identity?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+      JWT_SECRET: bookingtour-super-secret-key-change-in-prod-min-256-bits-required-aaaa
+    depends_on:
+      mysql: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  tour:
+    build: ./tour-service
+    container_name: bt-tour
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_tour?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+      REDIS_HOST: redis
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  booking:
+    build: ./booking-service
+    container_name: bt-booking
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_booking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+      KAFKA_BOOTSTRAP: kafka:29092
+    depends_on:
+      mysql: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  payment:
+    build: ./payment-service
+    container_name: bt-payment
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+      KAFKA_BOOTSTRAP: kafka:29092
+      VNP_TMN_CODE: ${VNP_TMN_CODE:-}
+      VNP_HASH_SECRET: ${VNP_HASH_SECRET:-}
+      VNP_RETURN_URL: ${VNP_RETURN_URL:-http://localhost:8080/api/vnpay/return}
+    depends_on:
+      mysql: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  notification:
+    build: ./notification-service
+    container_name: bt-notification
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      KAFKA_BOOTSTRAP: kafka:29092
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@bookingtour.com}
+    depends_on:
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  review:
+    build: ./review-service
+    container_name: bt-review
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_review?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASS: root
+    depends_on:
+      mysql: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  integration:
+    build: ./integration-service
+    container_name: bt-integration
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+      REDIS_HOST: redis
+      NEWS_API_KEY: ${NEWS_API_KEY:-}
+      AMADEUS_CLIENT_ID: ${AMADEUS_CLIENT_ID:-}
+      AMADEUS_CLIENT_SECRET: ${AMADEUS_CLIENT_SECRET:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      redis: { condition: service_healthy }
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+  web-bff:
+    build: ./web-bff
+    container_name: bt-web
+    ports: [ "8090:8090" ]
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      discovery: { condition: service_healthy }
+    networks: [ bt-net ]
+
+volumes:
+  mysql-data:
+  grafana-data:
+
+networks:
+  bt-net:
+    driver: bridge

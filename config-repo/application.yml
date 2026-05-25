@@ -1,0 +1,24 @@
+# Shared defaults for all services - imported by Config Server.
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  level:
+    com.ducnm: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN

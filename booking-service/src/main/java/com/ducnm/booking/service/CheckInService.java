@@ -32,7 +32,7 @@ public class CheckInService {
 
     @Transactional
     public CheckInResult checkIn(String maCheckIn) {
-        DatCho booking = bookingRepo.findByMaCheckIn(maCheckIn)
+        DatCho booking = bookingRepo.findByCheckInToken(maCheckIn)
                 .orElseThrow(() -> BusinessException.notFound("Booking", maCheckIn));
 
         if (!"CONFIRMED".equals(booking.getTrangThai())) {
