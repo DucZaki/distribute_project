@@ -30,7 +30,6 @@
         <module>review-service</module>
         <module>notification-service</module>
         <module>integration-service</module>
-        <module>web-bff</module>
     </modules>
 
     <properties>

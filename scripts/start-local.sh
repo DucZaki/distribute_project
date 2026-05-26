@@ -27,6 +27,7 @@ run review-service
 run notification-service
 run integration-service
 run api-gateway
-run web-bff
+
+echo "Backend ready. Start React: cd frontend && npm run dev  → http://localhost:5173"
 
 wait

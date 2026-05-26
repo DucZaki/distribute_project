@@ -1,51 +1,53 @@
--- Dev seed data for tour-service (adapted from monolith Booking-Tour)
+-- Seed data adapted from monolith BookingTour V2 + bookingtour.sql
 
 INSERT IGNORE INTO diem_den (id, ten, mo_ta, hinh_anh, vung_mien, noi_bat) VALUES
-(1, 'Sapa', 'Thành phố sương mù với ruộng bậc thang tuyệt đẹp', '/anh/diemden/sapa.jpg', 'Miền Bắc', 1),
-(2, 'Hạ Long', 'Vịnh Hạ Long - Di sản thiên nhiên thế giới', '/anh/diemden/halong.jpg', 'Miền Bắc', 1),
-(3, 'Đà Nẵng', 'Thành phố đáng sống nhất Việt Nam', '/anh/diemden/danang.jpg', 'Miền Trung', 1),
-(4, 'Huế', 'Cố đô với di sản văn hóa phong phú', '/anh/diemden/hue.jpg', 'Miền Trung', 0),
-(5, 'Phú Quốc', 'Đảo ngọc phía Nam', '/anh/diemden/phuquoc.jpg', 'Miền Nam', 1),
-(6, 'Hà Nội', 'Thủ đô ngàn năm văn hiến', '/anh/chuyendi/hanoi.jpg', 'Miền Bắc', 1);
+(1, 'Sapa', 'Thành phố sương mù với ruộng bậc thang tuyệt đẹp', '/img/destinations/sapa.jpg', 'Việt Nam', 1),
+(2, 'Hạ Long', 'Vịnh Hạ Long - Di sản thiên nhiên thế giới', '/img/destinations/halong.jpg', 'Việt Nam', 1),
+(3, 'Đà Nẵng', 'Thành phố đáng sống nhất Việt Nam', '/img/destinations/danang.jpg', 'Việt Nam', 1),
+(4, 'Huế', 'Cố đô với di sản văn hóa phong phú', '/img/destinations/hue.jpg', 'Việt Nam', 0),
+(5, 'Phú Quốc', 'Đảo ngọc phía Nam', '/img/destinations/phuquoc.jpg', 'Việt Nam', 1),
+(6, 'Bangkok', 'Thủ đô Thái Lan sôi động', '/img/destinations/bangkok.jpg', 'Thái Lan', 1),
+(7, 'Seoul', 'Thủ đô Hàn Quốc hiện đại', '/img/destinations/seoul.jpg', 'Hàn Quốc', 1);
 
 INSERT IGNORE INTO diem_don (id, ten, dia_chi, thanh_pho) VALUES
 (1, 'Hà Nội', 'Sân bay Nội Bài', 'Hà Nội'),
 (2, 'Hồ Chí Minh', 'Sân bay Tân Sơn Nhất', 'Hồ Chí Minh'),
 (3, 'Đà Nẵng', 'Sân bay Đà Nẵng', 'Đà Nẵng');
 
-INSERT IGNORE INTO phuong_tien (id, ten, loai) VALUES
-(1, 'Vietnam Airlines', 'Plane'),
-(2, 'Xe khách cao cấp', 'Bus');
+INSERT IGNORE INTO phuong_tien (id, ten, loai, icon) VALUES
+(1, 'Vietnam Airlines', 'Plane', 'bi-airplane'),
+(2, 'Xe khách cao cấp', 'Bus', 'bi-bus-front'),
+(3, 'Xe khách cao cấp', 'Bus', 'bi-bus-front');
 
 INSERT IGNORE INTO noi_luu_tru (id, ten, dia_chi, hang_sao, loai) VALUES
 (1, 'Khách sạn Mường Thanh', 'Hà Nội', 4, 'Khách sạn'),
 (2, 'Vinpearl Resort', 'Phú Quốc', 5, 'Resort'),
-(3, 'InterContinental Đà Nẵng', 'Đà Nẵng', 5, 'Resort');
+(3, 'Homestay Sapa', 'Sapa, Lào Cai', 3, 'Homestay'),
+(4, 'InterContinental Đà Nẵng', 'Đà Nẵng', 5, 'Resort');
 
 INSERT IGNORE INTO chuyen_di (id, tieu_de, mo_ta, gia, ngay_khoi_hanh, ngay_ket_thuc, id_diem_den, id_phuong_tien, id_noi_luu_tru, id_diem_don, noi_bat, hinh_anh, highlight) VALUES
-(1, 'Tour Hà Nội 3N2Đ', 'Tham quan Hồ Gươm, Văn Miếu, Lăng Bác', 2500000.00, '2026-06-01', '2026-12-31', 6, 2, 1, 1, 1, '/anh/chuyendi/hanoi.jpg', 'Khám phá văn hóa Thủ đô ngàn năm'),
-(2, 'Tour 4N3Đ Đà Nẵng - Hội An', 'Bà Nà Hill, Hội An cổ', 4200000.00, '2026-06-01', '2026-12-31', 3, 1, 3, 3, 1, '/anh/diemden/danang.jpg', 'Cầu Vàng và phố cổ Hội An'),
-(3, 'Khám phá Huế 2N1Đ', 'Đại Nội, sông Hương', 1800000.00, '2026-06-01', '2026-12-31', 4, 2, 1, 1, 0, '/anh/diemden/hue.jpg', 'Di sản văn hóa cố đô'),
-(4, 'Du thuyền Hạ Long 2N1Đ', 'Vịnh di sản thế giới', 3200000.00, '2026-06-01', '2026-12-31', 2, 2, 1, 1, 1, '/anh/diemden/halong.jpg', 'Du thuyền sang trọng trên vịnh'),
-(5, 'Phú Quốc 3N2Đ', 'Biển đảo và resort', 5500000.00, '2026-06-01', '2026-12-31', 5, 1, 2, 2, 1, '/anh/diemden/phuquoc.jpg', 'Thiên đường nghỉ dưỡng'),
-(6, 'Sapa mùa lúa chín 3N2Đ', 'Ruộng bậc thang Fansipan', 2900000.00, '2026-06-01', '2026-12-31', 1, 2, 1, 1, 1, '/anh/diemden/sapa.jpg', 'Sương mù và núi non hùng vĩ');
+(1, 'Tour Hà Nội 3N2Đ', 'Tham quan Hồ Gươm, Văn Miếu, Lăng Bác', 2500000.00, DATE_ADD(CURDATE(), INTERVAL 14 DAY), DATE_ADD(CURDATE(), INTERVAL 17 DAY), 1, 3, 1, 1, 1, '/img/tours/hanoi.jpg', 'Khám phá văn hóa Thủ đô ngàn năm văn hiến'),
+(2, 'Tour 4N3Đ Đà Nẵng - Hội An', 'Bà Nà Hill, Hội An cổ', 4200000.00, DATE_ADD(CURDATE(), INTERVAL 10 DAY), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 3, 1, 4, 3, 1, '/img/tours/danang.jpg', 'Cầu Vàng, phố cổ Hội An lung linh'),
+(3, 'Khám phá Huế 2N1Đ', 'Ăn uống cung đình, sông Hương', 1800000.00, DATE_ADD(CURDATE(), INTERVAL 21 DAY), DATE_ADD(CURDATE(), INTERVAL 23 DAY), 4, 3, 1, 1, 0, '/img/tours/hue.jpg', 'Di sản cố đô Huế'),
+(4, 'Phú Quốc 3N2Đ', 'Biển đảo, Vinpearl Safari', 3500000.00, DATE_ADD(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 10 DAY), 5, 1, 2, 2, 1, '/img/tours/phuquoc.jpg', 'Nghỉ dưỡng đảo ngọc'),
+(5, 'Sapa mùa lúa chín 3N2Đ', 'Fansipan, bản Cát Cát', 2200000.00, DATE_ADD(CURDATE(), INTERVAL 30 DAY), DATE_ADD(CURDATE(), INTERVAL 33 DAY), 1, 3, 3, 1, 1, '/img/tours/sapa.jpg', 'Ruộng bậc thang vàng óng'),
+(6, 'Hạ Long 2N1Đ du thuyền', 'Du thuyền 5 sao trên vịnh', 2900000.00, DATE_ADD(CURDATE(), INTERVAL 12 DAY), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 2, 3, 1, 1, 1, '/img/tours/halong.jpg', 'Di sản thiên nhiên thế giới');
 
 INSERT IGNORE INTO chuyen_di_diem_don (chuyen_di_id, diem_don_id) VALUES
-(1, 1), (2, 1), (2, 3), (3, 1), (4, 1), (5, 2), (6, 1);
+(1, 1), (2, 1), (2, 3), (3, 1), (4, 2), (5, 1), (6, 1);
 
-INSERT IGNORE INTO lich_trinh (id, id_chuyen_di, ngay_thu, tieu_de, mo_ta, hinh_anh) VALUES
-(1, 1, 1, 'Hà Nội – Phố cổ', 'Hồ Gươm, 36 phố phường', '/anh/chuyendi/hanoi.jpg'),
-(2, 1, 2, 'Hà Nội – Văn hóa', 'Lăng Bác, Văn Miếu', '/anh/chuyendi/hanoi.jpg'),
-(3, 1, 3, 'Tiễn khách', 'Mua quà và tiễn sân bay', '/anh/chuyendi/hanoi.jpg'),
-(4, 2, 1, 'Đà Nẵng – Ngũ Hành Sơn', 'Biển Mỹ Khê', '/anh/diemden/danang.jpg'),
-(5, 2, 2, 'Bà Nà Hills', 'Cầu Vàng', '/anh/diemden/danang.jpg'),
-(6, 2, 3, 'Hội An', 'Phố cổ, hoa đăng', '/anh/diemden/danang.jpg');
+INSERT IGNORE INTO ngay_khoi_hanh (id, id_chuyen_di, ngay_khoi_hanh, ngay_ket_thuc, so_cho_toi_da, so_cho_da_dat, trang_thai) VALUES
+(1, 1, DATE_ADD(CURDATE(), INTERVAL 14 DAY), DATE_ADD(CURDATE(), INTERVAL 17 DAY), 30, 0, 'ACTIVE'),
+(2, 1, DATE_ADD(CURDATE(), INTERVAL 28 DAY), DATE_ADD(CURDATE(), INTERVAL 31 DAY), 30, 0, 'ACTIVE'),
+(3, 2, DATE_ADD(CURDATE(), INTERVAL 10 DAY), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 25, 0, 'ACTIVE'),
+(4, 4, DATE_ADD(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 10 DAY), 20, 0, 'ACTIVE'),
+(5, 5, DATE_ADD(CURDATE(), INTERVAL 30 DAY), DATE_ADD(CURDATE(), INTERVAL 33 DAY), 35, 0, 'ACTIVE'),
+(6, 6, DATE_ADD(CURDATE(), INTERVAL 12 DAY), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 40, 0, 'ACTIVE');
 
-INSERT IGNORE INTO ngay_khoi_hanh (id, id_chuyen_di, ngay_khoi_hanh, ngay_ket_thuc, so_cho_toi_da, so_cho_da_dat, gia_override, trang_thai) VALUES
-(1, 1, '2026-06-15', '2026-06-17', 30, 0, NULL, 'ACTIVE'),
-(2, 1, '2026-07-10', '2026-07-12', 30, 0, NULL, 'ACTIVE'),
-(3, 2, '2026-06-20', '2026-06-23', 25, 0, 500000.00, 'ACTIVE'),
-(4, 2, '2026-08-05', '2026-08-08', 25, 0, 450000.00, 'ACTIVE'),
-(5, 4, '2026-06-25', '2026-06-26', 20, 0, NULL, 'ACTIVE'),
-(6, 5, '2026-07-01', '2026-07-03', 20, 0, 800000.00, 'ACTIVE'),
-(7, 6, '2026-09-12', '2026-09-14', 25, 0, NULL, 'ACTIVE');
+INSERT IGNORE INTO lich_trinh (id, id_chuyen_di, ngay_thu, tieu_de, mo_ta) VALUES
+(1, 1, 1, 'Hà Nội - Hồ Gươm', 'Tham quan Hồ Gươm, Văn Miếu Quốc Tử Giám'),
+(2, 1, 2, 'Lăng Bác - Chùa Một Cột', 'Viếng Lăng Bác, chùa Một Cột'),
+(3, 1, 3, 'Làng gốm Bát Tràng', 'Trải nghiệm làm gốm, mua sắm'),
+(4, 2, 1, 'Đà Nẵng - Bà Nà Hills', 'Cầu Vàng, Fantasy Park'),
+(5, 2, 2, 'Hội An cổ', 'Phố cổ, thả hoa đăng'),
+(6, 4, 1, 'Phú Quốc - Bãi Sao', 'Tắm biển, hải sản tươi sống');

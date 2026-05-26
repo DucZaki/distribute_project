@@ -17,4 +17,3 @@ scrape_configs:
           - 'notification:8085'
           - 'review:8086'
           - 'integration:8087'
-          - 'web-bff:8090'

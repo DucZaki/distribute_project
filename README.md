@@ -8,14 +8,12 @@ Phiên bản microservice của ứng dụng [BookingTour](../Java/BookingTour) 
                                      ┌─────────────────┐
                                      │  Web Browser    │
                                      └────────┬────────┘
-                                              │ HTTPS
+                                              │ fetch /api/*
                                      ┌────────▼────────┐
-                                     │   Web-BFF       │ ◀── Thymeleaf (giữ UX cũ)
-                                     │   (8090)        │     gọi backend qua Feign
+                                     │ React Frontend  │ ◀── Vite :5173 (dev), nginx :8088 (Docker)
                                      └────────┬────────┘
                                               │
-                                              ▼
-                                     ┌─────────────────┐
+                                     ┌────────▼────────┐
                                      │   API Gateway   │ ◀── JWT validate, CORS, rate-limit
                                      │   (8080)        │     route lb://service-name
                                      └────────┬────────┘
@@ -68,7 +66,7 @@ Phiên bản microservice của ứng dụng [BookingTour](../Java/BookingTour) 
 | `DanhGia`, `YeuThich`, `Contact` + service tương ứng | **review-service** |
 | `EmailService`, templates email | **notification-service** |
 | `AmadeusClient`, `newsapi`, `ChatService`, `ChatController` | **integration-service** |
-| `HomeController`, `controller/user/**`, `controller/admin/**`, `templates/`, `static/` | **web-bff** |
+| `HomeController`, `controller/user/**`, `controller/admin/**`, `templates/`, `static/` | **frontend/** React SPA |
 
 ## Stack
 
@@ -152,13 +150,31 @@ bash scripts/start-local.sh
 # Hoặc Run cấu hình IntelliJ từng module
 ```
 
-Thứ tự khởi động: `discovery-server` → `config-server` → các service domain → `api-gateway` → `web-bff`.
+Thứ tự khởi động: `discovery-server` → `config-server` → các service domain → `api-gateway` → `frontend`.
+
+### React frontend (khuyến nghị)
+
+```bash
+# Backend đang chạy (Docker hoặc local), sau đó:
+cd frontend
+npm install
+npm run dev
+# → http://localhost:5173 (Vite proxy /api → gateway :8080)
+```
+
+Production build + Docker:
+
+```bash
+cd frontend && npm run build
+docker compose up -d frontend   # http://localhost:8088
+```
 
 ## Endpoints
 
 | Component | URL |
 |---|---|
-| Web UI (BFF) | http://localhost:8090 |
+| **React UI (dev)** | http://localhost:5173 |
+| **React UI (Docker)** | http://localhost:8088 |
 | API Gateway | http://localhost:8080 |
 | Eureka Dashboard | http://localhost:8761 |
 | Config Server | http://localhost:8888 (basic auth: configuser/configpass) |
@@ -227,7 +243,7 @@ distribute_project/
 ├── notification-service/        # Email + Kafka consumer :8085
 ├── review-service/              # DanhGia + YeuThich + Contact :8086
 ├── integration-service/         # Amadeus + News + OpenAI :8087
-├── web-bff/                     # Thymeleaf BFF :8090
+├── frontend/                    # React SPA (Vite) — UI gọi gateway
 ├── config-repo/                 # Properties cho Config Server
 ├── monitoring/
 │   ├── prometheus/

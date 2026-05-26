@@ -250,16 +250,12 @@ services:
       discovery: { condition: service_healthy }
     networks: [ bt-net ]
 
-  web-bff:
-    build: ./web-bff
-    container_name: bt-web
-    ports: [ "8090:8090" ]
-    environment:
-      EUREKA_URL: http://discovery:8761/eureka/
-      CONFIG_SERVER_URL: http://config:8888
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+  frontend:
+    build: ./frontend
+    container_name: bt-frontend
+    ports: [ "8088:80" ]
     depends_on:
-      discovery: { condition: service_healthy }
+      gateway: { condition: service_started }
     networks: [ bt-net ]
 
 volumes:

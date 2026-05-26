@@ -1,0 +1,1609 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+
+:root {
+    --bs-primary: #FECF2F !important;
+    --primary-hover: #fcd752;
+    --primary-glow: rgba(254, 207, 47, 0.4);
+    --bs-secondary: #1A1C1E !important;
+    --bs-dark: #121416 !important;
+    --bs-light: #F9F9FC !important;
+    --bs-body-color: #1A1C1E !important;
+    --bs-body-bg: #F9F9FC !important;
+    --accent-color: #FECF2F;
+
+    /* Golden Horizon Tokens */
+    --font-heading: 'Manrope', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --nav-glass-bg: rgba(255, 255, 255, 0.75);
+    --nav-shadow: 0 16px 48px -8px rgba(26, 28, 30, 0.12);
+    --card-radius: 20px;
+    --pill-radius: 100px;
+    --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+}
+
+/* ===================== PREMIUM NAVIGATION DOCK ===================== */
+.premium-nav-dock {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    background: var(--nav-glass-bg) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-radius: var(--pill-radius);
+    padding: 10px 32px !important;
+    box-shadow: var(--nav-shadow);
+    z-index: 1050;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: var(--transition-smooth);
+}
+
+.premium-nav-dock.scrolled {
+    top: 12px;
+    width: 95%;
+    padding: 6px 32px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.premium-nav-dock .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--bs-dark) !important;
+    padding: 0;
+}
+
+.premium-nav-dock .nav-link {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(26, 28, 30, 0.7) !important;
+    padding: 8px 16px !important;
+    transition: color 0.3s ease;
+}
+
+.premium-nav-dock .nav-link:hover,
+.premium-nav-dock .nav-link.active {
+    color: var(--bs-dark) !important;
+}
+
+.premium-nav-dock .user-profile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-dark);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.premium-nav-dock .user-profile-icon:hover {
+    transform: scale(1.05);
+    background: var(--bs-primary);
+}
+
+/* Removal of old navbar styles that conflict */
+.navbar {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* ===================== LOGO & BRANDING ===================== */
+.brand-logo-wrapper {
+    background: #000;
+    padding: 3px;
+    border-radius: 10px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.brand-logo-img {
+    height: 50px;
+    width: auto;
+    border-radius: 6px;
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-name {
+    font-size: 1.6rem !important;
+    color: #000 !important;
+    line-height: 1;
+    margin-bottom: 2px;
+    font-weight: 800 !important;
+}
+
+.brand-slogan {
+    font-size: 0.8rem !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+}
+
+/* Dark mode adjustments for branding in style.css */
+[data-theme="dark"] .brand-name {
+    color: var(--bs-primary) !important;
+}
+
+[data-theme="dark"] .brand-slogan {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .brand-logo-wrapper {
+    border-color: var(--bs-primary);
+}
+
+/* ============================================================ */
+
+/* Dark Mode Toggle Styling */
+#darkModeToggle {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#darkModeToggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(1.1);
+}
+
+/* ===================== GLOBAL COMPONENT OVERHAUL ===================== */
+.card {
+    border: none !important;
+    border-radius: var(--card-radius) !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 10px 30px rgba(26, 28, 30, 0.04) !important;
+    transition: var(--transition-smooth) !important;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 24px 60px rgba(26, 28, 30, 0.12) !important;
+}
+
+.img-zoom {
+    overflow: hidden;
+    position: relative;
+}
+
+.img-zoom img {
+    transition: var(--transition-smooth);
+}
+
+.card:hover .img-zoom img {
+    transform: scale(1.1);
+}
+
+.card-img-top {
+    border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
+}
+
+.btn {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    border-radius: var(--pill-radius) !important;
+    transition: all 0.3s ease;
+    padding: 10px 24px;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary) !important;
+    border: none !important;
+    color: var(--bs-dark) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(254, 207, 47, 0.3);
+}
+
+.form-control,
+.form-select {
+    border: none !important;
+    background-color: #F1F1F4 !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+    color: var(--bs-dark) !important;
+}
+
+/* Premium select (dùng cho bộ lọc): nhìn rõ hơn select mặc định */
+.select-premium {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(26, 28, 30, 0.14) !important;
+    box-shadow: 0 1px 0 rgba(26, 28, 30, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231A1C1E' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 14px 10px !important;
+    padding-right: 2.75rem !important;
+}
+
+.select-premium:hover {
+    border-color: rgba(254, 207, 47, 0.7) !important;
+}
+
+.select-premium:focus {
+    background-color: #FFFFFF !important;
+    border-color: rgba(254, 207, 47, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(254, 207, 47, 0.28) !important;
+}
+
+.filters-panel .form-label {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    color: rgba(26, 28, 30, 0.75);
+}
+
+.filters-panel {
+    position: sticky;
+    top: 110px;
+    z-index: 5;
+}
+
+@media (max-width: 767.98px) {
+    .filters-panel {
+        position: static;
+    }
+}
+
+/* Flatpickr (date picker) theme for public site */
+.flatpickr-calendar {
+    border-radius: 18px;
+    border: 1px solid rgba(26, 28, 30, 0.10);
+    box-shadow: 0 18px 60px rgba(26, 28, 30, 0.16);
+    overflow: hidden;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-weekdays {
+    background: #fff;
+}
+
+.flatpickr-current-month {
+    font-family: var(--font-heading);
+    font-weight: 800;
+}
+
+.flatpickr-weekday {
+    font-weight: 800;
+    color: rgba(26, 28, 30, 0.55);
+}
+
+.flatpickr-day {
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.flatpickr-day:hover {
+    background: rgba(254, 207, 47, 0.18);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #FECF2F;
+    border-color: #FECF2F;
+    color: #1A1C1E;
+}
+
+.flatpickr-day.today {
+    border-color: rgba(26, 28, 30, 0.28);
+}
+
+.flatpickr-day.today.selected {
+    border-color: #FECF2F;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(254, 207, 47, 0.2) !important;
+}
+
+/* ===================== HERO SECTION ===================== */
+.hero-section {
+    background: linear-gradient(180deg, #FFF9E6 0%, #F9F9FC 100%);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 0;
+}
+
+#typing-text {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--bs-dark);
+}
+
+.brand-gradient {
+    background: linear-gradient(90deg, #705900 0%, #FECF2F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-lead {
+    max-width: 600px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-weight: 500;
+    color: rgba(26, 28, 30, 0.6);
+}
+
+/* ===================== FORMS & SELECT FIXES ===================== */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 16px 12px !important;
+    padding-right: 2.5rem !important;
+}
+
+.search-section .form-control,
+.search-section .form-select {
+    height: 54px !important;
+}
+
+/* ===================== DROPDOWN & MEGA MENU ===================== */
+.mega-menu {
+    background: #FFFFFF !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.mega-menu .dropdown-item {
+    font-family: var(--font-body) !important;
+    font-weight: 500 !important;
+    color: var(--bs-dark) !important;
+}
+
+.logo-text {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--bs-dark);
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+}
+
+.premium-nav-dock .nav-link {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 10px 20px !important;
+    color: rgba(26, 28, 30, 0.6) !important;
+}
+
+.premium-nav-dock .nav-link:hover {
+    color: var(--bs-dark) !important;
+}
+
+/* ===================== EDITORIAL NEWSLETTER & FOOTER ===================== */
+.newsletter {
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    padding: 100px 0 !important;
+    text-align: center;
+}
+
+.newsletter h3 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    color: #FFF !important;
+}
+
+.newsletter p {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+.newsletter input {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    max-width: 400px;
+}
+
+footer {
+    background-color: #000000 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    padding: 80px 0 40px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===================== DROPDOWN MENU ===================== */
+
+/* Tổng thể dropdown */
+.navbar .dropdown-menu {
+    background-color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem 2rem !important;
+}
+
+/* Tiêu đề nhóm trong dropdown */
+.navbar .dropdown-menu h6 {
+    /*color: #0077b6 !important; !* xanh biển *!*/
+    font-weight: 700 !important;
+}
+
+/* Nhóm vùng (Miền Bắc / Miền Trung...) */
+.navbar .dropdown-menu p {
+    color: #212529 !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.3rem !important;
+}
+
+/* Link địa điểm */
+/* Booking Page Theme Overrides */
+.booking-avatar-bg {
+    background-color: #FECF2F !important;
+    color: #000 !important;
+}
+
+.text-booking-primary {
+    color: #FECF2F !important;
+}
+
+#bookingTabs .nav-link.active {
+    background-color: #FECF2F !important;
+    color: #000 !important;
+}
+
+.booking-sidebar-active {
+    background-color: #FECF2F !important;
+    color: #000 !important;
+}
+
+.navbar .dropdown-item {
+    color: #333 !important;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s;
+    padding: 6px 10px !important;
+}
+
+/* Hiệu ứng hover */
+.navbar .dropdown-item:hover {
+    background-color: #FECF2F !important;
+    /* xanh nhạt nhẹ */
+    color: #000000 !important;
+}
+
+/* Loại bỏ hiện tượng mờ hoặc bị disabled */
+.navbar .dropdown-item:disabled {
+    opacity: 1 !important;
+    color: #999 !important;
+    background-color: transparent !important;
+}
+
+/* Chỉnh border giữa các phần */
+.navbar .dropdown-menu .border-bottom {
+    border-color: #e9ecef !important;
+}
+
+/* Banner (hero-section) */
+/* ============================= */
+/* Hero Section - Banner đầu trang */
+/* ============================= */
+.hero-section {
+    height: 35vh;
+    /* Chiều cao banner */
+    background-color: #f5f5f5;
+    /* Nền sáng dịu */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Căn giữa theo chiều dọc */
+    align-items: center;
+    /* Căn giữa theo chiều ngang */
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    padding-top: 90px;
+    /* Đẩy nội dung xuống để không bị navbar che */
+    box-sizing: border-box;
+}
+
+/* Dòng chữ hiệu ứng typing */
+#typing-text {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    /*color: #1E90FF;*/
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+    animation: typing 2s steps(34, end) 1 normal both;
+    /* Hiệu ứng gõ chữ */
+    line-height: 1.3;
+    padding-bottom: 10px;
+    /* Tạo khoảng trống để không bị cắt chữ */
+}
+
+/* Hiệu ứng gõ từng chữ */
+@keyframes typing {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+/* Responsive cho màn nhỏ */
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 100px;
+        /* đẩy thêm chút cho mobile */
+        height: auto;
+    }
+
+    #typing-text {
+        white-space: normal;
+        /* Cho phép xuống dòng */
+        width: 100% !important;
+        /* Hiển thị toàn bộ chữ */
+        overflow: visible;
+        /* Không ẩn phần dư */
+        animation: none;
+        /* Tắt hiệu ứng typing trên mobile */
+        text-align: center;
+        font-size: 1.6rem;
+        /* Giảm kích thước cho vừa khung */
+    }
+}
+
+/* Carousel item */
+#reviewCarousel .carousel-item {
+    background-color: transparent !important;
+    color: #000 !important;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+/* Phần nội dung đánh giá */
+#reviewCarousel blockquote {
+    background-color: transparent !important;
+    color: #000 !important;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 700px;
+    font-size: 1.1rem;
+    font-style: italic;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Tên người đánh giá */
+#reviewCarousel .blockquote-footer {
+    background-color: transparent !important;
+    color: #555 !important;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 0.3rem;
+    /* giảm khoảng cách giữa nội dung và tên */
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.btn-outline-primary {
+    background-color: #FECF2F !important;
+    color: #000000 !important;
+    border-color: #FECF2F !important;
+    font-weight: 40px;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-hover) !important;
+    color: white !important;
+}
+
+/* Link and interactive colors */
+a {
+    color: #000;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* ===================== DROPDOWN & MEGA MENU TỐI ƯU ===================== */
+
+/* 1. Mặc định cho MOBILE (Dưới 992px) */
+@media (max-width: 991.98px) {
+    .navbar .dropdown-menu {
+        width: 100% !important;
+        position: static !important;
+        /* Quan trọng: Để nó đẩy các menu khác xuống thay vì nằm đè lên */
+        transform: none !important;
+        float: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 1rem !important;
+        border-bottom: 1px solid #eee !important;
+    }
+
+    /* Chia lại cột trên mobile để không bị quá hẹp */
+    .mega-menu .col-6 {
+        width: 50%;
+    }
+
+    .mega-menu .col-md-6 {
+        margin-bottom: 20px;
+    }
+}
+
+/* 2. Cho DESKTOP (Từ 992px trở lên) */
+@media (min-width: 992px) {
+
+    /* Ép thẻ li cha phải có position static để menu con rộng theo container của Navbar */
+    .nav-item.dropdown.position-static-lg {
+        position: static !important;
+    }
+
+    .mega-menu {
+        width: 90vw !important;
+        /* Tăng độ rộng để đẹp hơn */
+        max-width: 1100px;
+        left: 50% !important;
+        top: 100% !important;
+        transform: translateX(-50%) !important;
+        display: none;
+        /* Mặc định ẩn, Bootstrap sẽ tự hiển thị khi click */
+    }
+
+    .navbar .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        /* (Tùy chọn) Hiện khi hover nếu muốn */
+    }
+}
+
+/* 3. Style nội dung bên trong (Dùng chung) */
+.navbar .dropdown-menu h6 {
+    /*color: #0077b6 !important;*/
+    font-weight: 700 !important;
+    font-size: 1rem;
+}
+
+.navbar .dropdown-item {
+    white-space: normal;
+    /* Cho phép chữ xuống dòng nếu quá dài */
+    padding: 8px 12px !important;
+}
+
+/* Lưới lịch 7 cột */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.day-label {
+    font-weight: bold;
+    padding-bottom: 10px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+/* Ô ngày chung */
+.calendar-day {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+/* Ngày có tour và giá */
+.has-tour {
+    border-color: #dc3545;
+    /* Màu đỏ bootstrap */
+    cursor: pointer;
+}
+
+.has-tour:hover {
+    background-color: #fff5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.1);
+}
+
+/* Ngày đang được chọn (Active) */
+.has-tour.active-day {
+    background-color: #fff;
+    border: 2px solid #dc3545;
+    position: relative;
+}
+
+/* Số ngày */
+.day-num {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Giá vé dưới số ngày */
+.price-sub {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #dc3545;
+    margin-top: 2px;
+}
+
+/* Ngày của tháng khác */
+.other-month {
+    color: #ccc;
+    background-color: #f9f9f9;
+    border: none;
+}
+
+.row-cols-7>* {
+    flex: 0 0 auto;
+    width: 14.2857%;
+    padding-right: var(--bs-gutter-x, 0.25rem);
+    padding-left: var(--bs-gutter-x, 0.25rem);
+}
+
+.row-cols-7 .col>div {
+    min-height: 40px;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 0.25rem 0;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.calendar-day {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    min-height: 60px;
+    /* Phải có chiều cao để có diện tích click */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+/* Hiệu ứng khi di chuột */
+.calendar-day:hover {
+    border-color: #ffc107;
+    background-color: #fff9e6;
+}
+
+/* Màu sắc khi ngày được chọn */
+.calendar-day.active-day {
+    border: 2px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* Màu sắc cho các ngày thuộc tháng khác (mờ đi) */
+.calendar-day.other-month {
+    color: #ccc;
+    background-color: #f9f9f9;
+    pointer-events: none;
+    /* Không cho click vào ngày tháng khác */
+    border: none;
+}
+
+/* Màu sắc cho các nút chọn tháng khi được chọn */
+.month-btn.active {
+    background-color: #ffc107 !important;
+    /* Màu vàng như trong ảnh */
+    color: #000 !important;
+    border: none;
+}
+
+/* Ngày đã qua: mờ đi, gạch ngang số và không cho bấm */
+.disabled-day {
+    background-color: #f1f3f5 !important;
+    color: #adb5bd !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    /* Chặn click chuột hoàn toàn */
+}
+
+.disabled-day .day-num {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* Giữ nguyên màu cho ngày thuộc tháng khác nhưng chưa qua */
+.other-month:not(.disabled-day) {
+    color: #ccc;
+}
+
+.card-header {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.sticky-price-box {
+    /*position: -webkit-sticky; */
+    position: sticky;
+    top: 80px;
+    /* Khoảng cách từ mép trên trình duyệt khi trôi (tùy chỉnh theo chiều cao navbar của mày) */
+    z-index: 100;
+    transition: all 0.3s ease;
+}
+
+/* CSS cho ngày đã qua (như đã nói ở bước trước) */
+.disabled-day {
+    background-color: #f1f3f5 !important;
+    color: #adb5bd !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.disabled-day .day-num {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* Sidebar Menu Styling */
+.profile-sidebar-menu .menu-item a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: block;
+    transition: 0.3s;
+}
+
+.profile-sidebar-menu .menu-item.active>a {
+    color: #000;
+    font-weight: 700;
+}
+
+.profile-sidebar-menu .sub-menu a {
+    font-size: 0.9rem;
+    color: #666;
+    padding: 5px 0;
+    display: block;
+    font-weight: normal;
+}
+
+.profile-sidebar-menu .sub-menu a:hover {
+    color: var(--bs-primary);
+}
+
+/* Custom Search Box */
+.search-box-container .form-control:focus {
+    box-shadow: none;
+    background-color: #fff;
+}
+
+/* Tabs Styling */
+.nav-tabs .nav-link {
+    border: none;
+    color: #555;
+    transition: all 0.3s;
+}
+
+.nav-tabs .nav-link.active {
+    /*color: #0056b3 !important;*/
+    background-color: transparent !important;
+}
+
+/* Card Shadow */
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+}
+
+/* Biểu tượng yêu thích */
+.text-danger {
+    color: #e31c25 !important;
+}
+
+.rating {
+    direction: rtl;
+    display: inline-flex;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    font-size: 28px;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.rating input:checked~label {
+    color: #ffc107;
+}
+
+.rating label:hover,
+.rating label:hover~label {
+    color: #ffc107;
+}
+
+/* ===================== STAR RATING (Booking Review) ===================== */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    gap: 4px;
+}
+
+.star-rating label {
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.star-rating input:checked~label {
+    color: #ffc107;
+}
+
+.star-rating label:hover,
+.star-rating label:hover~label {
+    color: #ffc107;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* ===================== MEMBERSHIP TIERS ===================== */
+.tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tier-bronze {
+    background: linear-gradient(135deg, #f4e8d8, #dcb99c);
+    color: #8c5332;
+    border: 1px solid rgba(205, 127, 50, 0.4);
+}
+
+.tier-silver {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #555;
+    border: 1px solid rgba(192, 192, 192, 0.6);
+}
+
+.tier-gold {
+    background: linear-gradient(135deg, #fff9e6, #ffe58f);
+    color: #a37200;
+    border: 1px solid rgba(255, 215, 0, 0.6);
+}
+
+.tier-platinum {
+    background: linear-gradient(135deg, #ffffff, #e6e6e6);
+    color: #333;
+    border: 1px solid rgba(160, 160, 160, 0.6);
+}
+
+.tier-diamond {
+    background: linear-gradient(135deg, #e3f2fd, #90caf9, #5c6bc0);
+    color: #fff;
+    border: 1px solid rgba(92, 107, 192, 0.4);
+}
+
+/* Progress bar next tier */
+.tier-progress-wrap {
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.tier-progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bronze {
+    background: linear-gradient(90deg, #cd7f32, #a0522d);
+}
+
+.silver {
+    background: linear-gradient(90deg, #a8a8a8, #707070);
+}
+
+.gold {
+    background: linear-gradient(90deg, #FFD700, #FFA500);
+}
+
+.platinum {
+    background: linear-gradient(90deg, #e5e4e2, #a0a0a0);
+}
+
+.diamond {
+    background: linear-gradient(90deg, #42a5f5, #5c6bc0);
+}
+
+/* ===================== SEARCH CARD (hero + nav) ===================== */
+.search-card {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(254, 207, 47, 0.22);
+}
+
+.search-field-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--bs-dark);
+    margin-bottom: 8px;
+}
+
+.search-field-label i {
+    color: #C9A000;
+    font-size: 1rem;
+}
+
+.search-field-input {
+    height: 54px !important;
+    border: none !important;
+    border-radius: 12px !important;
+    background: #F3F3F6 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-weight: 500;
+}
+
+.search-field-input:focus {
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(254, 207, 47, 0.35) !important;
+}
+
+/* Select trong search card — 1 mũi tên duy nhất */
+.search-field-select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 14px 10px !important;
+    padding-right: 2.5rem !important;
+}
+
+.search-section .search-field-input {
+    height: 54px !important;
+}
+
+/* Nav search dropdown (không full-screen) */
+.nav-search-toggle {
+    background: none !important;
+    color: inherit;
+    line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-search-toggle:hover {
+    transform: scale(1.08);
+    color: var(--bs-primary);
+}
+
+.nav-search-dropdown {
+    position: fixed;
+    top: 88px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    width: min(920px, calc(100vw - 32px));
+    z-index: 1060;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+}
+
+.nav-search-dropdown.open {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.nav-search-dropdown-inner {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(254, 207, 47, 0.25);
+}
+
+.search-card--nav {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.nav-search-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.nav-search-scrim.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.search-dropdown-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+}
+
+/* ===================== DEPARTURE CALENDAR HIGHLIGHT ===================== */
+.departure-day {
+    position: relative;
+    background: linear-gradient(160deg, #fff9e6 0%, #fff3cd 100%) !important;
+    border: 2px solid #FECF2F !important;
+    color: #5c4a00 !important;
+    font-weight: 700;
+    cursor: pointer;
+    animation: departurePulse 2.4s ease-in-out infinite;
+    box-shadow: 0 4px 14px rgba(254, 207, 47, 0.35);
+}
+
+.departure-day:hover {
+    background: linear-gradient(160deg, #FECF2F 0%, #f5b800 100%) !important;
+    color: #1A1C1E !important;
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 22px rgba(254, 207, 47, 0.5);
+}
+
+.departure-day.active-day {
+    background: linear-gradient(160deg, #FECF2F 0%, #e6b800 100%) !important;
+    color: #1A1C1E !important;
+    border-color: #1A1C1E !important;
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(26, 28, 30, 0.15), 0 8px 24px rgba(254, 207, 47, 0.55);
+    transform: scale(1.06);
+}
+
+.departure-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc3545;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+.departure-day.active-day .departure-dot {
+    background: #1A1C1E;
+}
+
+.departure-tag {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #b8860b;
+    margin-top: 1px;
+    line-height: 1;
+}
+
+.departure-day.active-day .departure-tag {
+    color: #1A1C1E;
+}
+
+.departure-day .price-sub {
+    font-size: 0.62rem;
+    color: #dc3545;
+    font-weight: 800;
+    display: block;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.departure-day.active-day .price-sub {
+    color: #1A1C1E;
+}
+
+.calendar-legend .legend-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.legend-swatch.departure-swatch {
+    background: linear-gradient(160deg, #fff9e6, #FECF2F);
+    border: 2px solid #FECF2F;
+}
+
+.legend-swatch.active-swatch {
+    background: #FECF2F;
+    border: 2px solid #1A1C1E;
+}
+
+@keyframes departurePulse {
+    0%, 100% { box-shadow: 0 4px 14px rgba(254, 207, 47, 0.35); }
+    50% { box-shadow: 0 4px 20px rgba(254, 207, 47, 0.65), 0 0 0 4px rgba(254, 207, 47, 0.15); }
+}
+
+/* Booking page: cards should not "float" on hover */
+.card.card--static:hover {
+    transform: none;
+    box-shadow: 0 10px 30px rgba(26, 28, 30, 0.06) !important;
+}
+
+/* ===================== BOOKING PAGE ===================== */
+.booking-card {
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* ===================== PAGINATION (USER PAGES) ===================== */
+.pagination.zaki-pagination {
+    gap: 8px;
+}
+
+.pagination.zaki-pagination .page-link {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.7);
+    color: rgba(26, 28, 30, 0.85);
+    font-weight: 800;
+    border-radius: 999px !important;
+    padding: 8px 14px;
+    min-width: 42px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(26, 28, 30, 0.06);
+    transition: all 0.2s ease;
+}
+
+.pagination.zaki-pagination .page-link:hover {
+    background: rgba(254, 207, 47, 0.18);
+    border-color: rgba(254, 207, 47, 0.55);
+    color: #000;
+    transform: translateY(-1px);
+}
+
+.pagination.zaki-pagination .page-item.active .page-link {
+    background: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: #000 !important;
+    box-shadow: 0 12px 28px rgba(254, 207, 47, 0.28);
+}
+
+.pagination.zaki-pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    pointer-events: none;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .pagination.zaki-pagination .page-link {
+    background: rgba(0, 0, 0, 0.22);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.82);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .pagination.zaki-pagination .page-link:hover {
+    background: rgba(254, 207, 47, 0.16);
+    border-color: rgba(254, 207, 47, 0.35);
+    color: #fff;
+}
+
+.booking-card-header {
+    background: linear-gradient(135deg, rgba(254, 207, 47, 0.22) 0%, rgba(255, 255, 255, 1) 55%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 12px 16px;
+}
+
+.booking-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bs-dark);
+    color: var(--bs-primary);
+    box-shadow: 0 10px 24px rgba(26, 28, 30, 0.14);
+}
+
+.booking-card-icon--sky {
+    background: #0b4fd6;
+    color: #fff;
+}
+
+.booking-card-title {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    font-size: 1.05rem;
+    color: var(--bs-dark);
+}
+
+.booking-card-subtitle {
+    font-size: 0.85rem;
+    color: rgba(26, 28, 30, 0.65);
+    font-weight: 600;
+}
+
+.booking-card-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(26, 28, 30, 0.7);
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 6px 10px;
+    border-radius: 999px;
+}
+
+.booking-form .form-label {
+    font-weight: 800;
+    color: rgba(26, 28, 30, 0.85);
+    margin-bottom: 6px;
+}
+
+.booking-form .form-control {
+    background: #F3F4F7 !important;
+}
+
+.booking-form textarea.form-control {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.booking-flight-leg {
+    padding: 18px 22px;
+}
+
+.booking-flight-leg-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.booking-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.booking-pill--go {
+    background: rgba(24, 148, 78, 0.14);
+    color: #18944e;
+    border: 1px solid rgba(24, 148, 78, 0.18);
+}
+
+.booking-pill--back {
+    background: rgba(255, 193, 7, 0.18);
+    color: #7a5a00;
+    border: 1px solid rgba(255, 193, 7, 0.24);
+}
+
+.booking-price {
+    font-weight: 900;
+    color: #d3172a;
+    font-family: var(--font-heading);
+}
+
+.booking-flight-leg-body {
+    display: grid;
+    grid-template-columns: 1fr minmax(160px, 1.2fr) 1fr;
+    align-items: center;
+    gap: 14px;
+}
+
+.booking-flight-point {
+    text-align: left;
+}
+
+.booking-flight-time {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--bs-dark);
+    line-height: 1.05;
+}
+
+.booking-flight-place {
+    font-size: 0.9rem;
+    color: rgba(26, 28, 30, 0.62);
+    font-weight: 700;
+}
+
+.booking-flight-mid {
+    text-align: center;
+}
+
+.booking-flight-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: rgba(26, 28, 30, 0.7);
+}
+
+.booking-flight-line .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(26, 28, 30, 0.22);
+}
+
+.booking-flight-line .dash {
+    height: 2px;
+    width: 100%;
+    max-width: 110px;
+    background: rgba(26, 28, 30, 0.16);
+    border-radius: 2px;
+}
+
+.booking-flight-line i {
+    color: #0b4fd6;
+}
+
+.booking-flight-code {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: rgba(26, 28, 30, 0.6);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+    .booking-card-header {
+        padding: 10px 12px;
+    }
+    .booking-flight-leg {
+        padding: 16px 16px;
+    }
+    .booking-flight-leg-body {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .booking-flight-point,
+    .booking-flight-mid {
+        text-align: center;
+    }
+    .booking-flight-line .dash {
+        max-width: 160px;
+    }
+}
+
+[data-theme="dark"] .booking-card-header {
+    background: linear-gradient(135deg, rgba(254, 207, 47, 0.14) 0%, rgba(37, 40, 43, 1) 65%);
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .booking-card-title {
+    color: #F5F5F7;
+}
+
+[data-theme="dark"] .booking-card-subtitle {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .booking-card-badge {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .booking-form .form-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .booking-form .form-control {
+    background: #1a1c1e !important;
+}
+
+[data-theme="dark"] .booking-flight-time {
+    color: #F5F5F7;
+}
+
+[data-theme="dark"] .booking-flight-place,
+[data-theme="dark"] .booking-flight-code {
+    color: rgba(255, 255, 255, 0.62);
+}
+
+[data-theme="dark"] .booking-flight-line .dot {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .booking-flight-line .dash {
+    background: rgba(255, 255, 255, 0.12);
+}

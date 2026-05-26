@@ -22,16 +22,7 @@ spring:
           filters:
             - RewritePath=/api/auth/(?<seg>.*), /api/v1/auth/${seg}
 
-        # PUBLIC: destinations browse
-        - id: destination-public
-          uri: lb://tour-service
-          predicates:
-            - Path=/api/destinations/**
-            - Method=GET
-          filters:
-            - RewritePath=/api/destinations/(?<seg>.*), /api/v1/destinations/${seg}
-
-        # PUBLIC: promo validate
+        # PUBLIC: promo validate (during booking, before full auth)
         - id: booking-promo-public
           uri: lb://booking-service
           predicates:
@@ -40,7 +31,7 @@ spring:
           filters:
             - RewritePath=/api/bookings/(?<seg>.*), /api/v1/bookings/${seg}
 
-        # PUBLIC: read-only tour browse
+        # PUBLIC: read-only tour browse + destinations
         - id: tour-public
           uri: lb://tour-service
           predicates:
@@ -52,6 +43,33 @@ spring:
               args:
                 name: tourCB
                 fallbackUri: forward:/fallback/tour
+
+        # PUBLIC: read reviews on tour detail pages
+        - id: review-public-read
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/tour/**
+            - Method=GET
+          filters:
+            - RewritePath=/api/reviews/(?<seg>.*), /api/v1/reviews/${seg}
+
+        # PUBLIC: contact form submit
+        - id: contact-public
+          uri: lb://review-service
+          predicates:
+            - Path=/api/contacts
+            - Method=POST
+          filters:
+            - RewritePath=/api/contacts, /api/v1/contacts
+
+        # PROTECTED: write reviews & favorites
+        - id: review-secured
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/**, /api/favorites/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
 
         # PROTECTED: identity (profile, admin user mgmt)
         - id: identity-secured
@@ -107,15 +125,6 @@ spring:
             - Path=/api/vnpay/ipn, /api/vnpay/return
           filters:
             - RewritePath=/api/vnpay/(?<seg>.*), /api/v1/vnpay/${seg}
-
-        # PROTECTED: reviews & favorites
-        - id: review
-          uri: lb://review-service
-          predicates:
-            - Path=/api/reviews/**, /api/favorites/**, /api/contacts/**
-          filters:
-            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
-            - JwtAuthenticationFilter
 
         # PUBLIC: integrations (news, flights, chat)
         - id: integration
