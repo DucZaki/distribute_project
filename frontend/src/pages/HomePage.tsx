@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getFeaturedDestinations, getFeaturedTours, searchTours } from '../api/tours'
+import { getFeaturedDestinations, getFeaturedTours, getNearbyTours } from '../api/tours'
 import { getTourReviews } from '../api/reviews'
 import type { DiemDenSummary, ReviewItem, TourSummary } from '../types/api'
 import { formatVnd, imageUrl } from '../utils/format'
@@ -28,7 +28,7 @@ export function HomePage() {
   function loadNearby(city: string) {
     if (!city) return
     setNearbyStatus('Đang tải tour...')
-    searchTours({ thanhPho: city, size: 6 })
+    getNearbyTours({ city, size: 6 })
       .then((r) => {
         setNearbyTours(r.data.content ?? [])
         setNearbyStatus(
@@ -47,7 +47,14 @@ export function HomePage() {
     }
     setNearbyStatus('Đang lấy vị trí...')
     navigator.geolocation.getCurrentPosition(
-      () => loadNearby(nearbyCity || 'Hà Nội'),
+      (pos) => {
+        getNearbyTours({ lat: pos.coords.latitude, lng: pos.coords.longitude, city: nearbyCity || undefined, radiusKm: 100, size: 6 })
+          .then((r) => {
+            setNearbyTours(r.data.content ?? [])
+            setNearbyStatus(r.data.content?.length ? 'Gợi ý tour gần vị trí của bạn' : 'Chưa có tour gần vị trí của bạn')
+          })
+          .catch(() => setNearbyStatus('Không tải được tour gần bạn'))
+      },
       () => loadNearby(nearbyCity || 'Hà Nội'),
     )
   }
@@ -232,11 +239,15 @@ export function HomePage() {
               <div className="carousel-inner">
                 {reviews.map((r, i) => (
                   <div key={r.id} className={`carousel-item${i === 0 ? ' active' : ''}`}>
-                    <blockquote className="blockquote">
-                      <p className="mb-4 fw-bolder">Tour #{r.idChuyenDi}:</p>
-                      <p className="mb-4">{r.noiDung}</p>
-                      <footer className="blockquote-footer">Khách hàng #{r.idNguoiDung}</footer>
-                    </blockquote>
+                    <Link to={`/tour/${r.idChuyenDi}`} className="text-decoration-none">
+                      <blockquote className="blockquote" style={{ background: 'none', color: '#000' }}>
+                        <p className="mb-4 fw-bolder" style={{ marginBottom: 0 }}>
+                          {(r.tourTitle ?? `Tour #${r.idChuyenDi}`) + ':'}
+                        </p>
+                        <p className="mb-4" style={{ marginBottom: 0 }}>{r.noiDung}</p>
+                        <footer className="blockquote-footer">{r.hoTen ?? `Khách hàng #${r.idNguoiDung}`}</footer>
+                      </blockquote>
+                    </Link>
                   </div>
                 ))}
               </div>

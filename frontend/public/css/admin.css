@@ -1,0 +1,106 @@
+:root {
+  --primary-color: #fecf2f;
+  --primary-dark: #000000;
+  --sidebar-width: 260px;
+  --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --card-border-radius: 1rem;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.admin-shell {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: var(--sidebar-width);
+  min-height: calc(100vh - 80px);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.admin-sidebar .nav-link {
+  color: #495057;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 0.2rem 0;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  background: rgba(254, 207, 47, 0.15);
+  color: #000000;
+}
+
+.tour-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+#darkModeToggle {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border-radius: var(--card-border-radius);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.tier-diamond { background: rgba(0,0,0,0.08); }
+.tier-platinum { background: rgba(0,0,0,0.06); }
+.tier-gold { background: rgba(254,207,47,0.25); }
+.tier-silver { background: rgba(0,0,0,0.04); }
+.tier-bronze { background: rgba(0,0,0,0.03); }
+
+/* Brand overrides */
+.bg-primary { background-color: #fecf2f !important; }
+.text-primary { color: #000000 !important; }
+.border-primary { border-color: #fecf2f !important; }
+
+.btn-primary {
+  background-color: #fecf2f !important;
+  border-color: #fecf2f !important;
+  color: #000 !important;
+}
+.btn-primary:hover {
+  background-color: #e6ba1a !important;
+  border-color: #e6ba1a !important;
+  color: #000 !important;
+}
+
+.btn-outline-primary {
+  color: #fecf2f !important;
+  border-color: #fecf2f !important;
+}
+.btn-outline-primary:hover {
+  background-color: #fecf2f !important;
+  color: #000 !important;
+}

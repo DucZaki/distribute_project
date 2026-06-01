@@ -25,7 +25,6 @@ export function ZakiLayout() {
       <nav className="premium-nav-dock d-flex align-items-center justify-content-between">
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <img src="/favicon.icon" alt="Logo" height={50} className="rounded-3" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          <span className="ms-2 fw-bold d-none d-sm-inline">ZakiBooking</span>
         </Link>
 
         <div className="d-none d-lg-flex align-items-center gap-2">
@@ -136,7 +135,7 @@ export function ZakiLayout() {
       </nav>
 
       <div className="offcanvas offcanvas-end mobile-menu-panel" tabIndex={-1} id="mobileMenu" aria-labelledby="mobileMenuLabel">
-        <div className="offcanvas-header">
+          <div className="offcanvas-header">
           <div className="d-flex align-items-center gap-2">
             <img src="/favicon.icon" alt="ZakiBooking" height={38} className="rounded-3" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
             <div>

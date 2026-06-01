@@ -1,0 +1,95 @@
+/* Styles ported from monolith chitiet.html inline blocks */
+
+.info-card {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 12px 8px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  user-select: none;
+}
+
+.info-card:hover {
+  background: #fff8e1;
+  border-color: #ffc107;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255, 193, 7, 0.25);
+}
+
+.info-card-hint {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: #856404;
+  background: #fff3cd;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.info-card:hover .info-card-hint {
+  opacity: 1;
+}
+
+.weather-day-card {
+  background: #fffbec;
+  border-color: #ffc107 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weather-day-card:hover {
+  background: #fff3cd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+.schedule-empty {
+  color: #6c757d;
+}
+
+/* Lịch khởi hành — sidebar 3 tháng (desktop) */
+.month-switcher .btn {
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+}
+
+.month-switcher .btn-warning,
+.month-switcher .btn-warning.active {
+  background-color: #fecf2f !important;
+  border-color: #fecf2f !important;
+  color: #000 !important;
+}
+
+.month-switcher .btn-outline-light.border {
+  background: #fff;
+  border-color: #dee2e6 !important;
+  color: #212529 !important;
+}
+
+.month-switcher .btn-outline-light.border:hover {
+  background: rgba(254, 207, 47, 0.12);
+  border-color: #fecf2f !important;
+}
+
+.calendar-panel {
+  border-radius: 12px;
+}
+
+.calendar-day {
+  border-radius: 10px;
+  min-height: 64px;
+}
+
+.calendar-day.other-month {
+  color: #ccc;
+  background-color: #f9f9f9;
+  border: none;
+}
+
+.calendar-day.disabled-day {
+  opacity: 0.45;
+  pointer-events: none;
+}

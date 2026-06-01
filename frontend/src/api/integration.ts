@@ -6,6 +6,13 @@ export async function fetchNews(country = 'vn', category = 'general') {
   )
 }
 
+/** Tin du lịch — NewsAPI everything (giống monolith) */
+export async function fetchLatestNews(q = 'travel OR tourism OR destination') {
+  return apiFetch<{ articles?: Record<string, unknown>[] }>(
+    `/news/latest?q=${encodeURIComponent(q)}`,
+  )
+}
+
 export async function sendChat(message: string) {
   const res = await apiFetch<{ reply?: string }>('/chat', {
     method: 'POST',

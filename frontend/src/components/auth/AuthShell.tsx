@@ -65,7 +65,7 @@ export function AuthLogo({ variant }: { variant: 'login' | 'register' }) {
     return (
       <div className="auth-logo-block auth-logo-block--register">
         <Link to="/">
-          <img src="/favicon.icon" alt="ZakiBooking" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <img src="/favicon.icon" alt="Logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
         </Link>
       </div>
     )
@@ -73,7 +73,7 @@ export function AuthLogo({ variant }: { variant: 'login' | 'register' }) {
   return (
     <div className="auth-logo-block">
       <Link to="/" className="auth-logo-link">
-        <img src="/favicon.icon" alt="ZakiBooking" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+        <img src="/favicon.icon" alt="Logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
       </Link>
     </div>
   )

@@ -1,6 +1,8 @@
 import { apiFetch } from './client'
 import type {
   BookingResponse,
+  CheckInDetail,
+  CheckInResult,
   CreateBookingRequest,
   PageResponse,
   PaymentInitResponse,
@@ -40,6 +42,18 @@ export function initVnPay(bookingId: number, amount: number) {
       method: 'POST',
       body: JSON.stringify({ bookingId, amount, orderInfo: `Thanh toán đơn #${bookingId}` }),
     },
+    true,
+  )
+}
+
+export function getCheckInDetail(token: string) {
+  return apiFetch<CheckInDetail>(`/check-in/${encodeURIComponent(token)}`)
+}
+
+export function confirmCheckIn(token: string) {
+  return apiFetch<CheckInResult>(
+    `/check-in/${encodeURIComponent(token)}`,
+    { method: 'POST' },
     true,
   )
 }

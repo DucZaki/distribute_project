@@ -62,6 +62,9 @@ export function BookingsPage() {
                   {b.trangThai === 'PENDING' && (
                     <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => cancelBooking(b.id).then(reload)}>Huỷ</button>
                   )}
+                  {b.maCheckIn && (
+                    <Link to={`/check-in/${b.maCheckIn}`} className="btn btn-outline-primary btn-sm">QR check-in</Link>
+                  )}
                   <Link to={`/tour/${b.idChuyenDi}`} className="btn btn-outline-secondary btn-sm">Xem tour</Link>
                 </div>
               </div>

@@ -48,28 +48,55 @@ export interface TourSummary {
   diemDen?: DiemDenSummary
   phuongTien?: { id: number; ten: string; loai?: string }
   diemDon?: { id: number; ten: string; diaChi?: string; thanhPho?: string }
+
+  averageRating?: number
+  ratingCount?: number
+  bookingCount?: number
 }
 
 export interface NgayKhoiHanhDto {
   id: number
   ngayKhoiHanh: string
   availableSeats: number
+
+  ngayKetThuc?: string
+  soChoToiDa?: number
+  soChoDaDat?: number
+  giaOverride?: number
+  trangThai?: string
+
+  gioBayDi?: string
+  gioDenDi?: string
+  maChuyenBayDi?: string
+  giaVeDi?: number
+  gioBayVe?: string
+  gioDenVe?: string
+  maChuyenBayVe?: string
+  giaVeVe?: number
 }
 
 export interface LichTrinhDto {
+  id?: number
   ngayThu: number
   tieuDe: string
   moTa?: string
+  hinhAnh?: string
+  nghiDem?: string
+  soBuaAn?: string
+  hoatDongChinh?: string
+  noiDungLines?: string[]
 }
 
 export interface TourDetail extends TourSummary {
   moTa?: string
   ngayKetThuc?: string
   highlight?: string
-  phuongTien?: { id: number; ten: string }
+  diemDon?: { id: number; ten: string; diaChi?: string; thanhPho?: string }
+  phuongTien?: { id: number; ten: string; loai?: string }
   noiLuuTru?: { id: number; ten: string }
   ngayKhoiHanhs?: NgayKhoiHanhDto[]
   lichTrinhs?: LichTrinhDto[]
+  diemDons?: { id: number; ten: string; diaChi?: string; thanhPho?: string }[]
 }
 
 export interface BookingResponse {
@@ -85,11 +112,39 @@ export interface BookingResponse {
   tongGia: number
   tienGiamGia?: number
   maCheckIn?: string
+  checkedInAt?: string
+}
+
+export interface CheckInDetail {
+  valid: boolean
+  bookingId?: number
+  tourId?: number
+  scheduleId?: number
+  hoTen?: string
+  email?: string
+  soDienThoai?: string
+  tourTitle?: string
+  soLuong?: number
+  tongGia?: number
+  trangThai?: string
+  maCheckIn?: string
+  checkedInAt?: string
+  message?: string
+}
+
+export interface CheckInResult {
+  bookingId: number
+  hoTen: string
+  tourTitle?: string
+  soLuong: number
+  checkedAt?: string
+  firstTime: boolean
 }
 
 export interface CreateBookingRequest {
   idChuyenDi: number
   idNgayKhoiHanh: number
+  idDiemDon?: number
   soLuong: number
   hoTen: string
   email: string
@@ -107,7 +162,10 @@ export interface PaymentInitResponse {
 export interface ReviewItem {
   id: number
   idChuyenDi: number
+  tourTitle?: string
   idNguoiDung: number
+  hoTen?: string
+  anhDaiDien?: string
   diem: number
   noiDung: string
   createdAt?: string

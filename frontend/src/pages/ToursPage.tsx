@@ -188,6 +188,20 @@ export function ToursPage() {
                             {ds.tieuDe}
                           </Link>
                         </h5>
+
+                        <div className="d-flex flex-wrap align-items-center gap-2 gap-md-3 mb-2 tour-list-card-stats">
+                          <span className="text-warning fw-bold">
+                            <i className="bi bi-star-fill me-1" />
+                            <span>{(ds.averageRating ?? 0).toFixed(1)}</span>
+                            <span className="text-muted fw-normal">({ds.ratingCount ?? 0})</span>
+                          </span>
+                          <span className="text-muted d-none d-sm-inline">|</span>
+                          <span className="text-secondary fw-semibold">
+                            <i className="bi bi-people-fill me-1 text-primary" />
+                            <span>{(ds.bookingCount ?? 0) + '+ đã đặt'}</span>
+                          </span>
+                        </div>
+
                         <p className="mb-1 text-muted">
                           Mã tour: <strong className="text-body">{formatTourCode(ds.id)}</strong>
                         </p>

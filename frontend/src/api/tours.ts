@@ -35,6 +35,49 @@ export function searchTours(params: {
   return apiFetch<PageResponse<TourSummary>>(`/tours?${q}`)
 }
 
+export function getNearbyTours(params: {
+  lat?: number
+  lng?: number
+  city?: string
+  radiusKm?: number
+  page?: number
+  size?: number
+}) {
+  const q = new URLSearchParams()
+  if (params.lat != null) q.set('lat', String(params.lat))
+  if (params.lng != null) q.set('lng', String(params.lng))
+  if (params.city) q.set('city', params.city)
+  if (params.radiusKm != null) q.set('radiusKm', String(params.radiusKm))
+  q.set('page', String(params.page ?? 0))
+  q.set('size', String(params.size ?? 6))
+  return apiFetch<PageResponse<TourSummary>>(`/tours/nearby?${q}`)
+}
+
 export function getTour(id: number) {
   return apiFetch<TourDetail>(`/tours/${id}`)
+}
+
+export type FlightQuote = {
+  available: boolean
+  message?: string
+  unitPrice?: number
+  giaTour?: number
+  tongGiaVe?: number
+  giaVeDi?: number
+  giaVeVe?: number
+  diemDonTen?: string
+  diemDenTen?: string
+  maChuyenBayDi?: string
+  gioBayDi?: string
+  ngayDi?: string
+  ngayVe?: string
+}
+
+export function fetchFlightQuote(tourId: number, nkhId: number, diemDonId: number, refresh = false) {
+  const q = new URLSearchParams({
+    nkhId: String(nkhId),
+    diemDonId: String(diemDonId),
+    refresh: String(refresh),
+  })
+  return apiFetch<FlightQuote>(`/tours/${tourId}/flight-quote?${q}`)
 }
