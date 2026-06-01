@@ -31,14 +31,14 @@ spring:
           filters:
             - RewritePath=/api/bookings/(?<seg>.*), /api/v1/bookings/${seg}
 
-        # PUBLIC: read-only tour browse + destinations
+        # PUBLIC: read-only tour browse + destinations (/api/tours and /api/tours/**)
         - id: tour-public
           uri: lb://tour-service
           predicates:
-            - Path=/api/tours/**
+            - Path=/api/tours,/api/tours/**
             - Method=GET
           filters:
-            - RewritePath=/api/tours/(?<seg>.*), /api/v1/tours/${seg}
+            - RewritePath=/api/tours(?<remainder>/.*)?, /api/v1/tours${remainder}
             - name: CircuitBreaker
               args:
                 name: tourCB

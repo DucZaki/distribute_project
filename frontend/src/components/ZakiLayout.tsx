@@ -122,8 +122,87 @@ export function ZakiLayout() {
           <button type="button" className="btn p-0 border-0 ms-1" id="darkModeToggle" style={{ background: 'none', fontSize: '1.2rem' }}>
             🌙
           </button>
+          <button
+            className="btn btn-dark rounded-circle d-lg-none mobile-menu-toggle"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#mobileMenu"
+            aria-controls="mobileMenu"
+            aria-label="Mở menu"
+          >
+            <i className="bi bi-list fs-5" />
+          </button>
         </div>
       </nav>
+
+      <div className="offcanvas offcanvas-end mobile-menu-panel" tabIndex={-1} id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div className="offcanvas-header">
+          <div className="d-flex align-items-center gap-2">
+            <img src="/favicon.icon" alt="ZakiBooking" height={38} className="rounded-3" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            <div>
+              <h5 className="offcanvas-title fw-bold mb-0" id="mobileMenuLabel">
+                ZakiBooking
+              </h5>
+              <small className="text-muted">Đặt tour nhanh hơn trên điện thoại</small>
+            </div>
+          </div>
+          <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng" />
+        </div>
+        <div className="offcanvas-body">
+          <div className="mobile-menu-section">
+            <Link to="/tour" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+              <i className="bi bi-compass" />
+              <span>Tất cả tour</span>
+            </Link>
+            <Link to="/tin-tuc" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+              <i className="bi bi-newspaper" />
+              <span>Tin tức</span>
+            </Link>
+            <Link to="/contact" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+              <i className="bi bi-headset" />
+              <span>Liên hệ hỗ trợ</span>
+            </Link>
+          </div>
+          <div className="mobile-menu-section">
+            <div className="mobile-menu-title">Điểm đến phổ biến</div>
+            <div className="mobile-destination-grid">
+              {['Sapa', 'Hạ Long', 'Đà Nẵng', 'Huế', 'Thái Lan', 'Hàn Quốc'].map((c) => (
+                <Link key={c} to={`/tour?thanhPho=${encodeURIComponent(c)}`} data-bs-dismiss="offcanvas">
+                  {c}
+                </Link>
+              ))}
+            </div>
+          </div>
+          {isAuthenticated && (
+            <div className="mobile-menu-section">
+              <div className="mobile-menu-title">Tài khoản</div>
+              <Link to="/user/profile" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+                <i className="bi bi-person" />
+                <span>Hồ sơ cá nhân</span>
+              </Link>
+              <Link to="/user/bookings" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+                <i className="bi bi-luggage" />
+                <span>Đơn đặt chỗ</span>
+              </Link>
+              <Link to="/favorites/my-favorites" className="mobile-menu-link" data-bs-dismiss="offcanvas">
+                <i className="bi bi-bookmark-heart" />
+                <span>Tour yêu thích</span>
+              </Link>
+            </div>
+          )}
+          <div className="d-grid gap-2 mt-4">
+            {!isAuthenticated ? (
+              <Link to="/login" className="btn btn-primary rounded-pill py-3 fw-bold" data-bs-dismiss="offcanvas">
+                Đăng nhập để đặt tour
+              </Link>
+            ) : (
+              <button type="button" className="btn btn-outline-danger rounded-pill py-3 fw-bold w-100" onClick={logout}>
+                Đăng xuất
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
       <div className={`nav-search-dropdown${searchOpen ? ' show' : ''}`} id="navSearchPanel" aria-hidden={!searchOpen}>
         <div className="nav-search-dropdown-inner">
@@ -159,7 +238,7 @@ export function ZakiLayout() {
           </form>
         </div>
       </div>
-      {searchOpen && <div className="nav-search-scrim show" onClick={() => setSearchOpen(false)} aria-hidden />}
+      <div className={`nav-search-scrim${searchOpen ? ' show' : ''}`} onClick={() => setSearchOpen(false)} aria-hidden />
 
       <main className="pt-5 mt-4">
         <Outlet />

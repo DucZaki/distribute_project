@@ -44,7 +44,10 @@ export interface TourSummary {
   gia: number
   hinhAnh?: string
   ngayKhoiHanh?: string
+  noiBat?: boolean
   diemDen?: DiemDenSummary
+  phuongTien?: { id: number; ten: string; loai?: string }
+  diemDon?: { id: number; ten: string; diaChi?: string; thanhPho?: string }
 }
 
 export interface NgayKhoiHanhDto {

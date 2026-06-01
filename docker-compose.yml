@@ -6,6 +6,7 @@ services:
   mysql:
     image: mysql:8.4
     container_name: bt-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: bookingtour
@@ -137,7 +138,7 @@ services:
       EUREKA_URL: http://discovery:8761/eureka/
       CONFIG_SERVER_URL: http://config:8888
       ZIPKIN_URL: http://zipkin:9411/api/v2/spans
-      DB_URL: jdbc:mysql://mysql:3306/bookingtour_identity?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_identity?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       DB_USER: root
       DB_PASS: root
       JWT_SECRET: bookingtour-super-secret-key-change-in-prod-min-256-bits-required-aaaa
@@ -153,7 +154,7 @@ services:
       EUREKA_URL: http://discovery:8761/eureka/
       CONFIG_SERVER_URL: http://config:8888
       ZIPKIN_URL: http://zipkin:9411/api/v2/spans
-      DB_URL: jdbc:mysql://mysql:3306/bookingtour_tour?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_tour?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       DB_USER: root
       DB_PASS: root
       REDIS_HOST: redis
@@ -170,7 +171,7 @@ services:
       EUREKA_URL: http://discovery:8761/eureka/
       CONFIG_SERVER_URL: http://config:8888
       ZIPKIN_URL: http://zipkin:9411/api/v2/spans
-      DB_URL: jdbc:mysql://mysql:3306/bookingtour_booking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_booking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       DB_USER: root
       DB_PASS: root
       KAFKA_BOOTSTRAP: kafka:29092
@@ -187,7 +188,7 @@ services:
       EUREKA_URL: http://discovery:8761/eureka/
       CONFIG_SERVER_URL: http://config:8888
       ZIPKIN_URL: http://zipkin:9411/api/v2/spans
-      DB_URL: jdbc:mysql://mysql:3306/bookingtour_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       DB_USER: root
       DB_PASS: root
       KAFKA_BOOTSTRAP: kafka:29092
@@ -225,7 +226,7 @@ services:
       EUREKA_URL: http://discovery:8761/eureka/
       CONFIG_SERVER_URL: http://config:8888
       ZIPKIN_URL: http://zipkin:9411/api/v2/spans
-      DB_URL: jdbc:mysql://mysql:3306/bookingtour_review?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/bookingtour_review?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
       DB_USER: root
       DB_PASS: root
     depends_on:

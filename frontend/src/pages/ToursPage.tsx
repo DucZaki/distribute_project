@@ -41,7 +41,7 @@ export function ToursPage() {
       })
       .catch(() => setTours([]))
       .finally(() => setLoading(false))
-  }, [params])
+  }, [params, diemDen, ngayDi, khoangGia, sort, page])
 
   function applyFilter(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -55,102 +55,183 @@ export function ToursPage() {
     setParams(next)
   }
 
+  function goPage(p: number) {
+    const next = new URLSearchParams(params)
+    next.set('page', String(p))
+    setParams(next)
+  }
+
   return (
-    <section className="container mt-5 pt-4 bg-white">
-      <h2 className="fw-bold mb-4 text-black">Danh sách Điểm Đến</h2>
+    <>
+      <section className="container mt-5 pt-4 bg-white tour-list-heading">
+        <h2 className="fw-bold mb-2 text-black">Danh sách Điểm Đến</h2>
+        <p className="text-muted mb-0 d-md-none">Lọc nhanh, chọn tour phù hợp và đặt chỉ trong vài bước.</p>
+      </section>
+
       <div className="container mb-5 bg-light">
-        <div className="row align-items-start">
-          <section className="bg-light py-5 w-100">
-            <div className="container">
-              <div className="row align-items-start">
-                <div className="col-md-3 border-end bg-white p-4 rounded shadow-sm filters-panel">
-                  <h6 className="fw-bold mb-3">BỘ LỌC TÌM KIẾM</h6>
-                  <form onSubmit={applyFilter}>
-                    <div className="mb-3">
-                      <label className="form-label">Điểm đến</label>
-                      <select className="form-select select-premium" name="diemDen" defaultValue={diemDen}>
-                        <option value="">-- Tất cả điểm đến --</option>
-                        {DEST_OPTIONS.map((d) => (
-                          <option key={d} value={d}>{d}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Ngày đi (từ)</label>
-                      <input className="form-control zaki-date" name="ngayDi" defaultValue={ngayDi} placeholder="dd/mm/yyyy" />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Khoảng giá</label>
-                      <select className="form-select select-premium" name="khoangGia" defaultValue={khoangGia}>
-                        <option value="">-- Tất cả --</option>
-                        <option value="DUOI5">Dưới 5 triệu</option>
-                        <option value="5_10">5 - 10 triệu</option>
-                        <option value="TREN10">Trên 10 triệu</option>
-                      </select>
-                    </div>
-                    <button type="submit" className="btn btn-warning fw-bold w-100">Áp dụng</button>
-                  </form>
-                </div>
-                <div className="col-md-9">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <p className="mb-0">Tìm thấy <strong>{total}</strong> tour phù hợp</p>
-                    <select
-                      className="form-select w-auto select-premium"
-                      value={sort}
-                      onChange={(e) => {
-                        const next = new URLSearchParams(params)
-                        if (e.target.value) next.set('sort', e.target.value)
-                        else next.delete('sort')
-                        setParams(next)
-                      }}
-                    >
-                      <option value="">Tất cả</option>
-                      <option value="priceAsc">Giá tăng dần</option>
-                      <option value="priceDesc">Giá giảm dần</option>
+        <section className="bg-light py-5">
+          <div className="container">
+            <div className="mobile-filter-shell d-md-none mb-3">
+              <button
+                className="btn btn-primary w-100 fw-bold mobile-filter-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#tourFilters"
+                aria-expanded="false"
+                aria-controls="tourFilters"
+              >
+                <i className="bi bi-sliders me-2" />
+                Lọc tour phù hợp
+              </button>
+            </div>
+
+            <div className="row align-items-start">
+              <div
+                className="col-md-3 border-end bg-white p-4 rounded shadow-sm filters-panel collapse d-md-block"
+                id="tourFilters"
+              >
+                <h6 className="fw-bold mb-3">BỘ LỌC TÌM KIẾM</h6>
+                <form onSubmit={applyFilter}>
+                  <div className="mb-3">
+                    <label className="form-label">Điểm đến</label>
+                    <select className="form-select select-premium" name="diemDen" defaultValue={diemDen}>
+                      <option value="">-- Tất cả điểm đến --</option>
+                      {DEST_OPTIONS.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
                     </select>
                   </div>
-                  {loading && <p className="text-muted">Đang tải...</p>}
-                  {!loading && tours.length === 0 && (
-                    <div className="alert alert-info text-center p-5 rounded shadow-sm">
-                      <h5 className="fw-bold mb-2">Tạm thời không có chuyến đi nào tồn tại</h5>
-                      <p className="mb-0 text-muted">Vui lòng thử lại với điểm đến hoặc khoảng giá khác</p>
-                    </div>
-                  )}
-                  {tours.map((ds) => (
-                    <div key={ds.id} className="d-flex border rounded mb-3 shadow-sm bg-white flex-wrap">
-                      <img src={imageUrl(ds.hinhAnh)} alt="" style={{ width: 260, height: 210, objectFit: 'cover' }} className="rounded" />
-                      <div className="p-3 flex-grow-1">
-                        <h5 className="fw-bold">{ds.tieuDe}</h5>
-                        <p className="mb-1">Mã tour: <strong>{formatTourCode(ds.id)}</strong></p>
-                        <p className="mb-1">{ds.diemDen?.ten ?? 'Tour du lịch'}</p>
-                        <p className="text-danger fw-bold">{formatVnd(ds.gia)}</p>
+                  <div className="mb-3">
+                    <label className="form-label">Ngày đi (từ)</label>
+                    <input
+                      className="form-control zaki-date"
+                      name="ngayDi"
+                      defaultValue={ngayDi}
+                      placeholder="dd/mm/yyyy"
+                      inputMode="numeric"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Khoảng giá</label>
+                    <select className="form-select select-premium" name="khoangGia" defaultValue={khoangGia}>
+                      <option value="">-- Tất cả --</option>
+                      <option value="DUOI5">Dưới 5 triệu</option>
+                      <option value="5_10">5 - 10 triệu</option>
+                      <option value="TREN10">Trên 10 triệu</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="btn btn-warning fw-bold w-100">
+                    Áp dụng
+                  </button>
+                </form>
+              </div>
+
+              <div className="col-md-9">
+                <div className="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center mb-3">
+                  <p className="mb-0">
+                    Tìm thấy <strong>{loading ? '…' : total}</strong> tour phù hợp
+                  </p>
+                  <select
+                    className="form-select w-100 w-md-auto select-premium"
+                    value={sort}
+                    onChange={(e) => {
+                      const next = new URLSearchParams(params)
+                      if (e.target.value) next.set('sort', e.target.value)
+                      else next.delete('sort')
+                      setParams(next)
+                    }}
+                  >
+                    <option value="">Tất cả</option>
+                    <option value="priceAsc">Giá tăng dần</option>
+                    <option value="priceDesc">Giá giảm dần</option>
+                  </select>
+                </div>
+
+                {loading && (
+                  <p className="text-muted">
+                    <span className="spinner-border spinner-border-sm me-2" />
+                    Đang tải tour...
+                  </p>
+                )}
+
+                {!loading && tours.length === 0 && (
+                  <div className="alert alert-info text-center p-5 rounded shadow-sm">
+                    <h5 className="fw-bold mb-2">Tạm thời không có chuyến đi nào tồn tại</h5>
+                    <p className="mb-0 text-muted">Vui lòng thử lại với điểm đến hoặc khoảng giá khác</p>
+                  </div>
+                )}
+
+                {!loading &&
+                  tours.map((ds) => (
+                    <div
+                      key={ds.id}
+                      className="d-flex border rounded mb-3 shadow-sm tour-list-card overflow-hidden position-relative"
+                    >
+                      <div className="tour-list-card-media flex-shrink-0">
+                        <img
+                          src={imageUrl(ds.hinhAnh ?? ds.diemDen?.hinhAnh)}
+                          className="tour-list-card-img"
+                          alt={ds.tieuDe}
+                        />
+                        {ds.noiBat && (
+                          <span className="badge bg-danger tour-list-hot-badge">
+                            <i className="bi bi-fire me-1" />
+                            HOT TOUR
+                          </span>
+                        )}
                       </div>
-                      <div className="d-flex align-items-center px-3 pb-3 pb-md-0">
-                        <Link to={`/tour/${ds.id}`} className="btn btn-outline-primary">Xem chi tiết</Link>
+                      <div className="p-3 flex-grow-1 tour-list-card-info min-w-0">
+                        <h5 className="fw-bold mb-2 tour-list-card-title">
+                          <Link to={`/tour/${ds.id}`} className="text-decoration-none">
+                            {ds.tieuDe}
+                          </Link>
+                        </h5>
+                        <p className="mb-1 text-muted">
+                          Mã tour: <strong className="text-body">{formatTourCode(ds.id)}</strong>
+                        </p>
+                        <p className="mb-2 text-muted">
+                          Phương tiện: <span>{ds.phuongTien?.loai ?? '—'}</span>
+                          <span className="mx-1">|</span>
+                          Khởi hành: <span>{ds.diemDon?.ten ?? '—'}</span>
+                        </p>
+                        <p className="text-danger fw-bold fs-5 mb-0">{formatVnd(ds.gia)}</p>
+                      </div>
+                      <div className="d-flex align-items-center px-3 tour-list-card-action flex-shrink-0">
+                        <Link to={`/tour/${ds.id}`} className="btn btn-primary fw-bold px-4">
+                          Xem chi tiết
+                        </Link>
                       </div>
                     </div>
                   ))}
-                  {totalPages > 1 && (
-                    <ul className="pagination zaki-pagination justify-content-center mt-4">
-                      <li className={`page-item${page <= 0 ? ' disabled' : ''}`}>
-                        <button type="button" className="page-link" onClick={() => { const n = new URLSearchParams(params); n.set('page', String(page - 1)); setParams(n) }}>&laquo;</button>
+
+                {totalPages > 1 && (
+                  <ul className="pagination zaki-pagination justify-content-center mt-4">
+                    <li className={`page-item${page <= 0 ? ' disabled' : ''}`}>
+                      <button type="button" className="page-link" onClick={() => goPage(page - 1)}>
+                        &laquo;
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <li key={i} className={`page-item${i === page ? ' active' : ''}`}>
+                        <button type="button" className="page-link" onClick={() => goPage(i)}>
+                          {i + 1}
+                        </button>
                       </li>
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <li key={i} className={`page-item${i === page ? ' active' : ''}`}>
-                          <button type="button" className="page-link" onClick={() => { const n = new URLSearchParams(params); n.set('page', String(i)); setParams(n) }}>{i + 1}</button>
-                        </li>
-                      ))}
-                      <li className={`page-item${page >= totalPages - 1 ? ' disabled' : ''}`}>
-                        <button type="button" className="page-link" onClick={() => { const n = new URLSearchParams(params); n.set('page', String(page + 1)); setParams(n) }}>&raquo;</button>
-                      </li>
-                    </ul>
-                  )}
-                </div>
+                    ))}
+                    <li className={`page-item${page >= totalPages - 1 ? ' disabled' : ''}`}>
+                      <button type="button" className="page-link" onClick={() => goPage(page + 1)}>
+                        &raquo;
+                      </button>
+                    </li>
+                  </ul>
+                )}
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
-    </section>
+    </>
   )
 }

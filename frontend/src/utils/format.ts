@@ -10,6 +10,7 @@ export function imageUrl(path?: string) {
   if (!path) return FALLBACK
   if (path.startsWith('http')) return path
   if (path.startsWith('/')) return path
+  if (path.startsWith('anh/')) return `/${path}`
   return FALLBACK
 }
 

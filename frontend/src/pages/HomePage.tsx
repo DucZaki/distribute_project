@@ -176,15 +176,15 @@ export function HomePage() {
             {destinations.map((dd) => (
               <div key={dd.id} className="col-md-4">
                 <Link to={`/tour?diemDen=${encodeURIComponent(dd.ten)}`} className="text-decoration-none">
-                  <div className="card h-100 group">
+                  <div className="card h-100 group border-0 shadow-sm">
                     <div className="img-zoom" style={{ height: 300 }}>
-                      <img src={imageUrl(dd.hinhAnh)} className="w-100 h-100 object-cover" alt="" />
+                      <img src={imageUrl(dd.hinhAnh)} className="w-100 h-100 object-cover" alt={dd.ten} />
                       <div
                         className="card-img-overlay d-flex flex-column justify-content-end p-4"
                         style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)' }}
                       >
                         <h4 className="text-white fw-bold mb-1">{dd.ten}</h4>
-                        <p className="text-white-50 mb-0 fs-7">{dd.vungMien}</p>
+                        <p className="text-white-50 mb-0 small">{dd.vungMien}</p>
                       </div>
                     </div>
                   </div>
@@ -201,9 +201,14 @@ export function HomePage() {
           <div className="row g-4">
             {tours.map((ds) => (
               <div key={ds.id} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden group">
                   <div className="img-zoom">
-                    <img src={imageUrl(ds.hinhAnh)} className="card-img-top" alt="" style={{ width: '100%', height: 250, objectFit: 'cover' }} />
+                    <img
+                      src={imageUrl(ds.hinhAnh ?? ds.diemDen?.hinhAnh)}
+                      className="card-img-top"
+                      alt={ds.tieuDe}
+                      style={{ width: '100%', height: 250, objectFit: 'cover' }}
+                    />
                   </div>
                   <div className="card-body">
                     <h5 className="card-title fw-bold">{ds.tieuDe}</h5>

@@ -63,13 +63,29 @@ export function TourDetailPage() {
           <p className="text-muted small">Mã: {formatTourCode(tour.id)} · {tour.diemDen?.ten}</p>
           <hr />
           <div className="row g-2 tour-gallery mb-4">
-            <div className="col-12 tour-gallery-main">
-              <img src={imageUrl(tour.hinhAnh)} className="img-fluid rounded w-100" alt="" style={{ maxHeight: 420, objectFit: 'cover' }} />
+            <div className="col-3 d-none d-md-flex flex-column justify-content-start tour-gallery-thumbs">
+              {[tour.hinhAnh, tour.diemDen?.hinhAnh].filter(Boolean).slice(0, 3).map((src, i) => (
+                <img
+                  key={i}
+                  src={imageUrl(src)}
+                  className="img-fluid rounded mb-2 border"
+                  alt=""
+                  style={{ height: 90, objectFit: 'cover' }}
+                />
+              ))}
+            </div>
+            <div className="col-md-9 col-12 tour-gallery-main">
+              <img
+                src={imageUrl(tour.hinhAnh ?? tour.diemDen?.hinhAnh)}
+                className="img-fluid rounded w-100"
+                alt={tour.tieuDe}
+                style={{ maxHeight: 420, objectFit: 'cover' }}
+              />
             </div>
           </div>
 
           {tour.highlight && <p className="fw-semibold text-primary">{tour.highlight}</p>}
-          <p>{tour.moTa}</p>
+          <p className="text-muted">{tour.moTa}</p>
 
           <div className="card-header bg-white border-0 ps-0 mt-4">
             <h2 className="h5 fw-bold">LỊCH KHỞI HÀNH</h2>
