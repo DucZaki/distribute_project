@@ -16,7 +16,8 @@
 - `common-lib` owns shared DTOs, JWT helpers, exception handling, security header constants, and Kafka event records/topics.
 - `api-gateway` rewrites public `/api/auth/**` and GET `/api/tours/**`; protected routes use `JwtAuthenticationFilter` and forwarded user headers.
 - Booking/payment confirmation is event-driven with Kafka topics in `common-lib` (`booking.created`, `payment.succeeded`, `payment.failed`, `booking.confirmed`).
-- Flyway migrations live inside each service; demo tour data is in `tour-service/src/main/resources/db/migration/V2__seed_data.sql`.
+- Flyway migrations live inside each service; seed data (`V2__`, `V3/V4__import_*.sql`) — không dùng Python/shell import.
+- Frontend: React + TypeScript only (`frontend/src/`); legacy `public/js/*.js` đã bỏ khỏi `index.html`.
 - `config-server` reads `config-repo/` and is secured with basic auth configured in its `application.yml`/security config.
 
 ## Cross-Service Contracts

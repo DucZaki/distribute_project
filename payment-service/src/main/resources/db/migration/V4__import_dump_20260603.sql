@@ -1,0 +1,25 @@
+-- Flyway V4: seed from scripts/data/monolith-full-dump.sql
+-- Synthetic payments for CONFIRMED bookings from monolith dump
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+DELETE FROM payment;
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (1, 1, 1, 0, 'VND', 'VNPAY', 'IMP00000001', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (3, 3, 3, 0, 'VND', 'VNPAY', 'IMP00000003', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (4, 4, 4, 0, 'VND', 'VNPAY', 'IMP00000004', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (5, 5, 5, 0, 'VND', 'VNPAY', 'IMP00000005', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (6, 6, 6, 0, 'VND', 'VNPAY', 'IMP00000006', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (7, 7, 7, 0, 'VND', 'VNPAY', 'IMP00000007', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (9, 9, 1, 0, 'VND', 'VNPAY', 'IMP00000009', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (10, 10, 2, 0, 'VND', 'VNPAY', 'IMP00000010', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (11, 11, 3, 0, 'VND', 'VNPAY', 'IMP00000011', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (12, 12, 5, 0, 'VND', 'VNPAY', 'IMP00000012', 'SUCCESS', NULL, NULL);
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (25, 25, 9, 5600000, 'VND', 'VNPAY', 'IMP00000025', 'SUCCESS', '2026-03-05 22:47:37.905667', '2026-03-05 22:47:37.905667');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (26, 26, 9, 5600000, 'VND', 'VNPAY', 'IMP00000026', 'SUCCESS', '2026-03-05 23:06:08.798173', '2026-03-05 23:06:08.798173');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (27, 27, 9, 2800000, 'VND', 'VNPAY', 'IMP00000027', 'SUCCESS', '2026-03-05 23:09:39.958195', '2026-03-05 23:09:39.958195');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (28, 28, 4, 5108000, 'VND', 'VNPAY', 'IMP00000028', 'SUCCESS', '2026-03-05 23:43:21.104281', '2026-03-05 23:43:21.104281');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (30, 30, 9, 18000000, 'VND', 'VNPAY', 'IMP00000030', 'SUCCESS', '2026-03-05 23:58:04.781565', '2026-03-05 23:58:04.781565');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (35, 35, 9, 2800000, 'VND', 'VNPAY', 'IMP00000035', 'SUCCESS', '2026-03-11 10:43:58.032799', '2026-03-11 10:43:58.032799');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (36, 36, 9, 2100000, 'VND', 'VNPAY', 'IMP00000036', 'SUCCESS', '2026-03-11 11:21:08.213231', '2026-03-11 11:21:08.213231');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (38, 38, 9, 9000000, 'VND', 'VNPAY', 'IMP00000038', 'SUCCESS', '2026-03-12 14:04:01.818842', '2026-03-12 14:04:01.818842');
+INSERT INTO payment (id, booking_id, user_id, amount, currency, provider, txn_ref, status, created_at, paid_at) VALUES (39, 39, 22, 8400000, 'VND', 'VNPAY', 'IMP00000039', 'SUCCESS', '2026-03-12 14:08:10.166306', '2026-03-12 14:08:10.166306');
+SET FOREIGN_KEY_CHECKS = 1;

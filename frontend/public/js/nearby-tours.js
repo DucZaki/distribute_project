@@ -168,8 +168,9 @@
         currentPage = Number(params.page || 0);
 
         var qs = new URLSearchParams(params);
-        fetch('/api/tour/nearby?' + qs.toString())
+        fetch('/api/tours/nearby?' + qs.toString())
             .then(function (res) { return res.json(); })
+            .then(function (body) { return body.data != null ? body.data : body; })
             .then(renderTours)
             .catch(function () {
                 setStatus('Không tải được danh sách tour. Thử chọn thành phố bên cạnh hoặc bấm thử lại.', true);

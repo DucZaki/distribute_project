@@ -701,10 +701,10 @@ export function TourDetailPage() {
           </div>
 
           <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h3 className="h5 fw-bold mb-0">LICH TRINH</h3>
+            <h3 className="h5 fw-bold mb-0">LỊCH TRÌNH</h3>
             {!!tour.lichTrinhs?.length && (
               <button type="button" className="btn btn-primary btn-view-itinerary" onClick={openItineraryModal}>
-                <i className="bi bi-map me-1" /> Xem lich trinh chi tiet
+                <i className="bi bi-map me-1" /> Xem lịch trình chi tiết
               </button>
             )}
           </div>
@@ -712,11 +712,11 @@ export function TourDetailPage() {
           {!tour.lichTrinhs?.length ? (
             <div className="text-center py-5 schedule-empty">
               <i className="bi bi-calendar-x fs-1 mb-3" />
-              <p className="mb-0">Tam thoi chua co lich trinh cho chuyen di nay</p>
+              <p className="mb-0">Tạm thời chưa có lịch trình cho chuyến đi này</p>
             </div>
           ) : (
             <>
-              <p className="text-muted small mb-3">Tour <strong>{tour.lichTrinhs.length} ngay</strong> · Bam nut ben tren de xem day du</p>
+              <p className="text-muted small mb-3">Tour <strong>{tour.lichTrinhs.length} ngày</strong> · Bấm nút bên trên để xem đầy đủ</p>
               <div className="itinerary-preview">
                 {tour.lichTrinhs.slice(0, 3).map((lich) => (
                   <div key={lich.ngayThu} className="itinerary-preview-item">
@@ -740,7 +740,7 @@ export function TourDetailPage() {
             <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
               <div className="modal-content border-0 rounded-4 shadow-lg">
                 <div className="modal-header border-0 pb-0">
-                  <h5 className="modal-title fw-bold">Lich trinh</h5>
+                  <h5 className="modal-title fw-bold">Lịch trình — {tour.tieuDe}</h5>
                   <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Dong" />
                 </div>
                 <div className="modal-body pt-2 pb-4">

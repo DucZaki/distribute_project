@@ -11,6 +11,8 @@ spring:
       discovery:
         locator:
           enabled: false
+      httpclient:
+        response-timeout: 60s
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       routes:
@@ -21,6 +23,14 @@ spring:
             - Path=/api/auth/**
           filters:
             - RewritePath=/api/auth/(?<seg>.*), /api/v1/auth/${seg}
+
+        # PUBLIC: OAuth2 login (Google / Facebook)
+        - id: identity-oauth
+          uri: lb://identity-service
+          predicates:
+            - Path=/oauth2/**,/login/oauth2/**,/api/oauth2/**
+          filters:
+            - RewritePath=/api/oauth2/(?<seg>.*), /oauth2/${seg}
 
         # PUBLIC: promo validate (during booking, before full auth)
         - id: booking-promo-public
@@ -130,7 +140,7 @@ spring:
         - id: integration
           uri: lb://integration-service
           predicates:
-            - Path=/api/news/**, /api/flights/**, /api/chat/**
+            - Path=/api/news,/api/news/**,/api/flights,/api/flights/**,/api/chat,/api/chat/**
           filters:
             - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
 

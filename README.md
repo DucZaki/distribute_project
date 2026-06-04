@@ -128,10 +128,8 @@ Compensation:
 cp .env.example .env
 # Điền VNPay/Mail credentials vào .env
 
-# Build maven trước (Docker chỉ copy jar)
+# Build Maven trước (Docker chỉ copy jar)
 ./mvnw -DskipTests clean package
-# hoặc
-bash scripts/build-all.sh
 
 docker compose up -d
 
@@ -145,9 +143,8 @@ docker compose logs -f gateway booking
 # Hạ tầng dùng Docker
 docker compose up -d mysql redis kafka zipkin zookeeper prometheus grafana
 
-# Khởi động Java services lần lượt
-bash scripts/start-local.sh
-# Hoặc Run cấu hình IntelliJ từng module
+# Khởi động Java services lần lượt (IDE hoặc từng module):
+# discovery-server → config-server → domain services → api-gateway
 ```
 
 Thứ tự khởi động: `discovery-server` → `config-server` → các service domain → `api-gateway` → `frontend`.
@@ -249,10 +246,10 @@ distribute_project/
 │   ├── prometheus/
 │   └── grafana/
 └── scripts/
-    ├── build-all.sh
-    ├── start-local.sh
-    └── init-databases.sql
+    └── init-databases.sql    # MySQL schemas (docker init)
 ```
+
+Dữ liệu demo/monolith: **Flyway** trong từng service (`V2__seed_data.sql`, `V3/V4__import_*.sql`) — chỉ Java, không script Python/shell.
 
 ## Tài khoản mặc định (sau khi seed)
 

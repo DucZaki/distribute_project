@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -26,6 +27,13 @@ public class IntegrationController {
         return newsClient.topHeadlines(country, category).map(ApiResponse::ok);
     }
 
+    /** Tin du lịch — dùng NewsAPI /everything (trang /tin-tuc). */
+    @GetMapping("/news/latest")
+    public Mono<ApiResponse<Map<String, Object>>> newsLatest(
+            @RequestParam(required = false) String q) {
+        return newsClient.searchLatest(q).map(ApiResponse::ok);
+    }
+
     @GetMapping("/flights/search")
     public Mono<ApiResponse<Map>> flights(
             @RequestParam String origin,
@@ -33,6 +41,20 @@ public class IntegrationController {
             @RequestParam String date,
             @RequestParam(defaultValue = "1") int adults) {
         return amadeusClient.searchFlights(origin, destination, date, adults).map(ApiResponse::ok);
+    }
+
+    /** Vé máy bay rẻ nhất — dùng khi đặt tour / flight-quote (blocking, tránh async timeout MVC). */
+    @GetMapping("/flights/cheapest")
+    public ApiResponse<Map<String, Object>> cheapestFlight(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam String date) {
+        var offer = amadeusClient.getCheapestFlight(origin, destination, date)
+                .block(Duration.ofSeconds(35));
+        if (offer == null) {
+            return ApiResponse.ok(Map.of("available", false, "fallback", true));
+        }
+        return ApiResponse.ok(offer.toMap());
     }
 
     @PostMapping("/chat")

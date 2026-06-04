@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
+import { ThemeProvider } from './theme/ThemeContext'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { ZakiLayout } from './components/ZakiLayout'
 import { AdminLayout } from './components/admin/AdminLayout'
@@ -35,6 +36,7 @@ import { ToursPage } from './pages/ToursPage'
 
 export default function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -91,5 +93,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </ThemeProvider>
   )
 }

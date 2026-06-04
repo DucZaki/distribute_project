@@ -12,6 +12,7 @@ public interface TourMapper {
 
     @Mapping(target = "phuongTien", source = "phuongTien")
     @Mapping(target = "noiLuuTru", source = "noiLuuTru")
+    @Mapping(target = "lichTrinhs", ignore = true)
     TourResponse toResponse(ChuyenDi entity);
 
     @Mapping(target = "diemDen", source = "diemDen")
@@ -45,5 +46,14 @@ public interface TourMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "chuyenDi", ignore = true)
+    @Mapping(target = "moTa", ignore = true)
+    @Mapping(target = "noiDung", expression = "java(resolveNoiDung(dto))")
     LichTrinh fromLichTrinhDto(LichTrinhDto dto);
+
+    default String resolveNoiDung(LichTrinhDto dto) {
+        if (dto.getNoiDungLines() != null && !dto.getNoiDungLines().isEmpty()) {
+            return String.join("\n", dto.getNoiDungLines());
+        }
+        return dto.getMoTa();
+    }
 }

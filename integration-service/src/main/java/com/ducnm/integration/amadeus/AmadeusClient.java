@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -35,7 +36,10 @@ public class AmadeusClient {
     private String cachedToken;
     private Instant tokenExpiresAt = Instant.EPOCH;
 
-    private synchronized Mono<String> token() {
+    private Mono<String> token() {
+        if (clientId == null || clientId.isBlank() || clientSecret == null || clientSecret.isBlank()) {
+            return Mono.error(new IllegalStateException("Amadeus chưa được cấu hình"));
+        }
         if (cachedToken != null && Instant.now().isBefore(tokenExpiresAt.minusSeconds(60))) {
             return Mono.just(cachedToken);
         }
@@ -67,9 +71,95 @@ public class AmadeusClient {
                 .bodyToMono(Map.class));
     }
 
+    @CircuitBreaker(name = "amadeus", fallbackMethod = "cheapestFallback")
+    public Mono<AmadeusFlightOffer> getCheapestFlight(String origin, String destination, String date) {
+        return token().flatMap(tk -> builder.build().get()
+                        .uri(baseUrl + "/v2/shopping/flight-offers?originLocationCode={o}&destinationLocationCode={d}"
+                                + "&departureDate={dt}&adults=1&currencyCode=VND&max=1",
+                                origin, destination, date)
+                        .header("Authorization", "Bearer " + tk)
+                        .retrieve()
+                        .bodyToMono(Map.class))
+                .map(this::parseCheapest)
+                .onErrorResume(e -> {
+                    log.warn("Amadeus cheapest {}-{} {}: {}", origin, destination, date, e.getMessage());
+                    return Mono.just(unavailable(true));
+                });
+    }
+
+    @SuppressWarnings("unchecked")
+    private AmadeusFlightOffer parseCheapest(Map response) {
+        if (response == null) {
+            return unavailable(true);
+        }
+        Object dataObj = response.get("data");
+        if (!(dataObj instanceof List<?> data) || data.isEmpty()) {
+            return unavailable(Boolean.TRUE.equals(response.get("fallback")));
+        }
+        Map<String, Object> offer = (Map<String, Object>) data.get(0);
+        double price = 0;
+        Object priceObj = offer.get("price");
+        if (priceObj instanceof Map<?, ?> priceMap) {
+            Object total = priceMap.get("grandTotal");
+            if (total != null) {
+                price = Double.parseDouble(String.valueOf(total));
+            }
+        }
+        String airline = "";
+        String flightNumber = "";
+        String departureTime = "";
+        String arrivalTime = "";
+        Object itineraries = offer.get("itineraries");
+        if (itineraries instanceof List<?> itinList && !itinList.isEmpty()) {
+            Map<String, Object> itin = (Map<String, Object>) itinList.get(0);
+            Object segments = itin.get("segments");
+            if (segments instanceof List<?> segList && !segList.isEmpty()) {
+                Map<String, Object> seg = (Map<String, Object>) segList.get(0);
+                airline = String.valueOf(seg.getOrDefault("carrierCode", ""));
+                flightNumber = airline + seg.getOrDefault("number", "");
+                Object dep = seg.get("departure");
+                if (dep instanceof Map<?, ?> depRaw) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> depMap = (Map<String, Object>) depRaw;
+                    departureTime = String.valueOf(depMap.getOrDefault("at", ""));
+                }
+                Object arr = seg.get("arrival");
+                if (arr instanceof Map<?, ?> arrRaw) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> arrMap = (Map<String, Object>) arrRaw;
+                    arrivalTime = String.valueOf(arrMap.getOrDefault("at", ""));
+                }
+            }
+        }
+        return AmadeusFlightOffer.builder()
+                .available(price > 0)
+                .price(price)
+                .airline(airline)
+                .flightNumber(flightNumber)
+                .departureTime(departureTime)
+                .arrivalTime(arrivalTime)
+                .currency("VND")
+                .fallback(false)
+                .build();
+    }
+
+    private static AmadeusFlightOffer unavailable(boolean fallback) {
+        return AmadeusFlightOffer.builder()
+                .available(false)
+                .price(0)
+                .fallback(fallback)
+                .build();
+    }
+
     @SuppressWarnings("unused")
     private Mono<Map> searchFallback(String origin, String destination, String date, int adults, Throwable e) {
         log.warn("Amadeus fallback: {}", e.getMessage());
-        return Mono.just(Map.of("data", java.util.List.of(), "fallback", true));
+        return Mono.just(Map.of("data", List.of(), "fallback", true));
+    }
+
+    @SuppressWarnings("unused")
+    private Mono<AmadeusFlightOffer> cheapestFallback(String origin, String destination, String date, Throwable e) {
+        log.warn("Amadeus cheapest fallback: {}", e.getMessage());
+        return Mono.just(unavailable(true));
     }
 }

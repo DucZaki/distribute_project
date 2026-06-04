@@ -2,11 +2,15 @@ package com.ducnm.tour.service;
 
 import com.ducnm.common.dto.PageResponse;
 import com.ducnm.common.exception.BusinessException;
+import com.ducnm.tour.dto.NearbyToursResponse;
+import com.ducnm.tour.dto.NearbyToursResponse.NearbyTourItem;
 import com.ducnm.tour.dto.TourDtos.*;
 import com.ducnm.tour.entity.*;
 import com.ducnm.tour.mapper.TourMapper;
 import com.ducnm.tour.repository.*;
 import com.ducnm.tour.specification.ChuyenDiSpecification;
+import com.ducnm.tour.util.CityCoordinates;
+import com.ducnm.tour.util.GeoUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,9 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,14 +36,23 @@ public class TourService {
     private final DiemDonRepository diemDonRepo;
     private final PhuongTienRepository phuongTienRepo;
     private final NoiLuuTruRepository noiLuuTruRepo;
+    private final NgayKhoiHanhRepository ngayKhoiHanhRepo;
     private final TourMapper mapper;
+    private final LichTrinhPresenter lichTrinhPresenter;
 
     @Cacheable(value = "tours", key = "#id")
     @Transactional(readOnly = true)
     public TourResponse getById(Integer id) {
-        ChuyenDi tour = chuyenDiRepo.findById(id)
+        ChuyenDi tour = chuyenDiRepo.findDetailedById(id)
                 .orElseThrow(() -> BusinessException.notFound("Tour", id));
-        return mapper.toResponse(tour);
+        TourResponse response = mapper.toResponse(tour);
+        response.setLichTrinhs(lichTrinhPresenter.toDtos(tour.getLichTrinhs()));
+        List<NgayKhoiHanh> bookable = ngayKhoiHanhRepo.findByChuyenDi_IdAndTrangThai(id, "ACTIVE").stream()
+                .filter(n -> !n.getNgayKhoiHanh().isBefore(LocalDate.now()))
+                .sorted(Comparator.comparing(NgayKhoiHanh::getNgayKhoiHanh))
+                .toList();
+        response.setNgayKhoiHanhs(mapper.toNgayDtos(bookable));
+        return response;
     }
 
     @Cacheable(value = "tours-featured")
@@ -110,6 +123,170 @@ public class TourService {
 
         log.info("Created tour id={} title={}", saved.getId(), saved.getTieuDe());
         return mapper.toResponse(saved);
+    }
+
+    /**
+     * Tour có điểm đón gần vị trí user — giống monolith {@code TourService#findNearbyTours}.
+     */
+    @Transactional(readOnly = true)
+    public NearbyToursResponse findNearbyTours(
+            Double lat, Double lng, String city, double radiusKm, int limit, int page) {
+        int safeLimit = Math.max(1, Math.min(limit, 20));
+        int safePage = Math.max(0, page);
+
+        NearbyToursResponse.NearbyToursResponseBuilder result = NearbyToursResponse.builder()
+                .tours(List.of())
+                .inRange(false)
+                .page(safePage)
+                .limit(safeLimit)
+                .total(0)
+                .totalPages(0)
+                .hasPrev(false)
+                .hasNext(false)
+                .count(0);
+
+        if (lat == null || lng == null) {
+            if (city == null || city.isBlank()) {
+                return result.message("Thiếu vị trí").build();
+            }
+            Optional<double[]> coords = CityCoordinates.resolve(city);
+            if (coords.isEmpty()) {
+                return result.message("Chưa hỗ trợ thành phố này").build();
+            }
+            lat = coords.get()[0];
+            lng = coords.get()[1];
+        }
+
+        List<DiemDon> diemDons = diemDonRepo.findAll();
+        if (diemDons.isEmpty()) {
+            return result.message("Chưa có điểm đón").build();
+        }
+
+        final double userLat = lat;
+        final double userLng = lng;
+
+        record RankedDon(DiemDon diemDon, double distanceKm) {
+        }
+
+        List<RankedDon> ranked = diemDons.stream()
+                .map(d -> CityCoordinates.resolve(d.getTen())
+                        .map(c -> new RankedDon(d, GeoUtils.haversineKm(userLat, userLng, c[0], c[1])))
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingDouble(RankedDon::distanceKm))
+                .toList();
+
+        if (ranked.isEmpty()) {
+            return result.message("Chưa có tọa độ cho điểm đón").build();
+        }
+
+        RankedDon nearest = ranked.get(0);
+        double nearestDist = nearest.distanceKm();
+
+        result.nearestDepartureCity(nearest.diemDon().getTen())
+                .nearestDistanceKm(roundKm(nearestDist))
+                .radiusKm(radiusKm);
+
+        if (nearestDist > radiusKm) {
+            return result.message(
+                            "Không có điểm xuất phát tour trong bán kính " + (int) radiusKm + " km quanh bạn.")
+                    .build();
+        }
+
+        result.departureCity(nearest.diemDon().getTen())
+                .distanceKm(roundKm(nearestDist))
+                .inRange(true);
+
+        List<Integer> inRangeDonIds = ranked.stream()
+                .filter(r -> r.distanceKm() <= radiusKm)
+                .map(r -> r.diemDon().getId())
+                .distinct()
+                .toList();
+
+        List<ChuyenDi> tours = inRangeDonIds.isEmpty()
+                ? List.of()
+                : chuyenDiRepo.findByDiemDonIdsAndBookable(inRangeDonIds, LocalDate.now());
+
+        List<NearbyTourItem> allItems = tours.stream()
+                .map(t -> toNearbyItem(t, userLat, userLng, nearestDist))
+                .sorted(Comparator.comparingDouble(NearbyTourItem::getDistanceKm))
+                .collect(Collectors.toList());
+
+        int total = allItems.size();
+        int totalPages = (int) Math.ceil(total / (double) safeLimit);
+        if (totalPages > 0 && safePage > totalPages - 1) {
+            safePage = totalPages - 1;
+        }
+        int from = safePage * safeLimit;
+        int to = Math.min(from + safeLimit, total);
+        List<NearbyTourItem> pageItems =
+                (from >= 0 && from < to) ? allItems.subList(from, to) : List.of();
+
+        NearbyToursResponse built = result.page(safePage)
+                .limit(safeLimit)
+                .total(total)
+                .totalPages(totalPages)
+                .hasPrev(safePage > 0)
+                .hasNext(safePage + 1 < totalPages)
+                .tours(pageItems)
+                .count(pageItems.size())
+                .build();
+
+        if (pageItems.isEmpty()) {
+            built.setMessage(
+                    "Chưa có tour khả dụng xuất phát từ " + nearest.diemDon().getTen()
+                            + " trong bán kính " + (int) radiusKm + " km.");
+        }
+        return built;
+    }
+
+    private NearbyTourItem toNearbyItem(ChuyenDi t, double userLat, double userLng, double fallbackDist) {
+        String nearestDep = null;
+        double best = Double.MAX_VALUE;
+        Set<DiemDon> dons = t.getDiemDons() != null ? t.getDiemDons() : Set.of();
+        if (t.getDiemDonDefault() != null) {
+            dons = new HashSet<>(dons);
+            dons.add(t.getDiemDonDefault());
+        }
+        for (DiemDon d : dons) {
+            Optional<double[]> dc = CityCoordinates.resolve(d.getTen());
+            if (dc.isEmpty()) {
+                continue;
+            }
+            double dist = GeoUtils.haversineKm(userLat, userLng, dc.get()[0], dc.get()[1]);
+            if (dist < best) {
+                best = dist;
+                nearestDep = d.getTen();
+            }
+        }
+        if (nearestDep == null) {
+            nearestDep = resolveTourDepartureCity(t).orElse(null);
+            best = CityCoordinates.resolve(nearestDep)
+                    .map(c -> GeoUtils.haversineKm(userLat, userLng, c[0], c[1]))
+                    .orElse(fallbackDist);
+        }
+        String diemDen = t.getDiemDen() != null ? t.getDiemDen().getTen() : null;
+        return NearbyTourItem.builder()
+                .id(t.getId())
+                .tieuDe(t.getTieuDe())
+                .gia(t.getGia())
+                .hinhAnh(t.getHinhAnh())
+                .diemDon(nearestDep)
+                .diemDen(diemDen)
+                .distanceKm(roundKm(best))
+                .build();
+    }
+
+    private Optional<String> resolveTourDepartureCity(ChuyenDi tour) {
+        if (tour.getDiemDonDefault() != null && tour.getDiemDonDefault().getTen() != null
+                && !tour.getDiemDonDefault().getTen().isBlank()) {
+            return Optional.of(tour.getDiemDonDefault().getTen());
+        }
+        return CityCoordinates.inferDepartureFromText(tour.getTieuDe());
+    }
+
+    private static double roundKm(double km) {
+        return Math.round(km * 10.0) / 10.0;
     }
 
     @CacheEvict(value = {"tours", "tours-featured"}, allEntries = true)

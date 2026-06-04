@@ -27,8 +27,13 @@ spring:
     baseline-on-migrate: true
     locations: classpath:db/migration
 
-# OAuth2 Google login: set GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET as env vars to enable
-# (Spring relaxed-binding picks SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID automatically)
+spring.security.oauth2.client.registration.google.client-id: ${GOOGLE_CLIENT_ID:disabled}
+spring.security.oauth2.client.registration.google.client-secret: ${GOOGLE_CLIENT_SECRET:disabled}
+spring.security.oauth2.client.registration.google.scope: email,profile
+spring.security.oauth2.client.registration.facebook.client-id: ${FACEBOOK_CLIENT_ID:disabled}
+spring.security.oauth2.client.registration.facebook.client-secret: ${FACEBOOK_CLIENT_SECRET:disabled}
+spring.security.oauth2.client.registration.facebook.scope: public_profile,email
+spring.security.oauth2.client.provider.facebook.user-info-uri: https://graph.facebook.com/me?fields=id,name,email
 
 eureka:
   client:
@@ -38,6 +43,8 @@ eureka:
     prefer-ip-address: true
 
 app:
+  oauth:
+    frontend-redirect: ${OAUTH_FRONTEND_REDIRECT:http://localhost:5173/oauth/callback}
   jwt:
     secret: ${JWT_SECRET:bookingtour-super-secret-key-change-in-prod-min-256-bits-required-aaaa}
     access-token-expiration-ms: 3600000

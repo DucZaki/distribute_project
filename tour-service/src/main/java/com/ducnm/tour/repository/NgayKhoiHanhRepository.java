@@ -17,6 +17,8 @@ public interface NgayKhoiHanhRepository extends JpaRepository<NgayKhoiHanh, Inte
 
     Optional<NgayKhoiHanh> findByIdAndTrangThai(Integer id, String trangThai);
 
+    Optional<NgayKhoiHanh> findByIdAndChuyenDi_Id(Integer id, Integer chuyenDiId);
+
     /**
      * Atomic seat reservation. Returns 1 if reservation succeeded, 0 if no seats / inactive.
      * Used via Feign by booking-service to prevent overbooking.

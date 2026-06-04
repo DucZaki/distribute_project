@@ -3,12 +3,13 @@ package com.ducnm.review.controller;
 import com.ducnm.common.dto.ApiResponse;
 import com.ducnm.common.dto.PageResponse;
 import com.ducnm.common.util.SecurityHeaders;
+import com.ducnm.review.dto.ReviewDtos.ReviewResponse;
 import com.ducnm.review.entity.DanhGia;
 import com.ducnm.review.repository.DanhGiaRepository;
+import com.ducnm.review.service.ReviewQueryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -21,21 +22,14 @@ import java.util.Map;
 public class ReviewController {
 
     private final DanhGiaRepository repo;
+    private final ReviewQueryService reviewQueryService;
 
     @GetMapping("/tour/{tourId}")
-    public ApiResponse<PageResponse<DanhGia>> list(@PathVariable Integer tourId,
-                                                    @RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "10") int size) {
-        Page<DanhGia> p = repo.findByIdChuyenDi(tourId,
-                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
-        return ApiResponse.ok(PageResponse.<DanhGia>builder()
-                .content(p.getContent())
-                .page(p.getNumber())
-                .size(p.getSize())
-                .totalElements(p.getTotalElements())
-                .totalPages(p.getTotalPages())
-                .last(p.isLast())
-                .build());
+    public ApiResponse<PageResponse<ReviewResponse>> list(@PathVariable Integer tourId,
+                                                            @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok(reviewQueryService.listByTour(
+                tourId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @GetMapping("/tour/{tourId}/summary")

@@ -28,6 +28,13 @@ spring:
   cache:
     type: redis
 
+feign:
+  client:
+    config:
+      integration-service:
+        connectTimeout: 5000
+        readTimeout: 90000
+
 eureka:
   client:
     service-url:

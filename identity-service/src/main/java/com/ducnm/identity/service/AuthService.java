@@ -81,6 +81,16 @@ public class AuthService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public TokenResponse tokensForUsername(String tenDangNhap) {
+        NguoiDung user = repo.findByTenDangNhap(tenDangNhap)
+                .orElseThrow(() -> BusinessException.unauthorized("Người dùng OAuth không tồn tại"));
+        if (Boolean.FALSE.equals(user.getEnabled())) {
+            throw BusinessException.forbidden("Tài khoản đã bị vô hiệu hoá");
+        }
+        return issueTokens(user);
+    }
+
     private TokenResponse issueTokens(NguoiDung user) {
         Map<String, Object> claims = Map.of(
                 "uid", user.getId(),

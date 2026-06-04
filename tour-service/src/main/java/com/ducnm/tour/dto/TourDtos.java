@@ -125,8 +125,12 @@ public class TourDtos {
         private Integer ngayThu;
         @NotBlank
         private String tieuDe;
+        private String soBuaAn;
+        private String hoatDongChinh;
         private String moTa;
+        private String nghiDem;
         private String hinhAnh;
+        private List<String> noiDungLines;
     }
 
     @Data

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getFeaturedDestinations, getFeaturedTours, getNearbyTours } from '../api/tours'
+import { getFeaturedDestinations, getFeaturedTours } from '../api/tours'
+import { NearbyToursSection } from '../components/NearbyToursSection'
 import { getTourReviews } from '../api/reviews'
 import type { DiemDenSummary, ReviewItem, TourSummary } from '../types/api'
 import { formatVnd, imageUrl } from '../utils/format'
@@ -10,10 +11,6 @@ export function HomePage() {
   const [tours, setTours] = useState<TourSummary[]>([])
   const [destinations, setDestinations] = useState<DiemDenSummary[]>([])
   const [reviews, setReviews] = useState<ReviewItem[]>([])
-  const [nearbyTours, setNearbyTours] = useState<TourSummary[]>([])
-  const [nearbyStatus, setNearbyStatus] = useState('Chọn thành phố hoặc dùng vị trí của bạn')
-  const [nearbyCity, setNearbyCity] = useState('')
-
   useEffect(() => {
     getFeaturedTours().then((r) => {
       setTours(r.data ?? [])
@@ -24,40 +21,6 @@ export function HomePage() {
     })
     getFeaturedDestinations().then((r) => setDestinations(r.data ?? []))
   }, [])
-
-  function loadNearby(city: string) {
-    if (!city) return
-    setNearbyStatus('Đang tải tour...')
-    getNearbyTours({ city, size: 6 })
-      .then((r) => {
-        setNearbyTours(r.data.content ?? [])
-        setNearbyStatus(
-          r.data.content?.length
-            ? `Gợi ý tour xuất phát từ ${city}`
-            : `Chưa có tour khởi hành từ ${city}`,
-        )
-      })
-      .catch(() => setNearbyStatus('Không tải được tour gần bạn'))
-  }
-
-  function useMyLocation() {
-    if (!navigator.geolocation) {
-      loadNearby(nearbyCity || 'Hà Nội')
-      return
-    }
-    setNearbyStatus('Đang lấy vị trí...')
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        getNearbyTours({ lat: pos.coords.latitude, lng: pos.coords.longitude, city: nearbyCity || undefined, radiusKm: 100, size: 6 })
-          .then((r) => {
-            setNearbyTours(r.data.content ?? [])
-            setNearbyStatus(r.data.content?.length ? 'Gợi ý tour gần vị trí của bạn' : 'Chưa có tour gần vị trí của bạn')
-          })
-          .catch(() => setNearbyStatus('Không tải được tour gần bạn'))
-      },
-      () => loadNearby(nearbyCity || 'Hà Nội'),
-    )
-  }
 
   return (
     <section>
@@ -116,55 +79,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="py-5 bg-white" id="nearbyToursSection">
-        <div className="container">
-          <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-            <div>
-              <h6 className="text-primary fw-bold text-uppercase ls-wide">Gần bạn</h6>
-              <h2 className="fw-800 mb-0" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
-                Chuyến đi gần bạn
-              </h2>
-              <p className="text-muted mb-0 mt-2">Tour khởi hành từ điểm đón gần vị trí hiện tại của bạn</p>
-            </div>
-            <div className="d-flex flex-wrap align-items-center gap-2">
-              <select
-                className="form-select"
-                style={{ minWidth: 180 }}
-                value={nearbyCity}
-                onChange={(e) => setNearbyCity(e.target.value)}
-              >
-                <option value="">Hoặc chọn thành phố</option>
-                <option value="Hà Nội">Hà Nội</option>
-                <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-                <option value="Đà Nẵng">Đà Nẵng</option>
-              </select>
-              <button type="button" className="btn btn-outline-primary" onClick={() => loadNearby(nearbyCity || 'Hà Nội')}>
-                Tìm theo thành phố
-              </button>
-              <button type="button" className="btn btn-outline-primary" onClick={useMyLocation}>
-                <i className="bi bi-crosshair" /> Dùng vị trí của tôi
-              </button>
-            </div>
-          </div>
-          <div className="nearby-status mb-4 text-muted">{nearbyStatus}</div>
-          <div className="row g-4">
-            {nearbyTours.map((t) => (
-              <div key={t.id} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-                  <img src={imageUrl(t.hinhAnh)} alt="" style={{ height: 200, objectFit: 'cover', width: '100%' }} />
-                  <div className="card-body">
-                    <h5 className="fw-bold">{t.tieuDe}</h5>
-                    <p className="text-danger fw-bold">{formatVnd(t.gia)}</p>
-                    <Link to={`/tour/${t.id}`} className="btn btn-primary rounded-pill btn-sm">
-                      Xem chi tiết
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <NearbyToursSection />
 
       <section className="py-5">
         <div className="container">

@@ -66,6 +66,19 @@ h6 {
     font-size: 1.4rem;
     color: var(--bs-dark) !important;
     padding: 0;
+    flex-shrink: 0;
+}
+
+.premium-nav-dock .nav-brand-logo {
+    height: 76px;
+    width: auto;
+    max-width: min(280px, 42vw);
+    object-fit: contain;
+    display: block;
+}
+
+.premium-nav-dock.scrolled .nav-brand-logo {
+    height: 64px;
 }
 
 .premium-nav-dock .nav-link {
@@ -646,7 +659,7 @@ footer {
     background-color: #FECF2F !important;
     color: #000000 !important;
     border-color: #FECF2F !important;
-    font-weight: 40px;
+    font-weight: 700 !important;
 }
 
 .btn-outline-primary:hover {
@@ -1785,8 +1798,13 @@ a:hover {
         border-radius: 24px;
     }
 
-    .premium-nav-dock .navbar-brand img {
-        height: 42px;
+    .premium-nav-dock .nav-brand-logo {
+        height: 58px;
+        max-width: 200px;
+    }
+
+    .premium-nav-dock.scrolled .nav-brand-logo {
+        height: 52px;
     }
 
     .premium-nav-dock .btn.rounded-pill {
@@ -2133,8 +2151,13 @@ a:hover {
         border-radius: 22px;
     }
 
-    .premium-nav-dock .navbar-brand img {
-        height: 32px;
+    .premium-nav-dock .nav-brand-logo {
+        height: 46px;
+        max-width: 160px;
+    }
+
+    .premium-nav-dock.scrolled .nav-brand-logo {
+        height: 42px;
     }
 
     .premium-nav-dock > .d-flex:last-child {

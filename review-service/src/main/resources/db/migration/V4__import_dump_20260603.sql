@@ -1,0 +1,34 @@
+-- Flyway V4: seed from scripts/data/monolith-full-dump.sql
+-- Imported from monolith dump
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+DELETE FROM danh_gia;
+DELETE FROM yeu_thich;
+DELETE FROM contact;
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (1, 1, 1, 5, 'Chuyến đi rất tuyệt vời, hướng dẫn viên nhiệt tình.', '2025-01-03 03:15:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (2, 1, 2, 4, 'Khá hài lòng, nhưng khách sạn hơi xa trung tâm.', '2025-01-05 07:20:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (3, 2, 3, 5, 'Dịch vụ tốt, phong cảnh đẹp.', '2025-01-10 02:45:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (4, 2, 4, 3, 'Ổn nhưng lịch trình hơi dày.', '2025-01-11 09:30:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (5, 3, 1, 4, 'Giá hợp lý, đi vui.', '2025-01-15 01:00:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (6, 3, 5, 2, 'Không đúng mô tả, hơi thất vọng.', '2025-01-16 12:10:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (7, 4, 2, 5, 'Quá tuyệt! Mọi thứ hoàn hảo.', '2025-01-18 06:25:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (8, 4, 3, 4, 'Tour ổn, thời tiết đẹp.', '2025-01-19 04:55:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (9, 5, 4, 5, 'Hướng dẫn viên thân thiện, ăn uống ngon.', '2025-01-20 10:40:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (10, 5, 5, 3, 'Cũng được, hơi đông người.', '2025-01-21 13:15:00');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (11, 1, 9, 2, 'hay', '2026-03-03 08:29:12');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (12, 2, 9, 5, 'okrn', '2026-03-16 23:20:29');
+INSERT INTO danh_gia (id, id_chuyen_di, id_nguoi_dung, diem, noi_dung, created_at) VALUES (13, 3, 9, 5, 'tốt', '2026-03-17 00:23:30');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (1, 1, 2, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (2, 1, 6, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (3, 2, 1, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (4, 3, 9, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (5, 5, 6, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (6, 7, 5, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (7, 8, 12, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (8, 2, 14, '2025-10-13 15:42:35');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (11, 9, 2, '2026-01-16 00:58:36');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (14, 1, 4, '2026-01-28 03:22:08');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (16, 9, 1, '2026-03-03 03:25:59');
+INSERT INTO yeu_thich (id, id_nguoi_dung, id_chuyen_di, created_at) VALUES (17, 4, 1, '2026-03-05 09:47:31');
+INSERT INTO contact (id, ho_ten, email, so_dien_thoai, tieu_de, noi_dung, trang_thai, created_at) VALUES (1, 'Nguyễn minh đức', 'minhd4360@gmail.com', 0866147595, 'Trợ giúp cách di chuyển', 'thắc mắc cách di chuyển đến điểm đón cần giải thíchrn', 'READ', '2026-03-11 11:54:15.915214');
+SET FOREIGN_KEY_CHECKS = 1;

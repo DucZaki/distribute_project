@@ -24,9 +24,23 @@ public class LichTrinh {
     @Column(name = "ngay_thu", nullable = false)
     private Integer ngayThu;
 
+    /** Tuyến / điểm đến trong ngày */
     @Column(name = "tieu_de", length = 255)
     private String tieuDe;
 
+    @Column(name = "so_bua_an", length = 255)
+    private String soBuaAn;
+
+    @Column(name = "hoat_dong_chinh", length = 500)
+    private String hoatDongChinh;
+
+    @Column(name = "noi_dung", columnDefinition = "TEXT")
+    private String noiDung;
+
+    @Column(name = "nghi_dem", length = 255)
+    private String nghiDem;
+
+    /** Legacy import — ưu tiên noi_dung khi map ra API */
     @Column(name = "mo_ta", columnDefinition = "TEXT")
     private String moTa;
 

@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: integration-service
+  mvc:
+    async:
+      request-timeout: 90s
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   data:
@@ -30,9 +33,14 @@ amadeus:
   base-url: ${AMADEUS_BASE_URL:https://test.api.amadeus.com}
 
 chat:
-  openai-key: ${OPENAI_API_KEY:}
-  model: ${OPENAI_MODEL:gpt-4o-mini}
-  base-url: https://api.openai.com/v1
+  groq-key: ${GROQ_API_KEY:}
+  groq-url: ${GROQ_API_URL:https://api.groq.com/openai/v1/chat/completions}
+  groq-model: ${GROQ_MODEL:llama-3.1-8b-instant}
+  openrouter-key: ${OPENROUTER_API_KEY:}
+  openrouter-url: ${OPENROUTER_API_URL:https://openrouter.ai/api/v1/chat/completions}
+  openrouter-model: ${OPENROUTER_MODEL:google/gemini-2.0-flash-exp:free}
+  gemini-key: ${GEMINI_API_KEY:}
+  gemini-model: ${GEMINI_MODEL:gemini-2.0-flash}
 
 resilience4j:
   circuitbreaker:
