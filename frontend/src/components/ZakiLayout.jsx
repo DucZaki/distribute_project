@@ -124,16 +124,33 @@ function ZakiLayout() {
         </div>
       </nav>
 
-      {searchOpen && (
-        <div className="container nav-search-panel">
-          <form className="row g-2 bg-white shadow-sm rounded-4 p-3" onSubmit={navSearch}>
-            <div className="col-md-5"><input className="form-control" name="diemDen" placeholder="Bạn muốn đi đâu?" /></div>
-            <div className="col-md-3"><input className="form-control" name="ngayDi" placeholder="Ngày đi" /></div>
-            <div className="col-md-3"><input className="form-control" name="khoangGia" placeholder="Khoảng giá" /></div>
-            <div className="col-md-1 d-grid"><button className="btn btn-primary" type="submit">Tìm</button></div>
+      {/* Scrim Backdrop */}
+      <div className={`nav-search-scrim ${searchOpen ? "open" : ""}`} onClick={() => setSearchOpen(false)} />
+
+      {/* Search Panel Dropdown */}
+      <div className={`nav-search-dropdown ${searchOpen ? "open" : ""}`}>
+        <div className="nav-search-dropdown-inner">
+          <form className="row g-2 search-card--nav" onSubmit={navSearch}>
+            <div className="col-md-5">
+              <input className="form-control" name="diemDen" placeholder="Bạn muốn đi đâu?" />
+            </div>
+            <div className="col-md-3">
+              <input className="form-control" name="ngayDi" placeholder="Ngày đi" />
+            </div>
+            <div className="col-md-3">
+              <select className="form-select" name="khoangGia" defaultValue="">
+                <option value="">Tất cả mức giá</option>
+                <option value="DUOI5">Dưới 5 triệu</option>
+                <option value="5_10">5 - 10 triệu</option>
+                <option value="TREN10">Trên 10 triệu</option>
+              </select>
+            </div>
+            <div className="col-md-1 d-grid">
+              <button className="btn btn-primary" type="submit">Tìm</button>
+            </div>
           </form>
         </div>
-      )}
+      </div>
 
       <div className="offcanvas offcanvas-end mobile-menu-panel" tabIndex={-1} id="mobileMenu" aria-labelledby="mobileMenuLabel">
         <div className="offcanvas-header">

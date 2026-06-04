@@ -1,3 +1,27 @@
+export type ApiResponse<T> = {
+  success: boolean
+  message?: string
+  data?: T
+  error?: unknown
+  timestamp?: string
+}
+
+export type PageResponse<T> = {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+}
+
+export type UserSummary = {
+  id: number
+  email?: string
+  hoTen?: string
+  vaiTro?: string
+  anhDaiDien?: string
+}
+
 export type ReviewItem = {
   id: number
   idChuyenDi: number

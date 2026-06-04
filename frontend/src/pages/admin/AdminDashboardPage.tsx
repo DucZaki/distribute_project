@@ -16,13 +16,6 @@ import {
 } from '../../api/adminDashboard'
 import { formatVnd } from '../../utils/format'
 
-declare global {
-  interface Window {
-    Chart: any
-    bootstrap: any
-  }
-}
-
 export function AdminDashboardPage() {
   const [kpis, setKpis] = useState<DashboardKpis | null>(null)
   const [years, setYears] = useState<number[]>([])
