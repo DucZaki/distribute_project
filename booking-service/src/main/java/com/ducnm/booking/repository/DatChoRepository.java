@@ -22,4 +22,10 @@ public interface DatChoRepository extends JpaRepository<DatCho, Integer> {
     Optional<DatCho> findByCheckInToken(@Param("ma") String ma);
 
     long countByIdChuyenDi(Integer idChuyenDi);
+
+    @Query("""
+            SELECT COALESCE(SUM(d.soLuong), 0) FROM DatCho d
+            WHERE d.idChuyenDi = :tourId AND d.trangThai <> 'CANCELLED'
+            """)
+    long sumSoLuongByIdChuyenDi(@Param("tourId") Integer tourId);
 }

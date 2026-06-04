@@ -18,5 +18,6 @@ public class ReviewDtos {
         private Integer diem;
         private String noiDung;
         private LocalDateTime createdAt;
+        private String tourTitle;
     }
 }

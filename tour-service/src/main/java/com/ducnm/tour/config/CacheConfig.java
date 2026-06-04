@@ -36,7 +36,7 @@ public class CacheConfig {
 
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(cfg)
-                .withCacheConfiguration("tours-featured", cfg.entryTtl(Duration.ofMinutes(30)))
+                .withCacheConfiguration("tours-featured-v2", cfg.entryTtl(Duration.ofMinutes(2)))
                 .build();
     }
 }

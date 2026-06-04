@@ -63,6 +63,15 @@ spring:
           filters:
             - RewritePath=/api/reviews/(?<seg>.*), /api/v1/reviews/${seg}
 
+        # PUBLIC: danh sách tất cả đánh giá (trang chủ)
+        - id: review-public-list
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews
+            - Method=GET
+          filters:
+            - RewritePath=/api/reviews, /api/v1/reviews
+
         # PUBLIC: contact form submit
         - id: contact-public
           uri: lb://review-service

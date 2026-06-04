@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getNearbyTours } from '../api/tours'
+import { TourCardStats } from './TourCardStats'
 import { formatVnd, imageUrl } from '../utils/format'
 
 const NEARBY_RADIUS_KM = 100
@@ -14,6 +15,10 @@ export interface NearbyTourCard {
   diemDon?: string
   diemDen?: string
   distanceKm?: number
+  noiBat?: boolean
+  averageRating?: number
+  ratingCount?: number
+  bookingCount?: number
 }
 
 export interface NearbyToursPayload {
@@ -49,16 +54,12 @@ export function NearbyToursSection() {
     '<span class="spinner-border spinner-border-sm me-2"></span>Đang lấy vị trí...',
   )
   const [statusError, setStatusError] = useState(false)
-  const [tours, setTours] = useState<NearbyTourCard[]>([])
-  const [pagination, setPagination] = useState<{
-    page: number
-    totalPages: number
-    hasPrev: boolean
-    hasNext: boolean
-  } | null>(null)
+  const [allTours, setAllTours] = useState<NearbyTourCard[]>([])
+  const [currentPage, setCurrentPage] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   const currentParams = useRef<LoadParams>({})
-  const currentPage = useRef(0)
 
   const setStatus = useCallback((html: string, isError = false) => {
     setStatusHtml(html)
@@ -67,6 +68,7 @@ export function NearbyToursSection() {
 
   const renderTours = useCallback(
     (data: NearbyToursPayload) => {
+      setLoading(false)
       const list = data.tours ?? []
 
       if (data.inRange === false) {
@@ -75,8 +77,8 @@ export function NearbyToursSection() {
           farMsg += ` Điểm xuất phát gần nhất: <strong>${data.nearestDepartureCity}</strong> (~${data.nearestDistanceKm} km).`
         }
         setStatus(farMsg, false)
-        setTours([])
-        setPagination(null)
+        setAllTours([])
+        setCurrentPage(0)
         return
       }
 
@@ -86,30 +88,18 @@ export function NearbyToursSection() {
             `Chưa có tour khởi hành từ <strong>${data.departureCity || 'khu vực của bạn'}</strong>.`,
           false,
         )
-        setTours([])
-        setPagination(null)
+        setAllTours([])
+        setCurrentPage(0)
         return
       }
 
       const city = data.departureCity || ''
       const dist = data.distanceKm != null ? ` (~${data.distanceKm} km)` : ''
       setStatus(`Gợi ý tour xuất phát từ <strong>${city}</strong>${dist}.`, false)
-      setTours(list)
-
-      const totalPages = Number(data.totalPages || 0)
-      const page = Number(data.page || 0)
-      if (totalPages > 1) {
-        setPagination({
-          page,
-          totalPages,
-          hasPrev: Boolean(data.hasPrev),
-          hasNext: Boolean(data.hasNext),
-        })
-      } else {
-        setPagination(null)
-      }
+      setAllTours(list)
+      setCurrentPage(0)
     },
-    [setStatus],
+    [setStatus, setLoading],
   )
 
   const loadNearby = useCallback(
@@ -118,28 +108,29 @@ export function NearbyToursSection() {
         '<span class="spinner-border spinner-border-sm me-2"></span>Đang tìm chuyến đi gần bạn...',
         false,
       )
-      setTours([])
-      setPagination(null)
+      setLoading(true)
+      setAllTours([])
+      setCurrentPage(0)
 
       const merged: LoadParams = {
         ...params,
         radiusKm: params.radiusKm ?? NEARBY_RADIUS_KM,
-        limit: params.limit ?? PAGE_LIMIT,
-        page: params.page ?? 0,
+        limit: 100, // Fetch up to 100 tours at once
+        page: 0,
       }
       currentParams.current = merged
-      currentPage.current = Number(merged.page ?? 0)
 
       getNearbyTours(merged)
         .then((data) => renderTours(data as NearbyToursPayload))
         .catch(() => {
+          setLoading(false)
           setStatus(
             'Không tải được danh sách tour. Thử chọn thành phố bên cạnh hoặc bấm thử lại.',
             true,
           )
         })
     },
-    [renderTours, setStatus],
+    [renderTours, setStatus, setLoading],
   )
 
   const requestGeolocation = useCallback(() => {
@@ -168,9 +159,22 @@ export function NearbyToursSection() {
   }, [requestGeolocation])
 
   function goPage(target: number) {
-    currentPage.current = target
-    loadNearby({ ...currentParams.current, page: target })
+    if (target === currentPage || isTransitioning || loading) return
+    setIsTransitioning(true)
+    setTimeout(() => {
+      setCurrentPage(target)
+      setIsTransitioning(false)
+    }, 200)
   }
+
+  const tours = allTours.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT)
+  const totalPages = Math.ceil(allTours.length / PAGE_LIMIT)
+  const pagination = totalPages > 1 ? {
+    page: currentPage,
+    totalPages,
+    hasPrev: currentPage > 0,
+    hasNext: currentPage < totalPages - 1,
+  } : null
 
   return (
     <section className="py-5 bg-white" id="nearbyToursSection">
@@ -218,12 +222,21 @@ export function NearbyToursSection() {
           dangerouslySetInnerHTML={{ __html: statusHtml }}
         />
 
-        <div className="row g-4" id="nearbyToursGrid">
+        <div
+          className="row g-4"
+          id="nearbyToursGrid"
+          style={{
+            opacity: isTransitioning || loading ? 0 : 1,
+            transform: isTransitioning || loading ? 'translateY(10px)' : 'translateY(0)',
+            transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
+            minHeight: tours.length > 0 ? '600px' : 'auto',
+          }}
+        >
           {tours.map((t) => {
             const diemDen = t.diemDen ? ` → ${t.diemDen}` : ''
             return (
               <div key={t.id} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden position-relative">
                   <div className="img-zoom">
                     <img
                       src={imageUrl(t.hinhAnh)}
@@ -231,8 +244,14 @@ export function NearbyToursSection() {
                       alt=""
                       style={{ width: '100%', height: 220, objectFit: 'cover' }}
                     />
+                    {t.noiBat && (
+                      <span className="badge bg-danger position-absolute top-0 start-0 m-2">
+                        <i className="bi bi-fire me-1" />
+                        HOT
+                      </span>
+                    )}
                   </div>
-                  <div className="card-body d-flex flex-column">
+                  <div className="card-body d-flex flex-column text-start">
                     {t.distanceKm != null && (
                       <span className="badge bg-light text-dark border mb-2 align-self-start">
                         <i className="bi bi-crosshair me-1" />
@@ -244,6 +263,11 @@ export function NearbyToursSection() {
                       {diemDen}
                     </span>
                     <h5 className="card-title fw-bold">{t.tieuDe || 'Tour'}</h5>
+                    <TourCardStats
+                      averageRating={t.averageRating}
+                      ratingCount={t.ratingCount}
+                      bookingCount={t.bookingCount}
+                    />
                     <p className="fw-bold text-danger fs-5 mb-3">{formatVnd(Number(t.gia ?? 0))}</p>
                     <Link
                       to={`/tour/${t.id}`}
@@ -261,31 +285,36 @@ export function NearbyToursSection() {
         {pagination && pagination.totalPages > 1 && (
           <div className="d-flex justify-content-center mt-4" id="nearbyToursPagination">
             <ul className="pagination zaki-pagination mb-0">
-              <li className={`page-item${!pagination.hasPrev ? ' disabled' : ''}`}>
+              <li className={`page-item${!pagination.hasPrev || loading || isTransitioning ? ' disabled' : ''}`}>
                 <button
                   type="button"
                   className="page-link"
-                  disabled={!pagination.hasPrev}
-                  onClick={() => pagination.hasPrev && goPage(pagination.page - 1)}
-                  aria-label="Previous"
+                  disabled={!pagination.hasPrev || loading || isTransitioning}
+                  onClick={() => pagination.hasPrev && !loading && !isTransitioning && goPage(pagination.page - 1)}
+                  aria-label="Trước"
                 >
                   ‹
                 </button>
               </li>
               {Array.from({ length: pagination.totalPages }, (_, i) => (
-                <li key={i} className={`page-item${i === pagination.page ? ' active' : ''}`}>
-                  <button type="button" className="page-link" onClick={() => goPage(i)}>
+                <li key={i} className={`page-item${i === pagination.page ? ' active' : ''}${loading || isTransitioning ? ' disabled' : ''}`}>
+                  <button
+                    type="button"
+                    className="page-link"
+                    disabled={loading || isTransitioning}
+                    onClick={() => !loading && !isTransitioning && goPage(i)}
+                  >
                     {i + 1}
                   </button>
                 </li>
               ))}
-              <li className={`page-item${!pagination.hasNext ? ' disabled' : ''}`}>
+              <li className={`page-item${!pagination.hasNext || loading || isTransitioning ? ' disabled' : ''}`}>
                 <button
                   type="button"
                   className="page-link"
-                  disabled={!pagination.hasNext}
-                  onClick={() => pagination.hasNext && goPage(pagination.page + 1)}
-                  aria-label="Next"
+                  disabled={!pagination.hasNext || loading || isTransitioning}
+                  onClick={() => pagination.hasNext && !loading && !isTransitioning && goPage(pagination.page + 1)}
+                  aria-label="Tiếp"
                 >
                   ›
                 </button>

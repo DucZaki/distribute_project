@@ -7,7 +7,7 @@ import { useAuth } from '../auth/AuthContext'
 import type { ReviewItem, TourDetail } from '../types/api'
 import { getThreeMonthTabs, resolveCalendarView } from '../utils/departureCalendar'
 import { formatTourCode } from '../utils/tourCode'
-import { formatVnd, imageUrl } from '../utils/format'
+import { formatCountCap99, formatVnd, imageUrl, transportLabel } from '../utils/format'
 
 function pad2(n: number) {
   return String(n).padStart(2, '0')
@@ -262,50 +262,50 @@ export function TourDetailPage() {
     const data: Record<string, { icon: string; title: string; items: [string, string, string][] }> = {
       plane: {
         icon: 'bi-airplane',
-        title: 'Luu y khi di may bay',
+        title: 'Lưu ý khi đi máy bay',
         items: [
-          ['🧳', 'Hanh ly xach tay', 'Toi da 7kg, kich thuoc khong qua 56x36x23cm.'],
-          ['📦', 'Hanh ly ky gui', 'Theo ve (thuong 20-23kg). Vuot phu thu theo hang.'],
-          ['⏱️', 'Co mat tai san bay', 'Noi dia truoc 60 phut, quoc te truoc 2-3 tieng.'],
-          ['🚫', 'Khong mang', 'Chat long >100ml vao cabin, vat sac nhon, bat lua gas.'],
-          ['📱', 'Check-in online', 'Mo truoc 24h, giup chon ghe va tiet kiem thoi gian.'],
-          ['🎒', 'Mang theo', 'Giay to con han, ve dien tu, thuoc ca nhan.'],
+          ['🧳', 'Hành lý xách tay', 'Tối đa 7kg, kích thước không quá 56x36x23cm.'],
+          ['📦', 'Hành lý ký gửi', 'Theo vé, thường 20-23kg. Vượt mức sẽ phụ thu theo hãng.'],
+          ['⏱️', 'Có mặt tại sân bay', 'Nội địa trước 60 phút, quốc tế trước 2-3 tiếng.'],
+          ['🚫', 'Không mang', 'Chất lỏng >100ml vào cabin, vật sắc nhọn, bật lửa gas.'],
+          ['📱', 'Check-in online', 'Mở trước 24h, giúp chọn ghế và tiết kiệm thời gian.'],
+          ['🎒', 'Mang theo', 'Giấy tờ còn hạn, vé điện tử, thuốc cá nhân.'],
         ],
       },
       bus: {
         icon: 'bi-bus-front',
-        title: 'Luu y khi di xe khach',
+        title: 'Lưu ý khi đi xe khách',
         items: [
-          ['🧳', 'Hanh ly', 'Chi mang do gon nhe, han che vali cong kenh tren xe.'],
-          ['⏱️', 'Dung gio', 'Co mat truoc 15-30 phut tranh bi bo chuyen.'],
-          ['🍬', 'Chong say xe', 'Uong thuoc truoc 30 phut, tranh an no truoc khi len xe.'],
-          ['💧', 'Giu nuoc', 'Mang theo nuoc uong va do an nhe cho hanh trinh dai.'],
-          ['🪟', 'Chon cho ngoi', 'Ngoi giua xe hoac phia truoc it xoc hon.'],
-          ['📵', 'Tuan thu', 'Giu y thuc va ton trong hanh khach khac.'],
+          ['🧳', 'Hành lý', 'Chỉ mang đồ gọn nhẹ, hạn chế vali cồng kềnh trên xe.'],
+          ['⏱️', 'Đúng giờ', 'Có mặt trước 15-30 phút để tránh bị lỡ chuyến.'],
+          ['🍬', 'Chống say xe', 'Uống thuốc trước 30 phút, tránh ăn no trước khi lên xe.'],
+          ['💧', 'Giữ nước', 'Mang theo nước uống và đồ ăn nhẹ cho hành trình dài.'],
+          ['🪟', 'Chọn chỗ ngồi', 'Ngồi giữa xe hoặc phía trước sẽ ít xóc hơn.'],
+          ['📵', 'Tuân thủ', 'Giữ ý thức và tôn trọng hành khách khác.'],
         ],
       },
       train: {
         icon: 'bi-train-front',
-        title: 'Luu y khi di tau hoa',
+        title: 'Lưu ý khi đi tàu hỏa',
         items: [
-          ['🎫', 'Ve tau', 'Luu ve dien tu, kiem tra so toa va so ghe.'],
-          ['⏱️', 'Dung gio', 'Co mat tai ga truoc 30 phut, tau khong cho.'],
-          ['🧳', 'Hanh ly', 'De hanh ly dung ke, tranh can loi di.'],
-          ['🍱', 'An uong', 'Co the mang do an, tranh mui nang trong toa.'],
-          ['🪪', 'Giay to', 'Mang giay to tuy than de doi chieu khi can.'],
-          ['🌙', 'Giuong nam', 'Mang do thoai mai neu di hanh trinh dai.'],
+          ['🎫', 'Vé tàu', 'Lưu vé điện tử, kiểm tra số toa và số ghế.'],
+          ['⏱️', 'Đúng giờ', 'Có mặt tại ga trước 30 phút, tàu không chờ.'],
+          ['🧳', 'Hành lý', 'Để hành lý đúng kệ, tránh cản lối đi.'],
+          ['🍱', 'Ăn uống', 'Có thể mang đồ ăn, tránh món nặng mùi trong toa.'],
+          ['🪪', 'Giấy tờ', 'Mang giấy tờ tùy thân để đối chiếu khi cần.'],
+          ['🌙', 'Giường nằm', 'Mang đồ thoải mái nếu đi hành trình dài.'],
         ],
       },
       ship: {
         icon: 'bi-tsunami',
-        title: 'Luu y khi di tau thuy/pha',
+        title: 'Lưu ý khi đi tàu thủy / phà',
         items: [
-          ['🧴', 'Thuoc say song', 'Uong truoc khi len tau 30 phut.'],
-          ['🦺', 'Ao phao', 'Quan sat vi tri ao phao va loi thoat hiem.'],
-          ['🧳', 'Hanh ly', 'Giu gon va co dinh de tranh truot nga.'],
-          ['⏱️', 'Dung gio', 'Co mat tai ben truoc 30 phut de lam thu tuc.'],
-          ['🌊', 'Thoi tiet', 'Theo doi du bao thoi tiet bien truoc chuyen di.'],
-          ['📵', 'An toan', 'Khong dung o dau tau, khong ngoi tren lan can.'],
+          ['🧴', 'Thuốc say sóng', 'Uống trước khi lên tàu 30 phút.'],
+          ['🦺', 'Áo phao', 'Quan sát vị trí áo phao và lối thoát hiểm.'],
+          ['🧳', 'Hành lý', 'Giữ gọn và cố định để tránh trượt ngã.'],
+          ['⏱️', 'Đúng giờ', 'Có mặt tại bến trước 30 phút để làm thủ tục.'],
+          ['🌊', 'Thời tiết', 'Theo dõi dự báo thời tiết biển trước chuyến đi.'],
+          ['📵', 'An toàn', 'Không đứng ở đầu tàu, không ngồi trên lan can.'],
         ],
       },
     }
@@ -340,7 +340,7 @@ export function TourDetailPage() {
       <div className="row" style={{ marginTop: 30 }}>
         <div className="col-lg-8">
           <h1 className="h4 fw-bold">{tour.tieuDe}</h1>
-          <p className="text-muted small">Ma tour: {formatTourCode(tour.id)} · {diemDenDisplay}</p>
+          <p className="text-muted small">Mã tour: {formatTourCode(tour.id)} · {diemDenDisplay}</p>
           <hr />
           <div className="row g-2 tour-gallery mb-4">
             <div className="col-3 d-none d-md-flex flex-column justify-content-start tour-gallery-thumbs">
@@ -462,14 +462,14 @@ export function TourDetailPage() {
               <div className="card border-0 shadow-sm">
                 <div className="card-header bg-primary text-white py-3">
                   <h5 className="mb-0 fw-bold">
-                    <i className={`bi ${transportIcon(transportKind)} me-2`} /> THONG TIN CHUYEN
+                    <i className={`bi ${transportIcon(transportKind)} me-2`} /> THÔNG TIN CHUYẾN
                   </h5>
                 </div>
                 <div className="card-body p-0">
                   <div className="p-4 border-bottom">
                     <div className="d-flex align-items-center mb-3">
-                      <span className="badge bg-success me-2 px-3 py-2">CHIEU DI</span>
-                      <span className="text-muted small">Ngay {selectedSchedule.ngayKhoiHanh}</span>
+                      <span className="badge bg-success me-2 px-3 py-2">CHIỀU ĐI</span>
+                      <span className="text-muted small">Ngày {selectedSchedule.ngayKhoiHanh}</span>
                     </div>
                     <div className="row align-items-center">
                       <div className="col-md-3 text-center">
@@ -482,7 +482,7 @@ export function TourDetailPage() {
                           <i className={`bi ${transportIconTimeline(transportKind)} text-primary mx-3 fs-5`} />
                           <hr className="flex-grow-1" />
                         </div>
-                        <div className="small text-muted">Ma: {selectedSchedule.maChuyenBayDi || 'N/A'}</div>
+                        <div className="small text-muted">Mã: {selectedSchedule.maChuyenBayDi || 'N/A'}</div>
                       </div>
                       <div className="col-md-3 text-center">
                         <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioDenDi || 'N/A'}</div>
@@ -496,8 +496,8 @@ export function TourDetailPage() {
 
                   <div className="p-4 border-bottom">
                     <div className="d-flex align-items-center mb-3">
-                      <span className="badge bg-info me-2 px-3 py-2">CHIEU VE</span>
-                      <span className="text-muted small">{selectedSchedule.ngayKetThuc ? `Ngay ${selectedSchedule.ngayKetThuc}` : 'Chua xac dinh'}</span>
+                      <span className="badge bg-info me-2 px-3 py-2">CHIỀU VỀ</span>
+                      <span className="text-muted small">{selectedSchedule.ngayKetThuc ? `Ngày ${selectedSchedule.ngayKetThuc}` : 'Chưa xác định'}</span>
                     </div>
                     <div className="row align-items-center">
                       <div className="col-md-3 text-center">
@@ -510,7 +510,7 @@ export function TourDetailPage() {
                           <i className={`bi ${transportIconTimeline(transportKind)} text-primary mx-3 fs-5`} style={transportKind === 'plane' ? { transform: 'scaleX(-1)' } : undefined} />
                           <hr className="flex-grow-1" />
                         </div>
-                        <div className="small text-muted">Ma: {selectedSchedule.maChuyenBayVe || 'N/A'}</div>
+                        <div className="small text-muted">Mã: {selectedSchedule.maChuyenBayVe || 'N/A'}</div>
                       </div>
                       <div className="col-md-3 text-center">
                         <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioDenVe || 'N/A'}</div>
@@ -524,7 +524,7 @@ export function TourDetailPage() {
 
                   <div className="p-4 bg-light">
                     <div className="d-flex justify-content-between align-items-center">
-                      <span className="fw-bold fs-6">TONG GIA VE</span>
+                      <span className="fw-bold fs-6">TỔNG GIÁ VÉ</span>
                       <span className="text-danger fw-bold fs-4">{formatVnd(ticketPrice)}</span>
                     </div>
                   </div>
@@ -537,14 +537,14 @@ export function TourDetailPage() {
             <div id="weatherForecastContainer" className="mt-4 rounded border shadow-sm overflow-hidden">
               <div className="d-flex justify-content-between align-items-center px-3 py-2" style={{ background: '#ffc107' }}>
                 <h3 className="h6 fw-bold mb-0" style={{ color: '#212529' }}>
-                  <i className="bi bi-cloud-sun me-2" /> Du bao thoi tiet 5 ngay toi
+                  <i className="bi bi-cloud-sun me-2" /> Dự báo thời tiết 5 ngày tới
                 </h3>
-                <button type="button" className="btn-close btn-sm" onClick={() => setWeatherOpen(false)} aria-label="Dong" />
+                <button type="button" className="btn-close btn-sm" onClick={() => setWeatherOpen(false)} aria-label="Đóng" />
               </div>
               <div className="p-3 bg-white">
                 <div id="weatherContent" className="row text-center g-2" dangerouslySetInnerHTML={{ __html: weatherHtml }} />
                 {!weatherHtml && !weatherLoading && (
-                  <div className="text-muted small text-center">Chua co du lieu thoi tiet.</div>
+                  <div className="text-muted small text-center">Chưa có dữ liệu thời tiết.</div>
                 )}
               </div>
             </div>
@@ -552,7 +552,7 @@ export function TourDetailPage() {
 
           {tour.highlight && (
             <div className="mt-4 p-3 bg-light rounded border-start border-3 border-primary">
-              <h3 className="h6 text-primary fw-bold">Diem nhan cua chuong trinh</h3>
+              <h3 className="h6 text-primary fw-bold">Điểm nhấn của chương trình</h3>
               <p className="small mb-0 text-muted h7">{tour.highlight}</p>
             </div>
           )}
@@ -560,7 +560,7 @@ export function TourDetailPage() {
           <hr />
 
           <div className="mt-4">
-            <h3 className="h5 fw-bold mb-3">DANH GIA CUA KHACH HANG</h3>
+            <h3 className="h5 fw-bold mb-3">ĐÁNH GIÁ CỦA KHÁCH HÀNG</h3>
             <div className="mb-3 d-flex align-items-center gap-3">
               <div className="fs-4 text-warning">
                 {Array.from({ length: 5 }, (_, i) => {
@@ -570,17 +570,17 @@ export function TourDetailPage() {
               </div>
               <div>
                 <strong>{(summary?.averageRating ?? 0).toFixed(1)}/5</strong>
-                <span className="text-muted small"> ({summary?.totalReviews ?? 0} danh gia)</span>
+                <span className="text-muted small"> ({formatCountCap99(summary?.totalReviews ?? 0)} đánh giá)</span>
               </div>
             </div>
             <div className="card shadow-sm border-0 mb-3">
               <div className="card-body">
-                {reviews.length === 0 && <div className="text-muted text-center py-3">Chua co danh gia nao cho chuyen di nay.</div>}
+                {reviews.length === 0 && <div className="text-muted text-center py-3">Chưa có đánh giá nào cho chuyến đi này.</div>}
                 {reviews.map((dg) => (
                   <div key={dg.id} className="border-bottom pb-3 mb-3">
                     <div className="d-flex justify-content-between">
                       <div>
-                        <strong>{dg.hoTen ?? `Khach hang #${dg.idNguoiDung}`}</strong>
+                        <strong>{dg.hoTen ?? `Khách hàng #${dg.idNguoiDung}`}</strong>
                         <span className="text-warning ms-2">{dg.diem} ⭐</span>
                       </div>
                       <small className="text-muted">{dg.createdAt ?? ''}</small>
@@ -592,38 +592,38 @@ export function TourDetailPage() {
             </div>
           </div>
 
-          <h3 className="h5 fw-bold text-center mt-4 mb-3">THONG TIN THEM VE CHUYEN DI</h3>
+          <h3 className="h5 fw-bold text-center mt-4 mb-3">THÔNG TIN THÊM VỀ CHUYẾN ĐI</h3>
           <div className="row text-center border-bottom pb-3 mb-3 g-2">
             <div className="col-6 col-lg-3">
               <div className="info-card h-100">
                 <i className="bi bi-pin-map fs-3" style={{ color: '#ffc107' }} />
-                <p className="mb-1 fw-bold small mt-1">Diem khoi hanh</p>
+                <p className="mb-1 fw-bold small mt-1">Điểm khởi hành</p>
                 <p className="small text-muted mb-0">{diemDonTen}</p>
               </div>
             </div>
             <div className="col-6 col-lg-3">
               <div className="info-card" onClick={() => showWeather(diemDenDisplay)}>
                 <i className="bi bi-geo-alt fs-3" style={{ color: '#ffc107' }} />
-                <p className="mb-1 fw-bold small mt-1">Diem tham quan</p>
+                <p className="mb-1 fw-bold small mt-1">Điểm tham quan</p>
                 <p className="small fw-semibold text-dark mb-0">{diemDenDisplay}</p>
                 {tour.moTa && <p className="small text-muted mb-0">{tour.moTa}</p>}
-                <span className="info-card-hint"><i className="bi bi-cloud-sun me-1" />Xem thoi tiet</span>
+                <span className="info-card-hint"><i className="bi bi-cloud-sun me-1" />Xem thời tiết</span>
               </div>
             </div>
             <div className="col-6 col-lg-3">
               <div className="info-card" onClick={openTransportModal}>
                 <i className={`bi ${transportIcon(transportKind)} fs-3`} style={{ color: '#ffc107' }} />
-                <p className="mb-1 fw-bold small mt-1">Phuong tien</p>
-                <p className="small text-muted mb-0">{tour.phuongTien?.ten ?? tour.phuongTien?.loai ?? '—'}</p>
-                <span className="info-card-hint"><i className="bi bi-info-circle me-1" />Xem luu y</span>
+                <p className="mb-1 fw-bold small mt-1">Phương tiện</p>
+                <p className="small text-muted mb-0">{tour.phuongTien?.ten ?? transportLabel(tour.phuongTien?.loai)}</p>
+                <span className="info-card-hint"><i className="bi bi-info-circle me-1" />Xem lưu ý</span>
               </div>
             </div>
             <div className="col-6 col-lg-3">
               <div className="info-card" onClick={openAudienceModal}>
                 <i className="bi bi-people fs-3" style={{ color: '#ffc107' }} />
-                <p className="mb-1 fw-bold small mt-1">Doi tuong thich hop</p>
-                <p className="small text-muted mb-0">Cap doi, Gia dinh, Thanh nien</p>
-                <span className="info-card-hint"><i className="bi bi-lightbulb me-1" />Goi y hoat dong</span>
+                <p className="mb-1 fw-bold small mt-1">Đối tượng thích hợp</p>
+                <p className="small text-muted mb-0">Cặp đôi, Gia đình, Thanh niên</p>
+                <span className="info-card-hint"><i className="bi bi-lightbulb me-1" />Gợi ý hoạt động</span>
               </div>
             </div>
           </div>
@@ -632,12 +632,12 @@ export function TourDetailPage() {
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content border-0 shadow">
                 <div className="modal-header" style={{ background: '#ffc107' }}>
-                  <h5 className="modal-title fw-bold" id="transportModalTitle" style={{ color: '#212529' }}>Luu y phuong tien</h5>
+                  <h5 className="modal-title fw-bold" id="transportModalTitle" style={{ color: '#212529' }}>Lưu ý phương tiện</h5>
                   <button type="button" className="btn-close" data-bs-dismiss="modal" />
                 </div>
                 <div className="modal-body" id="transportModalBody" />
                 <div className="modal-footer border-0 pt-0">
-                  <button className="btn btn-sm fw-bold" style={{ background: '#ffc107', color: '#212529' }} data-bs-dismiss="modal">Da hieu</button>
+                  <button className="btn btn-sm fw-bold" style={{ background: '#ffc107', color: '#212529' }} data-bs-dismiss="modal">Đã hiểu</button>
                 </div>
               </div>
             </div>
@@ -647,7 +647,7 @@ export function TourDetailPage() {
             <div className="modal-dialog modal-dialog-centered modal-lg">
               <div className="modal-content border-0 shadow">
                 <div className="modal-header" style={{ background: '#ffc107' }}>
-                  <h5 className="modal-title fw-bold" style={{ color: '#212529' }}><i className="bi bi-people me-2" />Goi y hoat dong theo nhom</h5>
+                  <h5 className="modal-title fw-bold" style={{ color: '#212529' }}><i className="bi bi-people me-2" />Gợi ý hoạt động theo nhóm</h5>
                   <button type="button" className="btn-close" data-bs-dismiss="modal" />
                 </div>
                 <div className="modal-body">
@@ -655,46 +655,46 @@ export function TourDetailPage() {
                     <div className="col-md-4">
                       <div className="p-3 rounded h-100" style={{ background: '#fff8e1', border: '1px solid #ffc107' }}>
                         <div className="fs-2 text-center mb-2">💑</div>
-                        <h6 className="fw-bold text-center mb-3">Cap doi</h6>
+                        <h6 className="fw-bold text-center mb-3">Cặp đôi</h6>
                         <ul className="small text-muted ps-3 mb-0">
-                          <li>Bua toi lang man tai nha hang dia phuong</li>
-                          <li>Chup anh hoang hon tai diem den</li>
-                          <li>Trai nghiem spa va massage cap doi</li>
-                          <li>City tour theo lo trinh rieng tu</li>
-                          <li>Mua qua luu niem dac trung</li>
+                          <li>Bữa tối lãng mạn tại nhà hàng địa phương</li>
+                          <li>Chụp ảnh hoàng hôn tại điểm đến</li>
+                          <li>Trải nghiệm spa và massage cặp đôi</li>
+                          <li>City tour theo lộ trình riêng tư</li>
+                          <li>Mua quà lưu niệm đặc trưng</li>
                         </ul>
                       </div>
                     </div>
                     <div className="col-md-4">
                       <div className="p-3 rounded h-100" style={{ background: '#fff8e1', border: '1px solid #ffc107' }}>
                         <div className="fs-2 text-center mb-2">👨‍👩‍👧</div>
-                        <h6 className="fw-bold text-center mb-3">Gia dinh</h6>
+                        <h6 className="fw-bold text-center mb-3">Gia đình</h6>
                         <ul className="small text-muted ps-3 mb-0">
-                          <li>Khu vui choi va cong vien nuoc</li>
-                          <li>Tham quan bao tang, di tich lich su</li>
-                          <li>Nghi khach san co ho boi gia dinh</li>
-                          <li>An uong than thien tre em</li>
-                          <li>Hoat dong trai nghiem ngoai troi</li>
+                          <li>Khu vui chơi và công viên nước</li>
+                          <li>Tham quan bảo tàng, di tích lịch sử</li>
+                          <li>Nghỉ khách sạn có hồ bơi gia đình</li>
+                          <li>Ăn uống thân thiện với trẻ em</li>
+                          <li>Hoạt động trải nghiệm ngoài trời</li>
                         </ul>
                       </div>
                     </div>
                     <div className="col-md-4">
                       <div className="p-3 rounded h-100" style={{ background: '#fff8e1', border: '1px solid #ffc107' }}>
                         <div className="fs-2 text-center mb-2">🧑‍🤝‍🧑</div>
-                        <h6 className="fw-bold text-center mb-3">Thanh nien</h6>
+                        <h6 className="fw-bold text-center mb-3">Thanh niên</h6>
                         <ul className="small text-muted ps-3 mb-0">
-                          <li>Trekking, leo nui, kham pha thien nhien</li>
-                          <li>Street food tour va am thuc dia phuong</li>
-                          <li>Check-in diem song ao noi tieng</li>
-                          <li>Nightlife va rooftop view dep</li>
-                          <li>Thue xe may tu kham pha</li>
+                          <li>Trekking, leo núi, khám phá thiên nhiên</li>
+                          <li>Tour ẩm thực đường phố và món địa phương</li>
+                          <li>Check-in điểm sống ảo nổi tiếng</li>
+                          <li>Khám phá phố đêm và rooftop view đẹp</li>
+                          <li>Thuê xe máy tự khám phá</li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="modal-footer border-0 pt-0">
-                  <button className="btn btn-sm fw-bold" style={{ background: '#ffc107', color: '#212529' }} data-bs-dismiss="modal">Tuyet voi!</button>
+                  <button className="btn btn-sm fw-bold" style={{ background: '#ffc107', color: '#212529' }} data-bs-dismiss="modal">Tuyệt vời!</button>
                 </div>
               </div>
             </div>
@@ -741,7 +741,7 @@ export function TourDetailPage() {
               <div className="modal-content border-0 rounded-4 shadow-lg">
                 <div className="modal-header border-0 pb-0">
                   <h5 className="modal-title fw-bold">Lịch trình — {tour.tieuDe}</h5>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Dong" />
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Đóng" />
                 </div>
                 <div className="modal-body pt-2 pb-4">
                   <div className="itinerary-timeline-v2">
@@ -800,39 +800,39 @@ export function TourDetailPage() {
           <div className="card border-0 shadow-sm p-3 sticky-price-box sticky-top" style={{ top: 100 }}>
             <div className="card-body">
               <p className="small text-muted mb-3 pb-3 border-bottom">
-                <i className="bi bi-pin-map me-1" /> Diem khoi hanh: <strong>{diemDonTen}</strong>
+                <i className="bi bi-pin-map me-1" /> Điểm khởi hành: <strong>{diemDonTen}</strong>
               </p>
-              <p className="mb-0 text-secondary small">Gia tu:</p>
+              <p className="mb-0 text-secondary small">Giá từ:</p>
 
               {!selectedSchedule ? (
                 <>
-                  <h2 className="card-title text-danger fw-bold">{formatVnd(Number(tour.gia))} <span className="small text-secondary">/Khach</span></h2>
+                  <h2 className="card-title text-danger fw-bold">{formatVnd(Number(tour.gia))} <span className="small text-secondary">/Khách</span></h2>
                   <p className="small text-muted mb-3">
-                    <i className="bi bi-info-circle me-1" /> Vui long chon ngay khoi hanh tren lich
+                    <i className="bi bi-info-circle me-1" /> Vui lòng chọn ngày khởi hành trên lịch
                   </p>
                   <button className="btn btn-primary w-100 mb-2 py-2 fw-bold" disabled>
-                    <i className="bi bi-calendar-check me-2" /> Chon ngay khoi hanh
+                    <i className="bi bi-calendar-check me-2" /> Chọn ngày khởi hành
                   </button>
                 </>
               ) : (
                 <>
-                  <h2 className="card-title text-danger fw-bold">{formatVnd(totalPerGuest)} <span className="small text-secondary">/Khach</span></h2>
+                  <h2 className="card-title text-danger fw-bold">{formatVnd(totalPerGuest)} <span className="small text-secondary">/Khách</span></h2>
                   <div className="small text-muted mb-1">
-                    <span>Gia dich vu: </span>
+                    <span>Giá dịch vụ: </span>
                     <strong>{formatVnd(Number(tour.gia))}</strong>
                   </div>
                   <div className="small text-muted mb-3">
-                    <span>Ve: </span>
+                    <span>Vé: </span>
                     <strong>{formatVnd(ticketPrice)}</strong>
                   </div>
-                  <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngay di: <strong>{selectedSchedule.ngayKhoiHanh}</strong></p>
-                  <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngay ve: <strong>{selectedSchedule.ngayKetThuc ?? 'N/A'}</strong></p>
+                  <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngày đi: <strong>{selectedSchedule.ngayKhoiHanh}</strong></p>
+                  <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngày về: <strong>{selectedSchedule.ngayKetThuc ?? 'N/A'}</strong></p>
                   <p className="small text-muted mb-2">
-                    <i className={`bi ${transportIcon(transportKind)} me-1`} /> Chuyen di: <strong>{selectedSchedule.maChuyenBayDi ?? 'N/A'}</strong>
+                    <i className={`bi ${transportIcon(transportKind)} me-1`} /> Chuyến đi: <strong>{selectedSchedule.maChuyenBayDi ?? 'N/A'}</strong>
                     {selectedSchedule.gioBayDi && selectedSchedule.gioDenDi ? ` (${selectedSchedule.gioBayDi} -> ${selectedSchedule.gioDenDi})` : ''}
                   </p>
                   <p className="small text-muted mb-3">
-                    <i className={`bi ${transportIcon(transportKind)} me-1`} style={transportKind === 'plane' ? { transform: 'scaleX(-1)', display: 'inline-block' } : undefined} /> Chuyen ve: <strong>{selectedSchedule.maChuyenBayVe ?? 'N/A'}</strong>
+                    <i className={`bi ${transportIcon(transportKind)} me-1`} style={transportKind === 'plane' ? { transform: 'scaleX(-1)', display: 'inline-block' } : undefined} /> Chuyến về: <strong>{selectedSchedule.maChuyenBayVe ?? 'N/A'}</strong>
                     {selectedSchedule.gioBayVe && selectedSchedule.gioDenVe ? ` (${selectedSchedule.gioBayVe} -> ${selectedSchedule.gioDenVe})` : ''}
                   </p>
 
@@ -847,7 +847,7 @@ export function TourDetailPage() {
                       navigate(bookingUrl(tour.id, selectedSchedule.id))
                     }}
                   >
-                    <i className="bi bi-cart-check me-2" /> DAT NGAY
+                    <i className="bi bi-cart-check me-2" /> ĐẶT NGAY
                   </button>
                 </>
               )}
@@ -867,7 +867,7 @@ export function TourDetailPage() {
       {selectedSchedule && (
         <div className="mobile-sticky-cta">
           <div>
-            <div className="small text-muted">Gia tu / khach</div>
+            <div className="small text-muted">Giá từ / khách</div>
             <div className="fw-bold text-danger">{formatVnd(totalPerGuest)}</div>
           </div>
           <button
@@ -881,7 +881,7 @@ export function TourDetailPage() {
               navigate(bookingUrl(tour.id, selectedSchedule.id))
             }}
           >
-            Dat ngay
+            Đặt ngay
           </button>
         </div>
       )}

@@ -57,8 +57,10 @@ public class TourController {
     }
 
     @GetMapping("/featured")
-    public ApiResponse<List<TourSummary>> featured() {
-        return ApiResponse.ok(service.getFeatured());
+    @Operation(summary = "Top tour được yêu thích (theo lượt đặt) cho trang chủ")
+    public ApiResponse<List<TourSummary>> featured(
+            @RequestParam(defaultValue = "3") int limit) {
+        return ApiResponse.ok(service.getFeatured(limit));
     }
 
     @GetMapping

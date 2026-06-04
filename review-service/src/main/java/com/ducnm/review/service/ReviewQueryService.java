@@ -3,6 +3,7 @@ package com.ducnm.review.service;
 import com.ducnm.common.dto.ApiResponse;
 import com.ducnm.common.dto.PageResponse;
 import com.ducnm.review.client.IdentityClient;
+import com.ducnm.review.client.TourClient;
 import com.ducnm.review.dto.ReviewDtos.ReviewResponse;
 import com.ducnm.review.entity.DanhGia;
 import com.ducnm.review.repository.DanhGiaRepository;
@@ -23,6 +24,21 @@ public class ReviewQueryService {
 
     private final DanhGiaRepository repo;
     private final IdentityClient identityClient;
+    private final TourClient tourClient;
+
+    @Transactional(readOnly = true)
+    public PageResponse<ReviewResponse> listAll(Pageable pageable) {
+        Page<DanhGia> page = repo.findAll(pageable);
+        List<ReviewResponse> content = enrich(page.getContent());
+        return PageResponse.<ReviewResponse>builder()
+                .content(content)
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public PageResponse<ReviewResponse> listByTour(Integer tourId, Pageable pageable) {
@@ -43,6 +59,7 @@ public class ReviewQueryService {
             return List.of();
         }
         Map<Integer, String> names = resolveDisplayNames(reviews);
+        Map<Integer, String> tourTitles = resolveTourTitles(reviews);
         return reviews.stream()
                 .map(r -> ReviewResponse.builder()
                         .id(r.getId())
@@ -52,8 +69,28 @@ public class ReviewQueryService {
                         .diem(r.getDiem())
                         .noiDung(r.getNoiDung())
                         .createdAt(r.getCreatedAt())
+                        .tourTitle(tourTitles.get(r.getIdChuyenDi()))
                         .build())
                 .toList();
+    }
+
+    private Map<Integer, String> resolveTourTitles(List<DanhGia> reviews) {
+        Set<Integer> tourIds = reviews.stream()
+                .map(DanhGia::getIdChuyenDi)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Integer, String> result = new HashMap<>();
+        for (Integer tourId : tourIds) {
+            try {
+                ApiResponse<TourClient.TourBrief> res = tourClient.getTour(tourId);
+                if (res != null && res.getData() != null && res.getData().tieuDe() != null) {
+                    result.put(tourId, res.getData().tieuDe().trim());
+                }
+            } catch (Exception ex) {
+                log.warn("Cannot resolve tour title tourId={}: {}", tourId, ex.getMessage());
+            }
+        }
+        return result;
     }
 
     private Map<Integer, String> resolveDisplayNames(List<DanhGia> reviews) {

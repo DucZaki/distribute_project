@@ -47,6 +47,9 @@ public class TourDtos {
         private DiemDenSummary diemDen;
         private PhuongTienSummary phuongTien;
         private DiemDonDto diemDon;
+        private Double averageRating;
+        private Long ratingCount;
+        private Long bookingCount;
     }
 
     @Data

@@ -42,5 +42,9 @@ public class NearbyToursResponse {
         private String diemDon;
         private String diemDen;
         private Double distanceKm;
+        private Boolean noiBat;
+        private Double averageRating;
+        private Long ratingCount;
+        private Long bookingCount;
     }
 }

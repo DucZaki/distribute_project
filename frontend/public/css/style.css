@@ -363,7 +363,7 @@ h6 {
 /* ===================== HERO SECTION ===================== */
 .hero-section {
     background: linear-gradient(180deg, #FFF9E6 0%, #F9F9FC 100%);
-    min-height: 400px;
+    min-height: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -554,9 +554,9 @@ footer {
 /* Hero Section - Banner đầu trang */
 /* ============================= */
 .hero-section {
-    height: 35vh;
+    height: 48vh;
     /* Chiều cao banner */
-    background-color: #f5f5f5;
+    background: linear-gradient(180deg, #FFF9E6 0%, #F9F9FC 100%) !important;
     /* Nền sáng dịu */
     display: flex;
     flex-direction: column;
@@ -567,7 +567,7 @@ footer {
     text-align: center;
     overflow: hidden;
     position: relative;
-    padding-top: 90px;
+    padding-top: 150px;
     /* Đẩy nội dung xuống để không bị navbar che */
     box-sizing: border-box;
 }
@@ -602,7 +602,7 @@ footer {
 /* Responsive cho màn nhỏ */
 @media (max-width: 768px) {
     .hero-section {
-        padding-top: 100px;
+        padding-top: 140px;
         /* đẩy thêm chút cho mobile */
         height: auto;
     }
@@ -655,16 +655,34 @@ footer {
     font-size: 0.95rem;
 }
 
+/* Bootstrap 5.3 CDN: --bs-btn-color mặc định = --bs-primary (vàng) → chữ trùng nền nút */
 .btn-outline-primary {
+    --bs-btn-color: #1A1C1E;
+    --bs-btn-border-color: #FECF2F;
+    --bs-btn-bg: #FECF2F;
+    --bs-btn-hover-color: #1A1C1E;
+    --bs-btn-hover-bg: #fcd752;
+    --bs-btn-hover-border-color: #fcd752;
+    --bs-btn-active-color: #1A1C1E;
+    --bs-btn-active-bg: #f5b800;
+    --bs-btn-active-border-color: #f5b800;
     background-color: #FECF2F !important;
-    color: #000000 !important;
+    color: #1A1C1E !important;
     border-color: #FECF2F !important;
     font-weight: 700 !important;
 }
 
-.btn-outline-primary:hover {
+.btn-outline-primary:hover,
+.btn-outline-primary:focus-visible,
+.btn-outline-primary:active {
     background-color: var(--primary-hover) !important;
-    color: white !important;
+    border-color: var(--primary-hover) !important;
+    color: #1A1C1E !important;
+}
+
+#nearbyRetryBtn,
+#nearbyRetryBtn .bi {
+    color: #1A1C1E !important;
 }
 
 /* Link and interactive colors */
@@ -2465,4 +2483,20 @@ a:hover {
 
 [data-theme="dark"] .tour-premium-card .border-top {
     border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Page / Content Transitions */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

@@ -2,6 +2,8 @@ package com.ducnm.tour.service;
 
 import com.ducnm.common.dto.PageResponse;
 import com.ducnm.common.exception.BusinessException;
+import com.ducnm.tour.client.BookingStatsClient;
+import com.ducnm.tour.client.ReviewClient;
 import com.ducnm.tour.dto.NearbyToursResponse;
 import com.ducnm.tour.dto.NearbyToursResponse.NearbyTourItem;
 import com.ducnm.tour.dto.TourDtos.*;
@@ -31,6 +33,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TourService {
 
+    /** Số tour hiển thị block "được yêu thích nhất" trên trang chủ. */
+    public static final int HOME_FEATURED_LIMIT = 3;
+
     private final ChuyenDiRepository chuyenDiRepo;
     private final DiemDenRepository diemDenRepo;
     private final DiemDonRepository diemDonRepo;
@@ -39,6 +44,8 @@ public class TourService {
     private final NgayKhoiHanhRepository ngayKhoiHanhRepo;
     private final TourMapper mapper;
     private final LichTrinhPresenter lichTrinhPresenter;
+    private final ReviewClient reviewClient;
+    private final BookingStatsClient bookingStatsClient;
 
     @Cacheable(value = "tours", key = "#id")
     @Transactional(readOnly = true)
@@ -55,17 +62,29 @@ public class TourService {
         return response;
     }
 
-    @Cacheable(value = "tours-featured")
     @Transactional(readOnly = true)
-    public List<TourSummary> getFeatured() {
-        return mapper.toSummaryList(chuyenDiRepo.findTop6ByNoiBatTrueOrderByIdDesc());
+    public List<TourSummary> getFeatured(int limit) {
+        int cap = Math.min(Math.max(limit, 1), 12);
+        List<TourSummary> list = mapper.toSummaryList(
+                chuyenDiRepo.findAll(Sort.by(Sort.Direction.DESC, "id")));
+        enrichStats(list);
+        sortByMostBooked(list);
+        return list.stream().limit(cap).toList();
     }
 
     @Transactional(readOnly = true)
     public PageResponse<TourSummary> search(SearchRequest req, int page, int size, String sort) {
+        if (isPopularitySort(sort)) {
+            List<ChuyenDi> all = chuyenDiRepo.findAll(ChuyenDiSpecification.filter(req));
+            List<TourSummary> summaries = mapper.toSummaryList(all);
+            enrichStats(summaries);
+            sortByPopularity(summaries);
+            return paginate(summaries, page, size);
+        }
         Pageable pageable = PageRequest.of(page, size, Sort.by(parseSort(sort)));
         Page<ChuyenDi> result = chuyenDiRepo.findAll(ChuyenDiSpecification.filter(req), pageable);
         List<TourSummary> content = mapper.toSummaryList(result.getContent());
+        enrichStats(content);
         return PageResponse.<TourSummary>builder()
                 .content(content)
                 .page(result.getNumber())
@@ -76,7 +95,7 @@ public class TourService {
                 .build();
     }
 
-    @CacheEvict(value = {"tours", "tours-featured"}, allEntries = true)
+    @CacheEvict(value = {"tours", "tours-featured", "tours-featured-v2"}, allEntries = true)
     @Transactional
     public TourResponse create(CreateTourRequest req) {
         DiemDen diemDen = diemDenRepo.findById(req.getIdDiemDen())
@@ -209,8 +228,9 @@ public class TourService {
 
         List<NearbyTourItem> allItems = tours.stream()
                 .map(t -> toNearbyItem(t, userLat, userLng, nearestDist))
-                .sorted(Comparator.comparingDouble(NearbyTourItem::getDistanceKm))
                 .collect(Collectors.toList());
+        enrichNearbyItems(allItems);
+        sortNearbyByPopularity(allItems);
 
         int total = allItems.size();
         int totalPages = (int) Math.ceil(total / (double) safeLimit);
@@ -274,6 +294,10 @@ public class TourService {
                 .diemDon(nearestDep)
                 .diemDen(diemDen)
                 .distanceKm(roundKm(best))
+                .noiBat(Boolean.TRUE.equals(t.getNoiBat()))
+                .averageRating(0.0)
+                .ratingCount(0L)
+                .bookingCount(0L)
                 .build();
     }
 
@@ -289,7 +313,7 @@ public class TourService {
         return Math.round(km * 10.0) / 10.0;
     }
 
-    @CacheEvict(value = {"tours", "tours-featured"}, allEntries = true)
+    @CacheEvict(value = {"tours", "tours-featured", "tours-featured-v2"}, allEntries = true)
     @Transactional
     public void delete(Integer id) {
         if (!chuyenDiRepo.existsById(id)) {
@@ -298,8 +322,160 @@ public class TourService {
         chuyenDiRepo.deleteById(id);
     }
 
+    private void enrichStats(List<TourSummary> tours) {
+        for (TourSummary t : tours) {
+            applyReviewStats(t.getId(), t::setAverageRating, t::setRatingCount);
+            applyBookingStats(t.getId(), t::setBookingCount);
+        }
+    }
+
+    private void enrichNearbyItems(List<NearbyTourItem> items) {
+        for (NearbyTourItem item : items) {
+            applyReviewStats(item.getId(), item::setAverageRating, item::setRatingCount);
+            applyBookingStats(item.getId(), item::setBookingCount);
+        }
+    }
+
+    private void applyReviewStats(
+            Integer tourId,
+            java.util.function.Consumer<Double> setAvg,
+            java.util.function.Consumer<Long> setCount) {
+        setAvg.accept(0.0);
+        setCount.accept(0L);
+        try {
+            Map<String, Object> summary = reviewClient.summary(tourId).getData();
+            if (summary != null) {
+                Object avg = summary.get("averageRating");
+                Object total = summary.get("totalReviews");
+                if (avg instanceof Number n) {
+                    setAvg.accept(n.doubleValue());
+                }
+                if (total instanceof Number n) {
+                    setCount.accept(n.longValue());
+                }
+            }
+        } catch (Exception ex) {
+            log.debug("Review stats unavailable for tour {}: {}", tourId, ex.getMessage());
+        }
+    }
+
+    private void applyBookingStats(Integer tourId, java.util.function.Consumer<Long> setCount) {
+        setCount.accept(0L);
+        try {
+            Long count = bookingStatsClient.participantsByTour(tourId).getData();
+            if (count != null) {
+                setCount.accept(count);
+            }
+        } catch (Exception ex) {
+            log.debug("Booking stats unavailable for tour {}: {}", tourId, ex.getMessage());
+        }
+    }
+
+    private boolean isPopularitySort(String sort) {
+        return sort == null || sort.isBlank() || "popular".equalsIgnoreCase(sort);
+    }
+
+    /** Trang chủ: nhiều người đặt nhất → đánh giá cao (không ưu tiên cờ HOT). */
+    private void sortByMostBooked(List<TourSummary> tours) {
+        tours.sort((a, b) -> compareMostBooked(
+                a.getBookingCount(),
+                a.getAverageRating(),
+                a.getId(),
+                b.getBookingCount(),
+                b.getAverageRating(),
+                b.getId()));
+    }
+
+    /** HOT trước → nhiều người đặt → điểm đánh giá cao. */
+    private void sortByPopularity(List<TourSummary> tours) {
+        tours.sort((a, b) -> comparePopularity(
+                Boolean.TRUE.equals(a.getNoiBat()),
+                a.getBookingCount(),
+                a.getAverageRating(),
+                a.getId(),
+                Boolean.TRUE.equals(b.getNoiBat()),
+                b.getBookingCount(),
+                b.getAverageRating(),
+                b.getId()));
+    }
+
+    private void sortNearbyByPopularity(List<NearbyTourItem> items) {
+        items.sort((a, b) -> comparePopularity(
+                Boolean.TRUE.equals(a.getNoiBat()),
+                a.getBookingCount(),
+                a.getAverageRating(),
+                a.getId(),
+                Boolean.TRUE.equals(b.getNoiBat()),
+                b.getBookingCount(),
+                b.getAverageRating(),
+                b.getId()));
+    }
+
+    private static int compareMostBooked(
+            Long bookingsA, Double ratingA, Integer idA,
+            Long bookingsB, Double ratingB, Integer idB) {
+        long bA = bookingsA != null ? bookingsA : 0L;
+        long bB = bookingsB != null ? bookingsB : 0L;
+        int booked = Long.compare(bB, bA);
+        if (booked != 0) {
+            return booked;
+        }
+        double rA = ratingA != null ? ratingA : 0.0;
+        double rB = ratingB != null ? ratingB : 0.0;
+        int rating = Double.compare(rB, rA);
+        if (rating != 0) {
+            return rating;
+        }
+        return Integer.compare(idB != null ? idB : 0, idA != null ? idA : 0);
+    }
+
+    private static int comparePopularity(
+            boolean hotA, Long bookingsA, Double ratingA, Integer idA,
+            boolean hotB, Long bookingsB, Double ratingB, Integer idB) {
+        int hot = Boolean.compare(hotB, hotA);
+        if (hot != 0) {
+            return hot;
+        }
+        long bA = bookingsA != null ? bookingsA : 0L;
+        long bB = bookingsB != null ? bookingsB : 0L;
+        int booked = Long.compare(bB, bA);
+        if (booked != 0) {
+            return booked;
+        }
+        double rA = ratingA != null ? ratingA : 0.0;
+        double rB = ratingB != null ? ratingB : 0.0;
+        int rating = Double.compare(rB, rA);
+        if (rating != 0) {
+            return rating;
+        }
+        return Integer.compare(idB != null ? idB : 0, idA != null ? idA : 0);
+    }
+
+    private PageResponse<TourSummary> paginate(List<TourSummary> all, int page, int size) {
+        int safeSize = Math.max(1, size);
+        int total = all.size();
+        int totalPages = total == 0 ? 0 : (int) Math.ceil(total / (double) safeSize);
+        int safePage = Math.max(0, page);
+        if (totalPages > 0 && safePage > totalPages - 1) {
+            safePage = totalPages - 1;
+        }
+        int from = safePage * safeSize;
+        int to = Math.min(from + safeSize, total);
+        List<TourSummary> content = (from >= 0 && from < to) ? all.subList(from, to) : List.of();
+        return PageResponse.<TourSummary>builder()
+                .content(content)
+                .page(safePage)
+                .size(safeSize)
+                .totalElements(total)
+                .totalPages(totalPages)
+                .last(totalPages == 0 || safePage >= totalPages - 1)
+                .build();
+    }
+
     private Sort.Order parseSort(String sort) {
-        if (sort == null || sort.isBlank()) return Sort.Order.desc("id");
+        if (sort == null || sort.isBlank() || "popular".equalsIgnoreCase(sort)) {
+            return Sort.Order.desc("id");
+        }
         if ("priceAsc".equalsIgnoreCase(sort)) return Sort.Order.asc("gia");
         if ("priceDesc".equalsIgnoreCase(sort)) return Sort.Order.desc("gia");
         String[] parts = sort.split(",");

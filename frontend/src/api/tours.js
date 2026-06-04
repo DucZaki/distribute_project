@@ -1,7 +1,8 @@
 import { apiFetch } from "./client";
 import { parseNgayDi, priceRangeFromKhoangGia } from "../utils/searchFilters";
-function getFeaturedTours() {
-  return apiFetch("/tours/featured");
+function getFeaturedTours(limit = 3) {
+  const cap = Math.min(Math.max(Number(limit) || 3, 1), 12);
+  return apiFetch(`/tours/featured?limit=${cap}`);
 }
 function getFeaturedDestinations() {
   return apiFetch("/tours/destinations/featured");

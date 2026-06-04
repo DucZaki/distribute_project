@@ -24,6 +24,16 @@ public class ReviewController {
     private final DanhGiaRepository repo;
     private final ReviewQueryService reviewQueryService;
 
+    /** Tất cả bình luận (trang chủ — carousel / modal). */
+    @GetMapping
+    public ApiResponse<PageResponse<ReviewResponse>> listAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        int safeSize = Math.min(Math.max(size, 1), 200);
+        return ApiResponse.ok(reviewQueryService.listAll(
+                PageRequest.of(page, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+    }
+
     @GetMapping("/tour/{tourId}")
     public ApiResponse<PageResponse<ReviewResponse>> list(@PathVariable Integer tourId,
                                                             @RequestParam(defaultValue = "0") int page,

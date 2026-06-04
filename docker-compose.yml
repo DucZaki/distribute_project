@@ -245,7 +245,9 @@ services:
     networks: [ bt-net ]
 
   integration:
-    build: ./integration-service
+    build:
+      context: .
+      dockerfile: integration-service/Dockerfile
     container_name: bt-integration
     env_file: .env
     environment:

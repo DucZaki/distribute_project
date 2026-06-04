@@ -3,6 +3,11 @@ function formatVnd(value) {
   if (value == null) return "\u2014";
   return new Intl.NumberFormat("vi-VN").format(value) + " \u20AB";
 }
+/** Hiển thị tối đa 99+ khi số lượt đánh giá / đặt chỗ vượt 100. */
+function formatCountCap99(value) {
+  const n = Number(value) || 0;
+  return n > 100 ? "99+" : String(n);
+}
 function imageUrl(path) {
   if (!path) return FALLBACK;
   if (path.startsWith("http")) return path;
@@ -20,6 +25,20 @@ function statusLabel(s) {
   };
   return map[s] ?? s;
 }
+function transportLabel(value) {
+  const raw = String(value ?? "").trim();
+  const lower = raw.toLowerCase();
+  if (!raw) return "—";
+  if (lower.includes("plane") || lower.includes("flight") || lower.includes("máy bay")) return "Máy bay";
+  if (lower.includes("bus") || lower.includes("xe khách")) return "Xe khách";
+  if (lower.includes("train") || lower.includes("tàu hỏa") || lower.includes("tau hoa")) return "Tàu hỏa";
+  if (lower.includes("ferry") || lower.includes("ship") || lower.includes("boat") || lower.includes("phà")) return "Tàu thủy / phà";
+  if (lower.includes("hotel")) return "Khách sạn";
+  if (lower.includes("homestay")) return "Homestay";
+  if (lower.includes("resort")) return "Khu nghỉ dưỡng";
+  if (lower.includes("apartment")) return "Căn hộ";
+  return raw;
+}
 function bookingTabFilter(tab, trangThai) {
   if (tab === "all") return true;
   if (tab === "pending") return trangThai === "PENDING";
@@ -28,7 +47,9 @@ function bookingTabFilter(tab, trangThai) {
 }
 export {
   bookingTabFilter,
+  formatCountCap99,
   formatVnd,
   imageUrl,
-  statusLabel
+  statusLabel,
+  transportLabel
 };

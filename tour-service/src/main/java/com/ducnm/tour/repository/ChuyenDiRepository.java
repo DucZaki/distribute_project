@@ -19,6 +19,8 @@ public interface ChuyenDiRepository
 
     List<ChuyenDi> findTop6ByNoiBatTrueOrderByIdDesc();
 
+    List<ChuyenDi> findByNoiBatTrue();
+
     Page<ChuyenDi> findByDiemDen_Id(Integer diemDenId, Pageable pageable);
 
     @Query("select c from ChuyenDi c where c.tieuDe like %:keyword% or c.moTa like %:keyword%")

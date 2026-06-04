@@ -1,25 +1,84 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getFeaturedDestinations, getFeaturedTours } from '../api/tours'
+import { getFeaturedDestinations, getFeaturedTours, searchTours } from '../api/tours'
+import { CustomerReviewsSection } from '../components/CustomerReviewsSection'
 import { NearbyToursSection } from '../components/NearbyToursSection'
-import { getTourReviews } from '../api/reviews'
-import type { DiemDenSummary, ReviewItem, TourSummary } from '../types/api'
+import type { DiemDenSummary, TourSummary } from '../types/api'
+import { TourCardStats } from '../components/TourCardStats'
 import { formatVnd, imageUrl } from '../utils/format'
 
 export function HomePage() {
   const navigate = useNavigate()
   const [tours, setTours] = useState<TourSummary[]>([])
+  const [featuredLoading, setFeaturedLoading] = useState(true)
+  const [featuredError, setFeaturedError] = useState<string | null>(null)
   const [destinations, setDestinations] = useState<DiemDenSummary[]>([])
-  const [reviews, setReviews] = useState<ReviewItem[]>([])
+  const FEATURED_LIMIT = 3
+  const REFRESH_MS = 30_000
+
   useEffect(() => {
-    getFeaturedTours().then((r) => {
-      setTours(r.data ?? [])
-      const first = r.data?.[0]
-      if (first) {
-        getTourReviews(first.id).then((rev) => setReviews(rev.data.content ?? [])).catch(() => {})
-      }
+    let cancelled = false
+
+    const applyTours = (top: TourSummary[]) => {
+      setTours(top)
+      setFeaturedError(null)
+    }
+
+    const loadFeatured = (showSpinner = false) => {
+      if (showSpinner && !cancelled) setFeaturedLoading(true)
+      getFeaturedTours(FEATURED_LIMIT)
+        .then((r) => {
+          if (cancelled) return
+          const top = (r.data ?? []).slice(0, FEATURED_LIMIT)
+          if (top.length > 0) {
+            applyTours(top)
+            return
+          }
+          return searchTours({ sort: 'popular', size: FEATURED_LIMIT, page: 0 }).then((page) => {
+            if (cancelled) return
+            applyTours((page.data?.content ?? []).slice(0, FEATURED_LIMIT))
+          })
+        })
+        .catch(() =>
+          searchTours({ sort: 'popular', size: FEATURED_LIMIT, page: 0 })
+            .then((page) => {
+              if (cancelled) return
+              const top = (page.data?.content ?? []).slice(0, FEATURED_LIMIT)
+              if (top.length > 0) {
+                applyTours(top)
+              } else if (!cancelled) {
+                setTours([])
+                setFeaturedError('Không tải được tour nổi bật. Thử tải lại trang sau vài giây.')
+              }
+            })
+            .catch(() => {
+              if (!cancelled) {
+                setTours([])
+                setFeaturedError('Không tải được tour nổi bật. Kiểm tra api-gateway và tour-service.')
+              }
+            })
+        )
+        .finally(() => {
+          if (!cancelled) setFeaturedLoading(false)
+        })
+    }
+
+    loadFeatured(true)
+    const timer = window.setInterval(() => loadFeatured(false), REFRESH_MS)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') loadFeatured(false)
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
+    getFeaturedDestinations().then((r) => {
+      if (!cancelled) setDestinations(r.data ?? [])
     })
-    getFeaturedDestinations().then((r) => setDestinations(r.data ?? []))
+
+    return () => {
+      cancelled = true
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [])
 
   return (
@@ -119,11 +178,22 @@ export function HomePage() {
 
       <section className="bg-brand-light py-5">
         <div className="container text-center">
-          <h2 className="fw-bold mb-4">Tour được yêu thích nhất</h2>
-          <div className="row g-4">
+          <h2 className="fw-bold mb-2">Tour được yêu thích nhất</h2>
+          <div className="row g-4 justify-content-center">
+            {featuredLoading && tours.length === 0 && (
+              <div className="col-12 text-muted py-4">
+                <span className="spinner-border spinner-border-sm me-2" role="status" />
+                Đang tải tour nổi bật...
+              </div>
+            )}
+            {!featuredLoading && featuredError && tours.length === 0 && (
+              <div className="col-12 py-4">
+                <div className="alert alert-light mb-0">{featuredError}</div>
+              </div>
+            )}
             {tours.map((ds) => (
               <div key={ds.id} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden group">
+                <div className="card border-0 shadow-sm h-100 rounded-4 overflow-hidden group position-relative">
                   <div className="img-zoom">
                     <img
                       src={imageUrl(ds.hinhAnh ?? ds.diemDen?.hinhAnh)}
@@ -131,9 +201,25 @@ export function HomePage() {
                       alt={ds.tieuDe}
                       style={{ width: '100%', height: 250, objectFit: 'cover' }}
                     />
+                    {ds.noiBat && (
+                      <span className="badge bg-danger position-absolute top-0 start-0 m-2">
+                        <i className="bi bi-fire me-1" />
+                        HOT TOUR
+                      </span>
+                    )}
                   </div>
-                  <div className="card-body">
+                  <div className="card-body text-start">
                     <h5 className="card-title fw-bold">{ds.tieuDe}</h5>
+                    <TourCardStats
+                      averageRating={ds.averageRating}
+                      ratingCount={ds.ratingCount}
+                      bookingCount={ds.bookingCount}
+                    />
+                    {ds.diemDon?.ten && (
+                      <p className="text-muted small mb-2">
+                        Khởi hành: <strong>{ds.diemDon.ten}</strong>
+                      </p>
+                    )}
                     <p className="fw-bold text-danger fs-5 mb-3">{formatVnd(ds.gia)}</p>
                     <Link to={`/tour/${ds.id}`} className="btn btn-primary rounded-pill px-4">
                       Xem chi tiết
@@ -146,30 +232,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {reviews.length > 0 && (
-        <section className="py-5 text-center bg-light">
-          <div className="container">
-            <h2 className="fw-bold mb-4">Khách hàng nói gì?</h2>
-            <div id="reviewCarousel" className="carousel slide" data-bs-ride="carousel" data-bs-interval={5000}>
-              <div className="carousel-inner">
-                {reviews.map((r, i) => (
-                  <div key={r.id} className={`carousel-item${i === 0 ? ' active' : ''}`}>
-                    <Link to={`/tour/${r.idChuyenDi}`} className="text-decoration-none">
-                      <blockquote className="blockquote" style={{ background: 'none', color: '#000' }}>
-                        <p className="mb-4 fw-bolder" style={{ marginBottom: 0 }}>
-                          {(r.tourTitle ?? `Tour #${r.idChuyenDi}`) + ':'}
-                        </p>
-                        <p className="mb-4" style={{ marginBottom: 0 }}>{r.noiDung}</p>
-                        <footer className="blockquote-footer">{r.hoTen ?? `Khách hàng #${r.idNguoiDung}`}</footer>
-                      </blockquote>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <CustomerReviewsSection />
     </section>
   )
 }
