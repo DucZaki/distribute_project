@@ -46,5 +46,20 @@ public class UserDtos {
     public static class AdminUpdateRoleRequest {
         private String vaiTro;
         private Boolean enabled;
+        private String hoTen;
+        private String number;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminCreateUserRequest {
+        private String tenDangNhap;
+        private String email;
+        private String password;
+        private String hoTen;
+        private String number;
+        private String vaiTro;
+        private Boolean enabled;
     }
 }

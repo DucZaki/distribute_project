@@ -244,6 +244,21 @@ services:
       discovery: { condition: service_healthy }
     networks: [ bt-net ]
 
+  admin:
+    build: ./admin-service
+    container_name: bt-admin
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+      CONFIG_SERVER_URL: http://config:8888
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      discovery: { condition: service_healthy }
+      booking: { condition: service_started }
+      identity: { condition: service_started }
+      tour: { condition: service_started }
+      review: { condition: service_started }
+    networks: [ bt-net ]
+
   integration:
     build: ./integration-service
     container_name: bt-integration

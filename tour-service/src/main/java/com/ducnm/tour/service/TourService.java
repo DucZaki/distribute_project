@@ -289,6 +289,43 @@ public class TourService {
         return Math.round(km * 10.0) / 10.0;
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<TourSummary> listAdmin(String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        LocalDate today = LocalDate.now();
+        Page<ChuyenDi> result = "completed".equalsIgnoreCase(status)
+                ? chuyenDiRepo.findByNgayKetThucLessThan(today, pageable)
+                : chuyenDiRepo.findByNgayKetThucGreaterThanEqualOrNgayKetThucIsNull(today, pageable);
+        return PageResponse.<TourSummary>builder()
+                .content(mapper.toSummaryList(result.getContent()))
+                .page(result.getNumber())
+                .size(result.getSize())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .last(result.isLast())
+                .build();
+    }
+
+    @CacheEvict(value = {"tours", "tours-featured"}, allEntries = true)
+    @Transactional
+    public TourResponse update(Integer id, CreateTourRequest req) {
+        ChuyenDi tour = chuyenDiRepo.findById(id)
+                .orElseThrow(() -> BusinessException.notFound("Tour", id));
+        if (req.getTieuDe() != null) tour.setTieuDe(req.getTieuDe());
+        if (req.getMoTa() != null) tour.setMoTa(req.getMoTa());
+        if (req.getGia() != null) tour.setGia(req.getGia());
+        if (req.getNgayKhoiHanh() != null) tour.setNgayKhoiHanh(req.getNgayKhoiHanh());
+        if (req.getNgayKetThuc() != null) tour.setNgayKetThuc(req.getNgayKetThuc());
+        if (req.getHinhAnh() != null) tour.setHinhAnh(req.getHinhAnh());
+        if (req.getHighlight() != null) tour.setHighlight(req.getHighlight());
+        if (req.getNoiBat() != null) tour.setNoiBat(req.getNoiBat());
+        if (req.getIdDiemDen() != null) {
+            tour.setDiemDen(diemDenRepo.findById(req.getIdDiemDen())
+                    .orElseThrow(() -> BusinessException.notFound("DiemDen", req.getIdDiemDen())));
+        }
+        return mapper.toResponse(chuyenDiRepo.save(tour));
+    }
+
     @CacheEvict(value = {"tours", "tours-featured"}, allEntries = true)
     @Transactional
     public void delete(Integer id) {

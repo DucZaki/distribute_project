@@ -17,6 +17,12 @@ import java.util.Optional;
 public interface ChuyenDiRepository
         extends JpaRepository<ChuyenDi, Integer>, JpaSpecificationExecutor<ChuyenDi> {
 
+    org.springframework.data.domain.Page<ChuyenDi> findByNgayKetThucGreaterThanEqualOrNgayKetThucIsNull(
+            LocalDate date, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<ChuyenDi> findByNgayKetThucLessThan(
+            LocalDate date, org.springframework.data.domain.Pageable pageable);
+
     List<ChuyenDi> findTop6ByNoiBatTrueOrderByIdDesc();
 
     Page<ChuyenDi> findByDiemDen_Id(Integer diemDenId, Pageable pageable);

@@ -81,6 +81,24 @@ spring:
             - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
             - JwtAuthenticationFilter
 
+        # PROTECTED: admin dashboard BFF
+        - id: admin-bff
+          uri: lb://admin-service
+          predicates:
+            - Path=/api/admin/dashboard/**, /api/admin/stats
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
+        # PROTECTED: review admin
+        - id: review-admin
+          uri: lb://review-service
+          predicates:
+            - Path=/api/admin/contacts/**, /api/admin/reviews/**
+          filters:
+            - RewritePath=/api/(?<seg>.*), /api/v1/${seg}
+            - JwtAuthenticationFilter
+
         # PROTECTED: identity (profile, admin user mgmt)
         - id: identity-secured
           uri: lb://identity-service

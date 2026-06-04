@@ -80,7 +80,30 @@ public class UserService {
                 .orElseThrow(() -> BusinessException.notFound("User", id));
         if (req.getVaiTro() != null) user.setVaiTro(req.getVaiTro());
         if (req.getEnabled() != null) user.setEnabled(req.getEnabled());
+        if (req.getHoTen() != null) user.setHoTen(req.getHoTen());
+        if (req.getNumber() != null) user.setNumber(req.getNumber());
         return mapper.toResponse(user);
+    }
+
+    @Transactional
+    public UserResponse adminCreate(AdminCreateUserRequest req) {
+        if (repo.existsByEmail(req.getEmail())) {
+            throw BusinessException.conflict("Email đã tồn tại");
+        }
+        if (repo.existsByTenDangNhap(req.getTenDangNhap())) {
+            throw BusinessException.conflict("Tên đăng nhập đã tồn tại");
+        }
+        NguoiDung user = NguoiDung.builder()
+                .email(req.getEmail())
+                .tenDangNhap(req.getTenDangNhap())
+                .matKhau(passwordEncoder.encode(req.getPassword()))
+                .hoTen(req.getHoTen())
+                .number(req.getNumber())
+                .vaiTro(req.getVaiTro() != null ? req.getVaiTro() : "USER")
+                .provider("LOCAL")
+                .enabled(req.getEnabled() == null || req.getEnabled())
+                .build();
+        return mapper.toResponse(repo.save(user));
     }
 
     @Transactional

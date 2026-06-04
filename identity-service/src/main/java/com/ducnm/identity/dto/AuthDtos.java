@@ -11,8 +11,9 @@ public class AuthDtos {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
+        /** Email hoặc tên đăng nhập */
         @NotBlank
-        @Email
+        @Size(max = 255)
         private String email;
         @NotBlank
         @Size(min = 6, max = 100)
