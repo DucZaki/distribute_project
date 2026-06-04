@@ -13,7 +13,7 @@ public class PaymentDtos {
     public static class CreatePaymentRequest {
         @NotNull
         private Integer bookingId;
-        @NotNull
+        /** Optional — server lấy tongGia từ booking-service. */
         private BigDecimal amount;
         private String orderInfo;
     }

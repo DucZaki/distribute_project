@@ -16,6 +16,22 @@ import {
 } from '../../api/adminDashboard'
 import { formatVnd } from '../../utils/format'
 
+function bookingStatusBadge(status?: string) {
+  switch (status) {
+    case 'CONFIRMED':
+    case 'PAID':
+      return { text: 'Đã thanh toán', className: 'bg-success' }
+    case 'PENDING':
+      return { text: 'Chờ thanh toán', className: 'bg-warning text-dark' }
+    case 'CANCELLED':
+      return { text: 'Đã hủy', className: 'bg-secondary' }
+    case 'FAILED':
+      return { text: 'Thất bại', className: 'bg-danger' }
+    default:
+      return { text: status || '—', className: 'bg-secondary' }
+  }
+}
+
 export function AdminDashboardPage() {
   const [kpis, setKpis] = useState<DashboardKpis | null>(null)
   const [years, setYears] = useState<number[]>([])
@@ -45,9 +61,15 @@ export function AdminDashboardPage() {
     getAdminSummaryStats().then((r) => setSummaryStats(r.data)).catch(() => setSummaryStats(null))
   }, [])
 
-  const revenueTrend = kpis?.revenueGrowthPercent ?? 0
+  const revenueTrend = kpis?.revenueGrowthPercent
   const revenueTrendLabel =
-    revenueTrend > 0 ? `+${revenueTrend}%` : revenueTrend < 0 ? `${revenueTrend}%` : '0%'
+    revenueTrend == null
+      ? null
+      : revenueTrend > 0
+        ? `+${revenueTrend}%`
+        : revenueTrend < 0
+          ? `${revenueTrend}%`
+          : '0%'
 
   useEffect(() => {
     getMonthlyRevenue(year)
@@ -130,12 +152,17 @@ export function AdminDashboardPage() {
                   <div className="bg-primary bg-opacity-10 text-dark p-3 rounded-3">
                     <i className="bi bi-currency-dollar fs-4" />
                   </div>
-                  <span className={`badge small ${revenueTrend >= 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}>
-                    {revenueTrendLabel} tháng này
-                  </span>
+                  {revenueTrendLabel != null && (
+                    <span className={`badge small ${(revenueTrend ?? 0) >= 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}>
+                      {revenueTrendLabel} so với tháng trước
+                    </span>
+                  )}
                 </div>
                 <h6 className="text-muted mb-1 small uppercase fw-bold">Doanh thu tổng</h6>
                 <h3 className="fw-bold mb-0 text-dark">{formatVnd(Number(kpis?.totalRevenue ?? 0))}</h3>
+                {kpis?.revenueThisMonth != null && (
+                  <div className="text-muted small mt-1">Tháng này: {formatVnd(Number(kpis.revenueThisMonth))}</div>
+                )}
               </div>
             </div>
           </Link>
@@ -283,7 +310,12 @@ export function AdminDashboardPage() {
                           <div className="text-muted small">{b.email || '-'}</div>
                         </td>
                         <td className="py-3 border-0 fw-bold">{b.total != null ? formatVnd(Number(b.total)) : '-'}</td>
-                        <td className="py-3 border-0"><span className="badge bg-secondary">{b.status}</span></td>
+                        <td className="py-3 border-0">
+                          {(() => {
+                            const s = bookingStatusBadge(b.status)
+                            return <span className={`badge ${s.className}`}>{s.text}</span>
+                          })()}
+                        </td>
                         <td className="py-3 border-0 text-muted small">{b.createdAt ? new Date(b.createdAt).toLocaleString('vi-VN') : '-'}</td>
                       </tr>
                     ))}

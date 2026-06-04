@@ -1,4 +1,4 @@
--- V3 import reset users; restore admin password (admin123) and role
+-- V4 import dump re-seeded admin with wrong bcrypt; restore admin123
 UPDATE nguoi_dung
 SET mat_khau = '$2a$10$UL/RON44HldK/FK1S8Tjse83m4/nZNBSxV7cte.FlIyeVzGmElF9i',
     vai_tro  = 'ADMIN',

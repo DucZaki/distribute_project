@@ -12,6 +12,9 @@ function myBookings(page = 0, size = 10) {
     true
   );
 }
+function getBooking(id) {
+  return apiFetch(`/bookings/${id}`, {}, true);
+}
 function cancelBooking(id) {
   return apiFetch(`/bookings/${id}/cancel`, { method: "POST" }, true);
 }
@@ -22,15 +25,27 @@ function applyPromo(ma, subtotal) {
     true
   );
 }
-function initVnPay(bookingId, amount) {
+function initVnPay(bookingId) {
   return apiFetch(
     "/payments/vnpay/init",
     {
       method: "POST",
-      body: JSON.stringify({ bookingId, amount, orderInfo: `Thanh to\xE1n \u0111\u01A1n #${bookingId}` })
+      body: JSON.stringify({ bookingId, orderInfo: `Donhang${bookingId}` })
     },
     true
   );
+}
+function repayVnPay(bookingId) {
+  return apiFetch(`/payments/vnpay/repay/${bookingId}`, { method: "POST" }, true);
+}
+async function redirectToVnPay(bookingId, repay = false) {
+  const res = repay ? await repayVnPay(bookingId) : await initVnPay(bookingId);
+  if (res.data?.redirectUrl) {
+    // replace: không giữ URL VNPay cũ trong history (Back → timeout)
+    window.location.replace(res.data.redirectUrl);
+    return true;
+  }
+  throw new Error("Không nhận được link VNPay");
 }
 function getCheckInDetail(token) {
   return apiFetch(`/check-in/${encodeURIComponent(token)}`);
@@ -47,7 +62,10 @@ export {
   cancelBooking,
   confirmCheckIn,
   createBooking,
+  getBooking,
   getCheckInDetail,
   initVnPay,
-  myBookings
+  myBookings,
+  redirectToVnPay,
+  repayVnPay
 };

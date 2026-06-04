@@ -62,7 +62,7 @@ function ToursPage() {
     next.set("page", String(p));
     setParams(next);
   }
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("section", { className: "container mt-5 pt-4 bg-white tour-list-heading" }, /* @__PURE__ */ React.createElement("h2", { className: "fw-bold mb-2 text-black" }, "Danh sách điểm đến"), /* @__PURE__ */ React.createElement("p", { className: "text-muted mb-0 d-md-none" }, "Lọc nhanh, chọn tour phù hợp và đặt chỉ trong vài bước.")), /* @__PURE__ */ React.createElement("div", { className: "container mb-5 bg-light" }, /* @__PURE__ */ React.createElement("section", { className: "bg-light py-5" }, /* @__PURE__ */ React.createElement("div", { className: "container" }, /* @__PURE__ */ React.createElement("div", { className: "mobile-filter-shell d-md-none mb-3" }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("section", { className: "container mt-5 pt-4 tour-list-heading" }, /* @__PURE__ */ React.createElement("h2", { className: "fw-bold mb-2 text-black" }, "Danh sách điểm đến"), /* @__PURE__ */ React.createElement("p", { className: "text-muted mb-0 d-md-none" }, "Lọc nhanh, chọn tour phù hợp và đặt chỉ trong vài bước.")), /* @__PURE__ */ React.createElement("div", { className: "container mb-5 bg-light" }, /* @__PURE__ */ React.createElement("section", { className: "bg-light py-5" }, /* @__PURE__ */ React.createElement("div", { className: "container" }, /* @__PURE__ */ React.createElement("div", { className: "mobile-filter-shell d-md-none mb-3" }, /* @__PURE__ */ React.createElement(
     "button",
     {
       className: "btn btn-primary w-100 fw-bold mobile-filter-toggle",

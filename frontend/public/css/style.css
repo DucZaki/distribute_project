@@ -35,6 +35,19 @@ h6 {
 }
 
 /* ===================== PREMIUM NAVIGATION DOCK ===================== */
+.tour-list-heading,
+.news-page-shell {
+    padding-top: 10rem !important;
+    margin-top: 0 !important;
+}
+
+@media (max-width: 991.98px) {
+    .tour-list-heading,
+    .news-page-shell {
+        padding-top: 8rem !important;
+    }
+}
+
 .premium-nav-dock {
     position: fixed;
     top: 24px;
@@ -2536,20 +2549,3 @@ a:hover {
 [data-theme="dark"] .home-section-newsletter {
     background: linear-gradient(135deg, rgba(254, 207, 47, 0.15) 0%, rgba(30, 33, 38, 0.95) 100%) !important;
 }
-
-/* Fix nav search dropdown overlap and z-index issues */
-.nav-search-dropdown {
-    top: 105px !important;
-    z-index: 2000 !important;
-}
-.nav-search-scrim {
-    z-index: 1990 !important;
-}
-
-@media (max-width: 991.98px) {
-    .nav-search-dropdown {
-        top: 85px !important;
-    }
-}
-
-

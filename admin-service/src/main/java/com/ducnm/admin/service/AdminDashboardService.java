@@ -36,6 +36,11 @@ public class AdminDashboardService {
         m.put("failedBookings", num(b.get("failedBookings")));
         m.put("pendingBookings", num(b.get("pendingBookings")));
         m.put("totalRevenue", dbl(b.get("totalRevenue")));
+        m.put("revenueThisMonth", dbl(b.get("revenueThisMonth")));
+        m.put("revenueLastMonth", dbl(b.get("revenueLastMonth")));
+        if (b.get("revenueGrowthPercent") != null) {
+            m.put("revenueGrowthPercent", dbl(b.get("revenueGrowthPercent")));
+        }
         m.put("totalUsers", users);
         m.put("totalTours", tours);
         long total = num(b.get("totalBookings"));
@@ -65,13 +70,13 @@ public class AdminDashboardService {
         if (!(raw instanceof Map<?, ?> counts)) {
             return Map.of("labels", List.of(), "data", List.of());
         }
-        List<String> labels = new ArrayList<>();
-        List<Long> data = new ArrayList<>();
+        Map<String, Long> merged = new LinkedHashMap<>();
         counts.forEach((k, v) -> {
-            labels.add(String.valueOf(k));
-            data.add(v instanceof Number n ? n.longValue() : 0L);
+            String label = statusLabel(String.valueOf(k));
+            long n = v instanceof Number num ? num.longValue() : 0L;
+            merged.merge(label, n, Long::sum);
         });
-        return Map.of("labels", labels, "data", data);
+        return Map.of("labels", new ArrayList<>(merged.keySet()), "data", new ArrayList<>(merged.values()));
     }
 
     public List<Map<String, Object>> topTours() {
@@ -145,6 +150,16 @@ public class AdminDashboardService {
 
     private static double dbl(Object v) {
         return v instanceof Number n ? n.doubleValue() : 0.0;
+    }
+
+    private static String statusLabel(String code) {
+        return switch (code) {
+            case "CONFIRMED", "PAID" -> "Đã thanh toán";
+            case "PENDING" -> "Chờ thanh toán";
+            case "CANCELLED" -> "Đã hủy";
+            case "FAILED" -> "Thất bại";
+            default -> code;
+        };
     }
 
     private static <T> T unwrap(ApiResponse<T> res) {

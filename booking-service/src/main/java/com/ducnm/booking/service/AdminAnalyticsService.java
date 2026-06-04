@@ -21,7 +21,7 @@ public class AdminAnalyticsService {
         long total = repo.countTotal();
         long paid = repo.countPaid();
         long failed = repo.countFailed();
-        long pending = total - paid - failed;
+        long pending = repo.countPending();
 
         Map<String, Long> statusCounts = new LinkedHashMap<>();
         for (Object[] row : repo.statusDistribution()) {
@@ -38,15 +38,14 @@ public class AdminAnalyticsService {
         }
 
         List<Map<String, Object>> userSpending = new ArrayList<>();
-        int uid = 1;
         for (Object[] row : repo.userSpending()) {
             if (userSpending.size() >= 20) break;
             userSpending.add(Map.of(
-                    "userId", uid++,
-                    "name", row[0],
-                    "email", row[1],
-                    "purchases", ((Number) row[2]).longValue(),
-                    "spending", ((Number) row[3]).doubleValue()));
+                    "userId", row[0],
+                    "name", row[1],
+                    "email", row[2],
+                    "purchases", ((Number) row[3]).longValue(),
+                    "spending", ((Number) row[4]).doubleValue()));
         }
 
         List<Map<String, Object>> recent = new ArrayList<>();
@@ -64,12 +63,24 @@ public class AdminAnalyticsService {
             }
         }
 
+        double revenueThisMonth = repo.revenueCurrentMonth();
+        double revenueLastMonth = repo.revenuePreviousMonth();
+        Double revenueGrowthPercent = null;
+        if (revenueLastMonth > 0) {
+            revenueGrowthPercent = Math.round(100.0 * (revenueThisMonth - revenueLastMonth) / revenueLastMonth * 10) / 10.0;
+        }
+
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("totalBookings", total);
         m.put("successBookings", paid);
         m.put("failedBookings", failed);
         m.put("pendingBookings", pending);
         m.put("totalRevenue", repo.sumRevenue());
+        m.put("revenueThisMonth", revenueThisMonth);
+        m.put("revenueLastMonth", revenueLastMonth);
+        if (revenueGrowthPercent != null) {
+            m.put("revenueGrowthPercent", revenueGrowthPercent);
+        }
         m.put("topTours", topTours);
         m.put("userSpending", userSpending);
         m.put("recentBookings", recent);
@@ -151,8 +162,8 @@ public class AdminAnalyticsService {
             out.add(Map.of(
                     "bookingId", row[0],
                     "userId", row[1],
-                    "userName", row[2],
-                    "email", row[3],
+                    "userName", row[2] != null ? row[2] : "",
+                    "email", row[3] != null ? row[3] : "",
                     "quantity", row[4],
                     "total", row[5],
                     "createdAt", row[6] != null ? row[6].toString() : ""));

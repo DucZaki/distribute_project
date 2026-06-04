@@ -20,7 +20,7 @@ export function NewsPage() {
   const featured = articles.length > 2 ? articles[2] : articles[0]
 
   return (
-    <div className="container py-5" style={{ marginTop: 50 }}>
+    <div className="container news-page-shell py-5">
       <div className="border-start border-4 border-primary ps-3 mb-5">
         <h2 className="fw-bold text-uppercase m-0">Tin tức mới nhất</h2>
         <p className="text-muted mb-0">Cập nhật tin tức du lịch 2026</p>

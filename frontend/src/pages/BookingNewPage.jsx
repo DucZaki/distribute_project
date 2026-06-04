@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { applyPromo, createBooking, initVnPay } from "../api/bookings";
+import { applyPromo, createBooking, redirectToVnPay } from "../api/bookings";
 import { fetchFlightQuote, getTour } from "../api/tours";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../api/client";
@@ -76,13 +76,10 @@ function BookingNewPage() {
       });
       const booking = res.data;
       try {
-        const pay = await initVnPay(booking.id, booking.tongGia);
-        if (pay.data.redirectUrl) {
-          window.location.href = pay.data.redirectUrl;
-          return;
-        }
-      } catch {
-        setError("VNPay ch\u01B0a \u0111\u01B0\u1EE3c c\u1EA5u h\xECnh (VNP_TMN_CODE / VNP_HASH_SECRET).");
+        await redirectToVnPay(booking.id);
+        return;
+      } catch (payErr) {
+        setError(payErr instanceof ApiError ? payErr.message : "Không tạo được link VNPay. Kiểm tra VNP_TMN_CODE / VNP_HASH_SECRET trong .env.");
       }
       navigate("/user/bookings");
     } catch (err) {

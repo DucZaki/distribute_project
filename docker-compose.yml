@@ -113,7 +113,9 @@ services:
     networks: [ bt-net ]
 
   gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: bt-gateway
     ports: [ "8080:8080" ]
     environment:
@@ -132,7 +134,9 @@ services:
   # DOMAIN SERVICES
   # =========================
   identity:
-    build: ./identity-service
+    build:
+      context: .
+      dockerfile: identity-service/Dockerfile
     container_name: bt-identity
     env_file: .env
     environment:
@@ -154,7 +158,9 @@ services:
     networks: [ bt-net ]
 
   tour:
-    build: ./tour-service
+    build:
+      context: .
+      dockerfile: tour-service/Dockerfile
     container_name: bt-tour
     environment:
       EUREKA_URL: http://discovery:8761/eureka/
@@ -171,7 +177,9 @@ services:
     networks: [ bt-net ]
 
   booking:
-    build: ./booking-service
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
     container_name: bt-booking
     env_file: .env
     environment:
@@ -189,7 +197,9 @@ services:
     networks: [ bt-net ]
 
   payment:
-    build: ./payment-service
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
     container_name: bt-payment
     env_file: .env
     environment:
@@ -202,7 +212,9 @@ services:
       KAFKA_BOOTSTRAP: kafka:29092
       VNP_TMN_CODE: ${VNP_TMN_CODE:-}
       VNP_HASH_SECRET: ${VNP_HASH_SECRET:-}
+      VNP_PAY_URL: ${VNP_PAY_URL:-https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
       VNP_RETURN_URL: ${VNP_RETURN_URL:-http://localhost:8080/api/vnpay/return}
+      VNP_IPN_URL: ${VNP_IPN_URL:-http://localhost:8080/api/vnpay/ipn}
       VNP_FRONTEND_RETURN_URL: ${VNP_FRONTEND_RETURN_URL:-http://localhost:8088/payment/result}
     depends_on:
       mysql: { condition: service_healthy }
@@ -230,7 +242,9 @@ services:
     networks: [ bt-net ]
 
   review:
-    build: ./review-service
+    build:
+      context: .
+      dockerfile: review-service/Dockerfile
     container_name: bt-review
     environment:
       EUREKA_URL: http://discovery:8761/eureka/
@@ -245,7 +259,9 @@ services:
     networks: [ bt-net ]
 
   admin:
-    build: ./admin-service
+    build:
+      context: .
+      dockerfile: admin-service/Dockerfile
     container_name: bt-admin
     environment:
       EUREKA_URL: http://discovery:8761/eureka/

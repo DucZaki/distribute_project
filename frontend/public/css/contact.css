@@ -1,7 +1,7 @@
 /* ===================== CONTACT HERO ===================== */
 .contact-hero {
     background: linear-gradient(135deg, #FFF9E6 0%, rgba(254, 207, 47, 0.15) 40%, #F9F9FC 80%);
-    padding: 5rem 0 3.5rem;
+    padding: 10rem 0 3.5rem;
     margin-bottom: 0;
     position: relative;
     overflow: hidden;
@@ -369,6 +369,6 @@
     }
 
     .contact-hero {
-        padding: 3.5rem 0 2.5rem;
+        padding: 8rem 0 2.5rem;
     }
 }
