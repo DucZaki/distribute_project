@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface NgayKhoiHanhRepository extends JpaRepository<NgayKhoiHanh, Integer> {
 
+    List<NgayKhoiHanh> findByChuyenDi_Id(Integer chuyenDiId);
+
     List<NgayKhoiHanh> findByChuyenDi_IdAndTrangThai(Integer chuyenDiId, String trangThai);
 
     Optional<NgayKhoiHanh> findByIdAndTrangThai(Integer id, String trangThai);

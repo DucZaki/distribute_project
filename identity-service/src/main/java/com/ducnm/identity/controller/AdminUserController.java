@@ -17,6 +17,22 @@ public class AdminUserController {
 
     private final UserService userService;
 
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getById(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer id) {
+        requireAdmin(roles);
+        return ApiResponse.ok(userService.getById(id));
+    }
+
+    @PostMapping
+    public ApiResponse<UserResponse> create(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @Valid @RequestBody AdminCreateUserRequest req) {
+        requireAdmin(roles);
+        return ApiResponse.ok(userService.adminCreate(req), "Tạo user thành công");
+    }
+
     @GetMapping
     public ApiResponse<PageResponse<UserResponse>> list(
             @RequestHeader(SecurityHeaders.USER_ROLES) String roles,

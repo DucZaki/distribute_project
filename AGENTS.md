@@ -4,7 +4,8 @@
 - Spring Boot 3.3.4 / Spring Cloud 2023.0.3 Maven microservices repo targeting Java 21.
 - Root `pom.xml` is the reactor for `common-lib`, platform services, and domain services.
 - **UI:** React SPA in `frontend/` (Vite, port `5173` dev / `8088` Docker). Browser calls **api-gateway** `:8080` only — no Thymeleaf BFF.
-- Service split follows the monolith at `/Users/minhduc/Documents/WorkSpace/Java/BookingTour`: identity, tour, booking, payment, notification, review, integration.
+- Service split follows the monolith `BookingTour`: identity, tour, booking, payment, notification, review, integration, **admin-service** (dashboard BFF).
+- **Admin UI:** React `/admin/**` (sidebar giống monolith `templates/admin/`). API: gateway → `admin-service` (dashboard/stats), domain services (users, tours, bookings, promos, contacts, reviews).
 
 ## Build And Verification
 - Use `./mvnw -q -DskipTests package` from repo root for a fast reactor build.

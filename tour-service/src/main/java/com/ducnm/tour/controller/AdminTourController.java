@@ -1,6 +1,7 @@
 package com.ducnm.tour.controller;
 
 import com.ducnm.common.dto.ApiResponse;
+import com.ducnm.common.dto.PageResponse;
 import com.ducnm.common.exception.BusinessException;
 import com.ducnm.common.util.SecurityHeaders;
 import com.ducnm.tour.dto.TourDtos.*;
@@ -20,12 +21,36 @@ public class AdminTourController {
     private final TourService tourService;
     private final ScheduleService scheduleService;
 
+    @GetMapping
+    public ApiResponse<PageResponse<TourSummary>> list(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @RequestParam(defaultValue = "active") String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        requireAdmin(roles);
+        return ApiResponse.ok(tourService.listAdmin(status, page, size));
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<TourResponse> get(@PathVariable Integer id) {
+        return ApiResponse.ok(tourService.getById(id));
+    }
+
     @PostMapping
     public ApiResponse<TourResponse> create(
             @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
             @Valid @RequestBody CreateTourRequest req) {
         requireAdmin(roles);
         return ApiResponse.ok(tourService.create(req), "Tạo tour thành công");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<TourResponse> update(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer id,
+            @Valid @RequestBody CreateTourRequest req) {
+        requireAdmin(roles);
+        return ApiResponse.ok(tourService.update(id, req));
     }
 
     @DeleteMapping("/{id}")
@@ -39,7 +64,7 @@ public class AdminTourController {
 
     @GetMapping("/{id}/schedules")
     public ApiResponse<List<NgayKhoiHanhDto>> schedules(@PathVariable Integer id) {
-        return ApiResponse.ok(scheduleService.listActive(id));
+        return ApiResponse.ok(scheduleService.listAll(id));
     }
 
     @PostMapping("/{id}/schedules")
@@ -51,9 +76,32 @@ public class AdminTourController {
         return ApiResponse.ok(scheduleService.create(id, req));
     }
 
-    /**
-     * Internal endpoint - called by booking-service via Feign for atomic seat reservation.
-     */
+    @PutMapping("/{tourId}/schedules/{scheduleId}")
+    public ApiResponse<NgayKhoiHanhDto> updateSchedule(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer scheduleId,
+            @Valid @RequestBody NgayKhoiHanhDto req) {
+        requireAdmin(roles);
+        return ApiResponse.ok(scheduleService.update(scheduleId, req));
+    }
+
+    @PutMapping("/{tourId}/schedules/{scheduleId}/toggle")
+    public ApiResponse<NgayKhoiHanhDto> toggleSchedule(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer scheduleId) {
+        requireAdmin(roles);
+        return ApiResponse.ok(scheduleService.toggle(scheduleId));
+    }
+
+    @DeleteMapping("/{tourId}/schedules/{scheduleId}")
+    public ApiResponse<Void> deleteSchedule(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer scheduleId) {
+        requireAdmin(roles);
+        scheduleService.delete(scheduleId);
+        return ApiResponse.ok(null, "Đã xoá");
+    }
+
     @PostMapping("/internal/schedules/{scheduleId}/reserve")
     public ApiResponse<Boolean> reserve(
             @PathVariable Integer scheduleId,

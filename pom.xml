@@ -30,6 +30,7 @@
         <module>review-service</module>
         <module>notification-service</module>
         <module>integration-service</module>
+        <module>admin-service</module>
     </modules>
 
     <properties>

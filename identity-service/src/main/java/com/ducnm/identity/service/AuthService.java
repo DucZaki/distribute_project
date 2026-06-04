@@ -53,8 +53,9 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest req) {
-        NguoiDung user = repo.findByEmail(req.getEmail())
-                .orElseThrow(() -> BusinessException.unauthorized("Email hoặc mật khẩu không đúng"));
+        String login = req.getEmail() == null ? "" : req.getEmail().trim();
+        NguoiDung user = repo.findByEmailOrTenDangNhap(login)
+                .orElseThrow(() -> BusinessException.unauthorized("Tên đăng nhập hoặc mật khẩu không chính xác"));
 
         if (!"LOCAL".equalsIgnoreCase(user.getProvider())) {
             throw BusinessException.badRequest("Tài khoản này sử dụng đăng nhập " + user.getProvider());
@@ -62,8 +63,8 @@ public class AuthService {
         if (Boolean.FALSE.equals(user.getEnabled())) {
             throw BusinessException.forbidden("Tài khoản đã bị vô hiệu hoá");
         }
-        if (!passwordEncoder.matches(req.getPassword(), user.getMatKhau())) {
-            throw BusinessException.unauthorized("Email hoặc mật khẩu không đúng");
+        if (user.getMatKhau() == null || !passwordEncoder.matches(req.getPassword(), user.getMatKhau())) {
+            throw BusinessException.unauthorized("Tên đăng nhập hoặc mật khẩu không chính xác");
         }
 
         return issueTokens(user);
