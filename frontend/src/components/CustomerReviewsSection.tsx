@@ -61,9 +61,15 @@ export function CustomerReviewsSection() {
 
   if (loading) {
     return (
-      <section className="py-5 text-center bg-light">
+      <section className="py-5 text-center home-section-reviews">
         <div className="container">
-          <h2 className="fw-bold mb-4">Khách hàng nói gì?</h2>
+          <div className="text-center mb-4 mx-auto" style={{ maxWidth: '680px' }}>
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Đánh giá</span>
+            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+              Khách hàng nói gì?
+            </h2>
+            <p className="text-muted mb-0">Những chia sẻ và cảm nhận thực tế từ hành khách sau mỗi chuyến đi</p>
+          </div>
           <div className="text-muted py-4">
             <span className="spinner-border spinner-border-sm me-2" role="status" />
             Đang tải bình luận...
@@ -78,9 +84,15 @@ export function CustomerReviewsSection() {
   }
 
   return (
-    <section className="py-5 text-center bg-light">
+    <section className="py-5 text-center home-section-reviews">
       <div className="container">
-        <h2 className="fw-bold mb-4">Khách hàng nói gì?</h2>
+        <div className="text-center mb-5 mx-auto" style={{ maxWidth: '680px' }}>
+          <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Đánh giá</span>
+          <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+            Khách hàng nói gì?
+          </h2>
+          <p className="text-muted mb-0">Những chia sẻ và cảm nhận thực tế từ hành khách sau mỗi chuyến đi</p>
+        </div>
 
         <div
           id="reviewCarousel"

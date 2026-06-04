@@ -176,10 +176,13 @@ function ZakiLayout() {
       <Outlet />
 
       {isHome && (
-        <section className="py-5 bg-light">
-          <div className="container text-center">
-            <h2 className="fw-bold">Nhận ưu đãi tour mới nhất</h2>
-            <p className="text-muted">Đăng ký để không bỏ lỡ các chương trình khuyến mãi.</p>
+        <section className="py-5 home-section-newsletter">
+          <div className="container text-center py-2">
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Bản tin</span>
+            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+              Nhận ưu đãi tour mới nhất
+            </h2>
+            <p className="text-muted mb-4">Đăng ký email để không bỏ lỡ các chương trình khuyến mãi cực hot từ ZakiBooking.</p>
             <form className="d-flex justify-content-center mt-3 mx-auto" style={{ maxWidth: 600 }} onSubmit={(e) => {
               e.preventDefault();
               const email = new FormData(e.currentTarget).get("email");

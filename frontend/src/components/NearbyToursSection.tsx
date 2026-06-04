@@ -177,48 +177,47 @@ export function NearbyToursSection() {
   } : null
 
   return (
-    <section className="py-5 bg-white" id="nearbyToursSection">
+    <section className="py-5 home-section-nearby" id="nearbyToursSection">
       <div className="container">
-        <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-          <div>
-            <h6 className="text-primary fw-bold text-uppercase ls-wide">Gần bạn</h6>
-            <h2 className="fw-800 mb-0" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
-              Chuyến đi gần bạn
-            </h2>
-            <p className="text-muted mb-0 mt-2">Tour khởi hành từ điểm đón gần vị trí hiện tại của bạn</p>
-          </div>
-          <div className="d-flex flex-wrap align-items-center gap-2">
-            <select
-              className="form-select"
-              id="nearbyCitySelect"
-              style={{ minWidth: 180 }}
-              defaultValue=""
-              aria-label="Chọn thành phố xuất phát"
-              onChange={(e) => {
-                if (e.target.value) {
-                  loadNearby({ city: e.target.value, page: 0 })
-                }
-              }}
-            >
-              <option value="">Hoặc chọn thành phố</option>
-              <option value="Hà Nội">Hà Nội</option>
-              <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-              <option value="Đà Nẵng">Đà Nẵng</option>
-            </select>
-            <button
-              type="button"
-              className="btn btn-outline-primary"
-              id="nearbyRetryBtn"
-              onClick={requestGeolocation}
-            >
-              <i className="bi bi-crosshair" /> Dùng vị trí của tôi
-            </button>
-          </div>
+        <div className="text-center mb-4 mx-auto animate-fade-in" style={{ maxWidth: '680px' }}>
+          <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Gần bạn</span>
+          <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+            Chuyến đi gần bạn
+          </h2>
+          <p className="text-muted mb-0">Tour khởi hành từ điểm đón gần vị trí hiện tại của bạn</p>
+        </div>
+
+        <div className="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-4">
+          <select
+            className="form-select"
+            id="nearbyCitySelect"
+            style={{ width: 'auto', minWidth: 180 }}
+            defaultValue=""
+            aria-label="Chọn thành phố xuất phát"
+            onChange={(e) => {
+              if (e.target.value) {
+                loadNearby({ city: e.target.value, page: 0 })
+              }
+            }}
+          >
+            <option value="">Hoặc chọn thành phố</option>
+            <option value="Hà Nội">Hà Nội</option>
+            <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
+          </select>
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            id="nearbyRetryBtn"
+            onClick={requestGeolocation}
+          >
+            <i className="bi bi-crosshair" /> Dùng vị trí của tôi
+          </button>
         </div>
 
         <div
           id="nearbyToursStatus"
-          className={`nearby-status mb-4${statusError ? ' text-danger' : ' text-muted'}`}
+          className={`nearby-status text-center mb-4${statusError ? ' text-danger' : ' text-muted'}`}
           dangerouslySetInnerHTML={{ __html: statusHtml }}
         />
 

@@ -2500,3 +2500,40 @@ a:hover {
 .animate-fade-in {
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ===================== HOMEPAGE PREMIUM SECTIONS ===================== */
+.home-section-nearby {
+    background-color: #F8F9FB !important;
+}
+[data-theme="dark"] .home-section-nearby {
+    background-color: #1a1c1e !important;
+}
+
+.home-section-destinations {
+    background-color: #FFFFFF !important;
+}
+[data-theme="dark"] .home-section-destinations {
+    background-color: #121416 !important;
+}
+
+.home-section-popular {
+    background-color: #FFFDF2 !important;
+}
+[data-theme="dark"] .home-section-popular {
+    background-color: #1f1e1a !important;
+}
+
+.home-section-reviews {
+    background-color: #F4F6F9 !important;
+}
+[data-theme="dark"] .home-section-reviews {
+    background-color: #1a1d21 !important;
+}
+
+.home-section-newsletter {
+    background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CD 100%) !important;
+}
+[data-theme="dark"] .home-section-newsletter {
+    background: linear-gradient(135deg, rgba(254, 207, 47, 0.15) 0%, rgba(30, 33, 38, 0.95) 100%) !important;
+}
+

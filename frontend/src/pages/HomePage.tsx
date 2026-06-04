@@ -140,17 +140,16 @@ export function HomePage() {
 
       <NearbyToursSection />
 
-      <section className="py-5">
+      <section className="py-5 home-section-destinations">
         <div className="container">
-          <div className="d-flex align-items-end justify-content-between mb-5">
-            <div>
-              <h6 className="text-primary fw-bold text-uppercase ls-wide">Explore</h6>
-              <h2 className="fw-800 mb-0" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
-                Điểm đến nổi bật
-              </h2>
-            </div>
-            <Link to="/tour" className="text-dark fw-bold text-decoration-none border-bottom border-2 border-primary pb-1">
-              Xem tất cả
+          <div className="text-center mb-5 mx-auto" style={{ maxWidth: '680px' }}>
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Khám phá</span>
+            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+              Điểm đến nổi bật
+            </h2>
+            <p className="text-muted mb-3">Khám phá các địa danh du lịch hot nhất trong và ngoài nước</p>
+            <Link to="/tour" className="text-primary fw-bold text-decoration-none border-bottom border-2 border-primary pb-1">
+              Xem tất cả điểm đến
             </Link>
           </div>
           <div className="row g-4">
@@ -176,18 +175,24 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="bg-brand-light py-5">
-        <div className="container text-center">
-          <h2 className="fw-bold mb-2">Tour được yêu thích nhất</h2>
+      <section className="home-section-popular py-5">
+        <div className="container">
+          <div className="text-center mb-5 mx-auto" style={{ maxWidth: '680px' }}>
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Phổ biến</span>
+            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+              Tour được yêu thích nhất
+            </h2>
+            <p className="text-muted mb-0">Những hành trình tuyệt vời được khách hàng bình chọn và đánh giá hàng đầu</p>
+          </div>
           <div className="row g-4 justify-content-center">
             {featuredLoading && tours.length === 0 && (
-              <div className="col-12 text-muted py-4">
+              <div className="col-12 text-muted py-4 text-center">
                 <span className="spinner-border spinner-border-sm me-2" role="status" />
                 Đang tải tour nổi bật...
               </div>
             )}
             {!featuredLoading && featuredError && tours.length === 0 && (
-              <div className="col-12 py-4">
+              <div className="col-12 py-4 text-center">
                 <div className="alert alert-light mb-0">{featuredError}</div>
               </div>
             )}
