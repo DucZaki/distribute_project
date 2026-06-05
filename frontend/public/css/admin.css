@@ -80,6 +80,10 @@ body {
 .tier-silver { background: rgba(0,0,0,0.04); }
 .tier-bronze { background: rgba(0,0,0,0.03); }
 
+.ls-1 {
+  letter-spacing: 0.05em;
+}
+
 /* Brand overrides */
 .bg-primary { background-color: #fecf2f !important; }
 .text-primary { color: #000000 !important; }

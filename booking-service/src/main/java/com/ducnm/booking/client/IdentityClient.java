@@ -11,5 +11,5 @@ public interface IdentityClient {
     @GetMapping("/api/v1/users/{id}")
     ApiResponse<UserBrief> getUser(@PathVariable("id") Integer id);
 
-    record UserBrief(Integer id, String email, String hoTen, String number, String anhDaiDien) {}
+    record UserBrief(Integer id, String email, String hoTen, String tenDangNhap, String number, String anhDaiDien) {}
 }

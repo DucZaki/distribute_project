@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 public class AdminAnalyticsService {
 
     private final AdminAnalyticsRepository repo;
+    private final UserDisplayNameResolver displayNameResolver;
 
     @Transactional(readOnly = true)
     public Map<String, Object> metrics() {
@@ -30,22 +31,29 @@ public class AdminAnalyticsService {
 
         List<Map<String, Object>> topTours = new ArrayList<>();
         for (Object[] row : repo.topTours()) {
-            if (topTours.size() >= 10) break;
+            if (topTours.size() >= 50) break;
+            double revenue = ((Number) row[2]).doubleValue();
+            if (revenue <= 0) continue;
             topTours.add(Map.of(
                     "tourId", row[0],
                     "bookings", ((Number) row[1]).longValue(),
-                    "revenue", ((Number) row[2]).doubleValue()));
+                    "revenue", revenue));
         }
 
         List<Map<String, Object>> userSpending = new ArrayList<>();
         for (Object[] row : repo.userSpending()) {
-            if (userSpending.size() >= 20) break;
+            if (userSpending.size() >= 50) break;
+            Integer userId = row[0] != null ? ((Number) row[0]).intValue() : null;
+            String rawName = row[1] != null ? String.valueOf(row[1]) : "";
+            String email = row[2] != null ? String.valueOf(row[2]) : "";
+            double spending = ((Number) row[4]).doubleValue();
+            if (spending <= 0) continue;
             userSpending.add(Map.of(
-                    "userId", row[0],
-                    "name", row[1],
-                    "email", row[2],
+                    "userId", userId != null ? userId : 0,
+                    "name", displayNameResolver.resolve(userId, rawName, email),
+                    "email", email,
                     "purchases", ((Number) row[3]).longValue(),
-                    "spending", ((Number) row[4]).doubleValue()));
+                    "spending", spending));
         }
 
         List<Map<String, Object>> recent = new ArrayList<>();
@@ -159,11 +167,14 @@ public class AdminAnalyticsService {
     public List<Map<String, Object>> tourBookings(Integer tourId) {
         List<Map<String, Object>> out = new ArrayList<>();
         for (Object[] row : repo.bookingsByTour(tourId)) {
+            Integer userId = row[1] != null ? ((Number) row[1]).intValue() : null;
+            String hoTen = row[2] != null ? String.valueOf(row[2]) : "";
+            String email = row[3] != null ? String.valueOf(row[3]) : "";
             out.add(Map.of(
                     "bookingId", row[0],
-                    "userId", row[1],
-                    "userName", row[2] != null ? row[2] : "",
-                    "email", row[3] != null ? row[3] : "",
+                    "userId", userId != null ? userId : 0,
+                    "userName", displayNameResolver.resolve(userId, hoTen, email),
+                    "email", email,
                     "quantity", row[4],
                     "total", row[5],
                     "createdAt", row[6] != null ? row[6].toString() : ""));
@@ -171,12 +182,15 @@ public class AdminAnalyticsService {
         return out;
     }
 
-    private static Map<String, Object> bookingRow(Object[] row) {
+    private Map<String, Object> bookingRow(Object[] row) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("bookingId", row[0]);
         m.put("tourId", row[1]);
         m.put("userId", row[2]);
-        m.put("userName", row[3]);
+        m.put("userName", displayNameResolver.resolve(
+                row[2] != null ? ((Number) row[2]).intValue() : null,
+                row[3] != null ? String.valueOf(row[3]) : "",
+                row[4] != null ? String.valueOf(row[4]) : ""));
         m.put("email", row[4]);
         m.put("quantity", row[5]);
         m.put("total", row[6]);

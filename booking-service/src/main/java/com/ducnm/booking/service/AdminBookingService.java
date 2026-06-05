@@ -9,6 +9,7 @@ import com.ducnm.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +19,14 @@ public class AdminBookingService {
 
     private final DatChoRepository repo;
     private final TourClient tourClient;
+    private final UserDisplayNameResolver displayNameResolver;
 
     @Transactional(readOnly = true)
     public PageResponse<AdminBookingResponse> list(String trangThai, int page, int size) {
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<DatCho> p = trangThai != null && !trangThai.isBlank()
-                ? repo.findByTrangThai(trangThai, PageRequest.of(page, size))
-                : repo.findAll(PageRequest.of(page, size));
+                ? repo.findByTrangThai(trangThai, pageable)
+                : repo.findAll(pageable);
         return PageResponse.<AdminBookingResponse>builder()
                 .content(p.getContent().stream().map(this::map).toList())
                 .page(p.getNumber())
@@ -71,7 +74,7 @@ public class AdminBookingService {
                 .soLuong(d.getSoLuong())
                 .ngayDat(d.getNgayDat())
                 .createdAt(d.getCreatedAt())
-                .hoTen(d.getHoTen())
+                .hoTen(displayNameResolver.resolve(d.getIdNguoiDung(), d.getHoTen(), d.getEmail()))
                 .email(d.getEmail())
                 .tieuDeTour(tourTitle)
                 .maCheckIn(d.getMaCheckIn())

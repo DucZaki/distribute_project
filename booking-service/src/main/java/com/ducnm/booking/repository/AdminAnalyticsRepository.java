@@ -12,6 +12,8 @@ import java.util.List;
 public interface AdminAnalyticsRepository extends JpaRepository<DatCho, Integer> {
 
     String PAID_FILTER = "d.trangThai IN ('PAID', 'CONFIRMED')";
+    /** Đặt chỗ còn hiệu lực — dùng bảng dashboard (gồm chờ thanh toán) */
+    String ACTIVE_BOOKING_FILTER = "d.trangThai IN ('PAID', 'CONFIRMED', 'PENDING')";
     String FAILED_FILTER = "d.trangThai IN ('FAILED', 'CANCELLED')";
 
     @Query("SELECT COUNT(d) FROM DatCho d")
@@ -33,7 +35,7 @@ public interface AdminAnalyticsRepository extends JpaRepository<DatCho, Integer>
     List<Object[]> statusDistribution();
 
     @Query("SELECT d.idChuyenDi, COUNT(d), COALESCE(SUM(d.tongGia), 0) FROM DatCho d WHERE " + PAID_FILTER + " " +
-            "GROUP BY d.idChuyenDi ORDER BY COUNT(d) DESC")
+            "GROUP BY d.idChuyenDi HAVING COALESCE(SUM(d.tongGia), 0) > 0 ORDER BY SUM(d.tongGia) DESC")
     List<Object[]> topTours();
 
     @Query(value = """
@@ -82,9 +84,9 @@ public interface AdminAnalyticsRepository extends JpaRepository<DatCho, Integer>
             """, nativeQuery = true)
     double revenuePreviousMonth();
 
-    @Query("SELECT d.idNguoiDung, COALESCE(d.hoTen, ''), COALESCE(d.email, ''), COUNT(d), COALESCE(SUM(d.tongGia), 0) " +
+    @Query("SELECT d.idNguoiDung, COALESCE(MAX(d.hoTen), ''), COALESCE(MAX(d.email), ''), COUNT(d), COALESCE(SUM(d.tongGia), 0) " +
             "FROM DatCho d WHERE " + PAID_FILTER + " " +
-            "GROUP BY d.idNguoiDung, d.hoTen, d.email ORDER BY SUM(d.tongGia) DESC")
+            "GROUP BY d.idNguoiDung HAVING COALESCE(SUM(d.tongGia), 0) > 0 ORDER BY SUM(d.tongGia) DESC")
     List<Object[]> userSpending();
 
     @Query("SELECT d.id, d.idChuyenDi, d.idNguoiDung, d.hoTen, d.email, d.soLuong, d.tongGia, d.trangThai, d.createdAt " +
