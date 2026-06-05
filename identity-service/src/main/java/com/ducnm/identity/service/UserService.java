@@ -61,8 +61,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<UserResponse> listAll(int page, int size) {
-        Page<NguoiDung> p = repo.findAll(PageRequest.of(page, size));
+    public PageResponse<UserResponse> listAll(int page, int size, String q) {
+        Page<NguoiDung> p = q != null && !q.isBlank()
+                ? repo.search(q.trim(), PageRequest.of(page, size))
+                : repo.findAll(PageRequest.of(page, size));
         List<UserResponse> content = p.getContent().stream().map(mapper::toResponse).toList();
         return PageResponse.<UserResponse>builder()
                 .content(content)
@@ -82,6 +84,23 @@ public class UserService {
         if (req.getEnabled() != null) user.setEnabled(req.getEnabled());
         if (req.getHoTen() != null) user.setHoTen(req.getHoTen());
         if (req.getNumber() != null) user.setNumber(req.getNumber());
+        if (req.getTenDangNhap() != null && !req.getTenDangNhap().isBlank()) {
+            if (repo.existsByTenDangNhap(req.getTenDangNhap()) &&
+                    !req.getTenDangNhap().equalsIgnoreCase(user.getTenDangNhap())) {
+                throw BusinessException.conflict("Tên đăng nhập đã tồn tại");
+            }
+            user.setTenDangNhap(req.getTenDangNhap());
+        }
+        if (req.getEmail() != null && !req.getEmail().isBlank()) {
+            if (repo.existsByEmail(req.getEmail()) &&
+                    !req.getEmail().equalsIgnoreCase(user.getEmail())) {
+                throw BusinessException.conflict("Email đã tồn tại");
+            }
+            user.setEmail(req.getEmail());
+        }
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            user.setMatKhau(passwordEncoder.encode(req.getPassword()));
+        }
         return mapper.toResponse(user);
     }
 

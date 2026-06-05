@@ -32,7 +32,7 @@ public interface ChuyenDiRepository
     @Query("select c from ChuyenDi c where c.tieuDe like %:keyword% or c.moTa like %:keyword%")
     Page<ChuyenDi> searchByKeyword(String keyword, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"lichTrinhs", "diemDen", "phuongTien", "diemDonDefault"})
+    @EntityGraph(attributePaths = {"lichTrinhs", "diemDen", "phuongTien", "diemDonDefault", "diemDons"})
     @Query("select c from ChuyenDi c where c.id = :id")
     Optional<ChuyenDi> findDetailedById(Integer id);
 

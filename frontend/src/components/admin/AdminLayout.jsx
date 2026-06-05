@@ -48,9 +48,6 @@ function AdminLayout() {
         <nav className="admin-sidebar border-end bg-white">
           <ul className="nav flex-column px-3 py-2">
             <li className="nav-item mb-1"><NavLink end className="nav-link" to="/admin"><i className="bi bi-speedometer2 me-2" />Tổng quan</NavLink></li>
-            <li className="nav-item mb-1"><NavLink className="nav-link" to="/admin/revenue"><i className="bi bi-graph-up me-2" />Doanh thu</NavLink></li>
-            <li className="nav-item mb-1"><NavLink className="nav-link" to="/admin/bookings"><i className="bi bi-journal-check me-2" />Đặt chỗ</NavLink></li>
-            <li className="nav-item mb-1"><NavLink className="nav-link" to="/admin/tour-performance"><i className="bi bi-bar-chart me-2" />Hiệu suất tour</NavLink></li>
             <li className="nav-item mb-1"><NavLink className="nav-link" to="/admin/user"><i className="bi bi-people me-2" />Quản lý người dùng</NavLink></li>
             <li className="nav-item mb-1">
               <button type="button" className="nav-link w-100 border-0 bg-transparent d-flex justify-content-between align-items-center" onClick={() => setTourMenuOpen((o) => !o)}>

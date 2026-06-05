@@ -96,11 +96,26 @@ body {
   color: #000 !important;
 }
 
+/* Chữ/icon luôn tối trên nền vàng — tránh trùng màu primary (#fecf2f) */
 .btn-outline-primary {
-  color: #fecf2f !important;
+  --bs-btn-color: #1a1c1e;
+  --bs-btn-border-color: #fecf2f;
+  --bs-btn-bg: #fecf2f;
+  --bs-btn-hover-color: #1a1c1e;
+  --bs-btn-hover-bg: #e6ba1a;
+  --bs-btn-hover-border-color: #e6ba1a;
+  color: #1a1c1e !important;
   border-color: #fecf2f !important;
-}
-.btn-outline-primary:hover {
   background-color: #fecf2f !important;
-  color: #000 !important;
+  font-weight: 600;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus-visible,
+.btn-outline-primary:active {
+  background-color: #e6ba1a !important;
+  border-color: #e6ba1a !important;
+  color: #1a1c1e !important;
+}
+.btn-outline-primary .bi {
+  color: #1a1c1e !important;
 }

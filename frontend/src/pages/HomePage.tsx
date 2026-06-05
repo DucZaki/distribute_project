@@ -1,127 +1,159 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { getFeaturedDestinations, getFeaturedTours, searchTours } from '../api/tours'
-import { CustomerReviewsSection } from '../components/CustomerReviewsSection'
-import { NearbyToursSection } from '../components/NearbyToursSection'
-import type { DiemDenSummary, TourSummary } from '../types/api'
-import { TourCardStats } from '../components/TourCardStats'
-import { formatVnd, imageUrl } from '../utils/format'
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  getFeaturedDestinations,
+  getFeaturedTours,
+  searchTours,
+} from "../api/tours";
+import { CustomerReviewsSection } from "../components/CustomerReviewsSection";
+import { NearbyToursSection } from "../components/NearbyToursSection";
+import type { DiemDenSummary, TourSummary } from "../types/api";
+import { TourCardStats } from "../components/TourCardStats";
+import { formatVnd, imageUrl } from "../utils/format";
 
 export function HomePage() {
-  const navigate = useNavigate()
-  const [tours, setTours] = useState<TourSummary[]>([])
-  const [featuredLoading, setFeaturedLoading] = useState(true)
-  const [featuredError, setFeaturedError] = useState<string | null>(null)
-  const [destinations, setDestinations] = useState<DiemDenSummary[]>([])
-  const FEATURED_LIMIT = 3
-  const REFRESH_MS = 30_000
+  const navigate = useNavigate();
+  const [tours, setTours] = useState<TourSummary[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+  const [destinations, setDestinations] = useState<DiemDenSummary[]>([]);
+  const FEATURED_LIMIT = 3;
+  const REFRESH_MS = 30_000;
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     const applyTours = (top: TourSummary[]) => {
-      setTours(top)
-      setFeaturedError(null)
-    }
+      setTours(top);
+      setFeaturedError(null);
+    };
 
     const loadFeatured = (showSpinner = false) => {
-      if (showSpinner && !cancelled) setFeaturedLoading(true)
+      if (showSpinner && !cancelled) setFeaturedLoading(true);
       getFeaturedTours(FEATURED_LIMIT)
         .then((r) => {
-          if (cancelled) return
-          const top = (r.data ?? []).slice(0, FEATURED_LIMIT)
+          if (cancelled) return;
+          const top = (r.data ?? []).slice(0, FEATURED_LIMIT);
           if (top.length > 0) {
-            applyTours(top)
-            return
+            applyTours(top);
+            return;
           }
-          return searchTours({ sort: 'popular', size: FEATURED_LIMIT, page: 0 }).then((page) => {
-            if (cancelled) return
-            applyTours((page.data?.content ?? []).slice(0, FEATURED_LIMIT))
-          })
+          return searchTours({
+            sort: "popular",
+            size: FEATURED_LIMIT,
+            page: 0,
+          }).then((page) => {
+            if (cancelled) return;
+            applyTours((page.data?.content ?? []).slice(0, FEATURED_LIMIT));
+          });
         })
         .catch(() =>
-          searchTours({ sort: 'popular', size: FEATURED_LIMIT, page: 0 })
+          searchTours({ sort: "popular", size: FEATURED_LIMIT, page: 0 })
             .then((page) => {
-              if (cancelled) return
-              const top = (page.data?.content ?? []).slice(0, FEATURED_LIMIT)
+              if (cancelled) return;
+              const top = (page.data?.content ?? []).slice(0, FEATURED_LIMIT);
               if (top.length > 0) {
-                applyTours(top)
+                applyTours(top);
               } else if (!cancelled) {
-                setTours([])
-                setFeaturedError('Không tải được tour nổi bật. Thử tải lại trang sau vài giây.')
+                setTours([]);
+                setFeaturedError(
+                  "Không tải được tour nổi bật. Thử tải lại trang sau vài giây.",
+                );
               }
             })
             .catch(() => {
               if (!cancelled) {
-                setTours([])
-                setFeaturedError('Không tải được tour nổi bật. Kiểm tra api-gateway và tour-service.')
+                setTours([]);
+                setFeaturedError(
+                  "Không tải được tour nổi bật. Kiểm tra api-gateway và tour-service.",
+                );
               }
-            })
+            }),
         )
         .finally(() => {
-          if (!cancelled) setFeaturedLoading(false)
-        })
-    }
+          if (!cancelled) setFeaturedLoading(false);
+        });
+    };
 
-    loadFeatured(true)
-    const timer = window.setInterval(() => loadFeatured(false), REFRESH_MS)
+    loadFeatured(true);
+    const timer = window.setInterval(() => loadFeatured(false), REFRESH_MS);
     const onVisible = () => {
-      if (document.visibilityState === 'visible') loadFeatured(false)
-    }
-    document.addEventListener('visibilitychange', onVisible)
+      if (document.visibilityState === "visible") loadFeatured(false);
+    };
+    document.addEventListener("visibilitychange", onVisible);
 
     getFeaturedDestinations().then((r) => {
-      if (!cancelled) setDestinations(r.data ?? [])
-    })
+      if (!cancelled) setDestinations(r.data ?? []);
+    });
 
     return () => {
-      cancelled = true
-      window.clearInterval(timer)
-      document.removeEventListener('visibilitychange', onVisible)
-    }
-  }, [])
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, []);
 
   return (
     <section>
       <header className="hero-section text-center">
         <div className="container">
           <h1 id="typing-text">
-            Bạn muốn đi đâu cùng <span className="brand-gradient">ZakiBooking?</span>
+            Bạn muốn đi đâu cùng{" "}
+            <span className="brand-gradient">ZakiBooking?</span>
           </h1>
           <p className="lead hero-lead mx-auto">
-            Khám phá hàng ngàn tour du lịch hấp dẫn với giá tốt nhất, kiến tạo những kỷ niệm vô giá cùng chúng tôi.
+            Khám phá hàng ngàn tour du lịch hấp dẫn với giá tốt nhất, kiến tạo
+            những kỷ niệm vô giá cùng chúng tôi.
           </p>
         </div>
       </header>
 
-      <section className="search-section py-4" id="homeSearch" style={{ marginTop: -60, position: 'relative', zIndex: 10 }}>
-        <div className="container">
+      <section>
+        <div className="container search-section py-4" id="homeSearch" style={{ marginTop: -60, position: "relative", zIndex: 10 }}>
           <form
             className="search-card p-4 rounded-5 shadow-lg"
             onSubmit={(e) => {
-              e.preventDefault()
-              const fd = new FormData(e.currentTarget)
-              const params = new URLSearchParams()
-              ;['diemDen', 'ngayDi', 'khoangGia'].forEach((k) => {
-                const v = String(fd.get(k) ?? '')
-                if (v) params.set(k, v)
-              })
-              navigate(`/tour?${params}`)
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              const params = new URLSearchParams();
+              ["diemDen", "ngayDi", "khoangGia"].forEach((k) => {
+                const v = String(fd.get(k) ?? "");
+                if (v) params.set(k, v);
+              });
+              navigate(`/tour?${params}`);
             }}
             autoComplete="off"
           >
             <div className="row g-3 align-items-end">
               <div className="col-lg-4">
-                <label className="search-field-label"><i className="bi bi-geo-alt-fill" /> Bạn muốn đi đâu?</label>
-                <input className="form-control search-field-input" name="diemDen" placeholder="ví dụ: Đà Nẵng, Phú Quốc..." />
+                <label className="search-field-label">
+                  <i className="bi bi-geo-alt-fill" /> Bạn muốn đi đâu?
+                </label>
+                <input
+                  className="form-control search-field-input"
+                  name="diemDen"
+                  placeholder="ví dụ: Đà Nẵng, Phú Quốc..."
+                />
               </div>
               <div className="col-lg-3">
-                <label className="search-field-label"><i className="bi bi-calendar-event-fill" /> Ngày đi</label>
-                <input className="form-control search-field-input zaki-date" name="ngayDi" placeholder="dd/mm/yyyy" />
+                <label className="search-field-label">
+                  <i className="bi bi-calendar-event-fill" /> Ngày đi
+                </label>
+                <input
+                  className="form-control search-field-input zaki-date"
+                  name="ngayDi"
+                  placeholder="dd/mm/yyyy"
+                />
               </div>
               <div className="col-lg-3">
-                <label className="search-field-label"><i className="bi bi-tag-fill" /> Khoảng giá</label>
-                <select className="form-select search-field-input search-field-select" name="khoangGia" defaultValue="">
+                <label className="search-field-label">
+                  <i className="bi bi-tag-fill" /> Khoảng giá
+                </label>
+                <select
+                  className="form-select search-field-input search-field-select"
+                  name="khoangGia"
+                  defaultValue=""
+                >
                   <option value="">Tất cả mức giá</option>
                   <option value="DUOI5">Dưới 5 triệu</option>
                   <option value="5_10">5 - 10 triệu</option>
@@ -129,7 +161,10 @@ export function HomePage() {
                 </select>
               </div>
               <div className="col-lg-2">
-                <button type="submit" className="btn btn-primary w-100 py-3 shadow-sm fw-bold">
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100 py-3 shadow-sm fw-bold"
+                >
                   TÌM KIẾM
                 </button>
               </div>
@@ -142,29 +177,54 @@ export function HomePage() {
 
       <section className="py-5 home-section-destinations">
         <div className="container">
-          <div className="text-center mb-5 mx-auto" style={{ maxWidth: '680px' }}>
-            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Khám phá</span>
-            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+          <div
+            className="text-center mb-5 mx-auto"
+            style={{ maxWidth: "680px" }}
+          >
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">
+              Khám phá
+            </span>
+            <h2
+              className="fw-800 mb-2"
+              style={{ fontSize: "2.5rem", letterSpacing: "-0.02em" }}
+            >
               Điểm đến nổi bật
             </h2>
-            <p className="text-muted mb-3">Khám phá các địa danh du lịch hot nhất trong và ngoài nước</p>
-            <Link to="/tour" className="text-primary fw-bold text-decoration-none border-bottom border-2 border-primary pb-1">
+            <p className="text-muted mb-3">
+              Khám phá các địa danh du lịch hot nhất trong và ngoài nước
+            </p>
+            <Link
+              to="/tour"
+              className="text-primary fw-bold text-decoration-none border-bottom border-2 border-primary pb-1"
+            >
               Xem tất cả điểm đến
             </Link>
           </div>
           <div className="row g-4">
             {destinations.map((dd) => (
               <div key={dd.id} className="col-md-4">
-                <Link to={`/tour?diemDen=${encodeURIComponent(dd.ten)}`} className="text-decoration-none">
+                <Link
+                  to={`/tour?diemDen=${encodeURIComponent(dd.ten)}`}
+                  className="text-decoration-none"
+                >
                   <div className="card h-100 group border-0 shadow-sm">
                     <div className="img-zoom" style={{ height: 300 }}>
-                      <img src={imageUrl(dd.hinhAnh)} className="w-100 h-100 object-cover" alt={dd.ten} />
+                      <img
+                        src={imageUrl(dd.hinhAnh)}
+                        className="w-100 h-100 object-cover"
+                        alt={dd.ten}
+                      />
                       <div
                         className="card-img-overlay d-flex flex-column justify-content-end p-4"
-                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)' }}
+                        style={{
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)",
+                        }}
                       >
                         <h4 className="text-white fw-bold mb-1">{dd.ten}</h4>
-                        <p className="text-white-50 mb-0 small">{dd.vungMien}</p>
+                        <p className="text-white-50 mb-0 small">
+                          {dd.vungMien}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -177,17 +237,31 @@ export function HomePage() {
 
       <section className="home-section-popular py-5">
         <div className="container">
-          <div className="text-center mb-5 mx-auto" style={{ maxWidth: '680px' }}>
-            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">Phổ biến</span>
-            <h2 className="fw-800 mb-2" style={{ fontSize: '2.5rem', letterSpacing: '-0.02em' }}>
+          <div
+            className="text-center mb-5 mx-auto"
+            style={{ maxWidth: "680px" }}
+          >
+            <span className="text-primary fw-bold text-uppercase ls-wide mb-2 d-inline-block">
+              Phổ biến
+            </span>
+            <h2
+              className="fw-800 mb-2"
+              style={{ fontSize: "2.5rem", letterSpacing: "-0.02em" }}
+            >
               Tour được yêu thích nhất
             </h2>
-            <p className="text-muted mb-0">Những hành trình tuyệt vời được khách hàng bình chọn và đánh giá hàng đầu</p>
+            <p className="text-muted mb-0">
+              Những hành trình tuyệt vời được khách hàng bình chọn và đánh giá
+              hàng đầu
+            </p>
           </div>
           <div className="row g-4 justify-content-center">
             {featuredLoading && tours.length === 0 && (
               <div className="col-12 text-muted py-4 text-center">
-                <span className="spinner-border spinner-border-sm me-2" role="status" />
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                />
                 Đang tải tour nổi bật...
               </div>
             )}
@@ -204,7 +278,7 @@ export function HomePage() {
                       src={imageUrl(ds.hinhAnh ?? ds.diemDen?.hinhAnh)}
                       className="card-img-top"
                       alt={ds.tieuDe}
-                      style={{ width: '100%', height: 250, objectFit: 'cover' }}
+                      style={{ width: "100%", height: 250, objectFit: "cover" }}
                     />
                     {ds.noiBat && (
                       <span className="badge bg-danger position-absolute top-0 start-0 m-2">
@@ -225,8 +299,13 @@ export function HomePage() {
                         Khởi hành: <strong>{ds.diemDon.ten}</strong>
                       </p>
                     )}
-                    <p className="fw-bold text-danger fs-5 mb-3">{formatVnd(ds.gia)}</p>
-                    <Link to={`/tour/${ds.id}`} className="btn btn-primary rounded-pill px-4">
+                    <p className="fw-bold text-danger fs-5 mb-3">
+                      {formatVnd(ds.gia)}
+                    </p>
+                    <Link
+                      to={`/tour/${ds.id}`}
+                      className="btn btn-primary rounded-pill px-4"
+                    >
                       Xem chi tiết
                     </Link>
                   </div>
@@ -239,5 +318,5 @@ export function HomePage() {
 
       <CustomerReviewsSection />
     </section>
-  )
+  );
 }

@@ -44,6 +44,9 @@ public class UserDtos {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AdminUpdateRoleRequest {
+        private String tenDangNhap;
+        private String email;
+        private String password;
         private String vaiTro;
         private Boolean enabled;
         private String hoTen;

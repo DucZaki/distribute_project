@@ -37,9 +37,10 @@ public class AdminUserController {
     public ApiResponse<PageResponse<UserResponse>> list(
             @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String q) {
         requireAdmin(roles);
-        return ApiResponse.ok(userService.listAll(page, size));
+        return ApiResponse.ok(userService.listAll(page, size, q));
     }
 
     @PutMapping("/{id}")

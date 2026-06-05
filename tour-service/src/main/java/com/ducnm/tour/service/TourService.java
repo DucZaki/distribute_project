@@ -54,6 +54,7 @@ public class TourService {
                 .orElseThrow(() -> BusinessException.notFound("Tour", id));
         TourResponse response = mapper.toResponse(tour);
         response.setLichTrinhs(lichTrinhPresenter.toDtos(tour.getLichTrinhs()));
+        response.setDiemDons(mapper.toDiemDonDtos(tour.getDiemDons()));
         List<NgayKhoiHanh> bookable = ngayKhoiHanhRepo.findByChuyenDi_IdAndTrangThai(id, "ACTIVE").stream()
                 .filter(n -> !n.getNgayKhoiHanh().isBefore(LocalDate.now()))
                 .sorted(Comparator.comparing(NgayKhoiHanh::getNgayKhoiHanh))
@@ -333,7 +334,7 @@ public class TourService {
     @CacheEvict(value = {"tours", "tours-featured", "tours-featured-v2"}, allEntries = true)
     @Transactional
     public TourResponse update(Integer id, CreateTourRequest req) {
-        ChuyenDi tour = chuyenDiRepo.findById(id)
+        ChuyenDi tour = chuyenDiRepo.findDetailedById(id)
                 .orElseThrow(() -> BusinessException.notFound("Tour", id));
         if (req.getTieuDe() != null) tour.setTieuDe(req.getTieuDe());
         if (req.getMoTa() != null) tour.setMoTa(req.getMoTa());
@@ -347,7 +348,53 @@ public class TourService {
             tour.setDiemDen(diemDenRepo.findById(req.getIdDiemDen())
                     .orElseThrow(() -> BusinessException.notFound("DiemDen", req.getIdDiemDen())));
         }
-        return mapper.toResponse(chuyenDiRepo.save(tour));
+        if (req.getIdPhuongTien() != null) {
+            tour.setPhuongTien(phuongTienRepo.findById(req.getIdPhuongTien())
+                    .orElseThrow(() -> BusinessException.notFound("PhuongTien", req.getIdPhuongTien())));
+        }
+        if (req.getIdNoiLuuTru() != null) {
+            tour.setNoiLuuTru(noiLuuTruRepo.findById(req.getIdNoiLuuTru())
+                    .orElseThrow(() -> BusinessException.notFound("NoiLuuTru", req.getIdNoiLuuTru())));
+        }
+        if (req.getIdDiemDonDefault() != null) {
+            tour.setDiemDonDefault(diemDonRepo.findById(req.getIdDiemDonDefault())
+                    .orElseThrow(() -> BusinessException.notFound("DiemDon", req.getIdDiemDonDefault())));
+        }
+        if (req.getDiemDonIds() != null) {
+            tour.getDiemDons().clear();
+            if (!req.getDiemDonIds().isEmpty()) {
+                tour.getDiemDons().addAll(new HashSet<>(diemDonRepo.findAllById(req.getDiemDonIds())));
+            }
+        }
+        if (req.getLichTrinhs() != null) {
+            if (tour.getLichTrinhs() == null) {
+                tour.setLichTrinhs(new ArrayList<>());
+            } else {
+                tour.getLichTrinhs().clear();
+            }
+            req.getLichTrinhs().forEach(lt -> {
+                LichTrinh entity = mapper.fromLichTrinhDto(lt);
+                entity.setChuyenDi(tour);
+                tour.getLichTrinhs().add(entity);
+            });
+        }
+        ChuyenDi saved = chuyenDiRepo.save(tour);
+        TourResponse response = mapper.toResponse(saved);
+        response.setLichTrinhs(lichTrinhPresenter.toDtos(saved.getLichTrinhs()));
+        response.setDiemDons(mapper.toDiemDonDtos(saved.getDiemDons()));
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public TourFormOptions formOptions() {
+        return TourFormOptions.builder()
+                .destinations(diemDenRepo.findAll().stream().map(mapper::toDiemDenSummary).toList())
+                .vehicles(phuongTienRepo.findAll().stream().map(mapper::toPhuongTienSummary).toList())
+                .pickups(diemDonRepo.findAll().stream().map(mapper::toDiemDonDto).toList())
+                .accommodations(noiLuuTruRepo.findAll().stream()
+                        .map(n -> NoiLuuTruSummary.builder().id(n.getId()).ten(n.getTen()).loai(n.getLoai()).build())
+                        .toList())
+                .build();
     }
 
     @CacheEvict(value = {"tours", "tours-featured", "tours-featured-v2"}, allEntries = true)

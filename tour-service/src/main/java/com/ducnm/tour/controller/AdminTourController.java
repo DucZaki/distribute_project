@@ -31,6 +31,13 @@ public class AdminTourController {
         return ApiResponse.ok(tourService.listAdmin(status, page, size));
     }
 
+    @GetMapping("/form-options")
+    public ApiResponse<TourFormOptions> formOptions(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles) {
+        requireAdmin(roles);
+        return ApiResponse.ok(tourService.formOptions());
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<TourResponse> get(@PathVariable Integer id) {
         return ApiResponse.ok(tourService.getById(id));

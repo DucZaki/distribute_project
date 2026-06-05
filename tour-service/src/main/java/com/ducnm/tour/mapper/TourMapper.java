@@ -12,6 +12,7 @@ public interface TourMapper {
 
     @Mapping(target = "phuongTien", source = "phuongTien")
     @Mapping(target = "noiLuuTru", source = "noiLuuTru")
+    @Mapping(target = "diemDons", source = "diemDons")
     @Mapping(target = "lichTrinhs", ignore = true)
     TourResponse toResponse(ChuyenDi entity);
 

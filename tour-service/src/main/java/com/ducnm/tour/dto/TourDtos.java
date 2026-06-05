@@ -105,6 +105,7 @@ public class TourDtos {
     public static class SimpleRef {
         private Integer id;
         private String ten;
+        private String loai;
     }
 
     @Data
@@ -152,6 +153,27 @@ public class TourDtos {
         private BigDecimal giaOverride;
         private String trangThai;
         private Integer availableSeats;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NoiLuuTruSummary {
+        private Integer id;
+        private String ten;
+        private String loai;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TourFormOptions {
+        private List<DiemDenSummary> destinations;
+        private List<PhuongTienSummary> vehicles;
+        private List<DiemDonDto> pickups;
+        private List<NoiLuuTruSummary> accommodations;
     }
 
     @Data

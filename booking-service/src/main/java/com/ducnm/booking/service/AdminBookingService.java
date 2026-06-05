@@ -50,6 +50,10 @@ public class AdminBookingService {
         if (reason != null) b.setGhiChu(reason);
     }
 
+    AdminBookingResponse mapPublic(DatCho d) {
+        return map(d);
+    }
+
     private AdminBookingResponse map(DatCho d) {
         String tourTitle = null;
         try {

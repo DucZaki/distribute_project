@@ -15,6 +15,10 @@ function reactJsxShim(): Plugin {
 
 export default defineConfig({
   plugins: [reactJsxShim(), react()],
+  resolve: {
+    // Ưu tiên .tsx/.ts trước .jsx — tránh file .jsx build sẵn che bản nguồn TypeScript
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.json'],
+  },
   server: {
     port: 5173,
     proxy: {

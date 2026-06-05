@@ -24,4 +24,14 @@ public interface NguoiDungRepository extends JpaRepository<NguoiDung, Integer> {
     boolean existsByTenDangNhap(String tenDangNhap);
 
     Page<NguoiDung> findByVaiTro(String vaiTro, Pageable pageable);
+
+    @Query("""
+            SELECT u FROM NguoiDung u
+            WHERE :q IS NULL OR :q = '' OR
+                  LOWER(u.hoTen) LIKE LOWER(CONCAT('%', :q, '%')) OR
+                  LOWER(u.email) LIKE LOWER(CONCAT('%', :q, '%')) OR
+                  LOWER(u.tenDangNhap) LIKE LOWER(CONCAT('%', :q, '%')) OR
+                  CAST(u.id AS string) LIKE CONCAT('%', :q, '%')
+            """)
+    Page<NguoiDung> search(@Param("q") String q, Pageable pageable);
 }

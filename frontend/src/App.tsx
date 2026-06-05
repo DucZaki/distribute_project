@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams, useSearchParams } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import { ThemeProvider } from './theme/ThemeContext'
 import { ProtectedRoute } from './auth/ProtectedRoute'
@@ -15,9 +15,12 @@ import { AdminReviewsByTourPage } from './pages/admin/AdminReviewsByTourPage'
 import { AdminReviewsPage } from './pages/admin/AdminReviewsPage'
 import { AdminTourCreatePage } from './pages/admin/AdminTourCreatePage'
 import { AdminTourDetailPage } from './pages/admin/AdminTourDetailPage'
+import { AdminTourEditPage } from './pages/admin/AdminTourEditPage'
+import { AdminTourExtendPage } from './pages/admin/AdminTourExtendPage'
 import { AdminTourPerformancePage } from './pages/admin/AdminTourPerformancePage'
 import { AdminToursListPage } from './pages/admin/AdminToursListPage'
 import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage'
+import { AdminUserEditPage } from './pages/admin/AdminUserEditPage'
 import { AdminUserFormPage } from './pages/admin/AdminUserFormPage'
 import { AdminUsersPage } from './pages/admin/AdminUsersPage'
 import { BookingNewPage } from './pages/BookingNewPage'
@@ -33,6 +36,14 @@ import { RegisterPage } from './pages/RegisterPage'
 import { PaymentResultPage } from './pages/PaymentResultPage'
 import { TourDetailPage } from './pages/TourDetailPage'
 import { ToursPage } from './pages/ToursPage'
+
+function AdminTourDeparturesRedirect() {
+  const { id } = useParams()
+  const [search] = useSearchParams()
+  const qs = new URLSearchParams(search)
+  qs.set('tab', 'departures')
+  return <Navigate to={`/admin/tour/detail/${id}?${qs.toString()}`} replace />
+}
 
 export default function App() {
   return (
@@ -72,13 +83,16 @@ export default function App() {
             <Route path="tour-performance" element={<AdminTourPerformancePage />} />
             <Route path="user" element={<AdminUsersPage />} />
             <Route path="user/create" element={<AdminUserFormPage />} />
+            <Route path="user/edit/:id" element={<AdminUserEditPage />} />
             <Route path="user/:id" element={<AdminUserDetailPage />} />
             <Route path="tour/active" element={<AdminToursListPage status="active" title="Danh sách chuyến đi đang hoạt động" />} />
             <Route path="tour/completed" element={<AdminToursListPage status="completed" title="Danh sách chuyến đi đã kết thúc" />} />
             <Route path="tour/create" element={<AdminTourCreatePage />} />
+            <Route path="tour/detail/:id/ngay-khoi-hanh/edit/:scheduleId" element={<AdminTourDeparturesRedirect />} />
+            <Route path="tour/detail/:id/ngay-khoi-hanh" element={<AdminTourDeparturesRedirect />} />
             <Route path="tour/detail/:id" element={<AdminTourDetailPage />} />
-            <Route path="tour/edit/:id" element={<AdminTourDetailPage />} />
-            <Route path="tour/extend/:id" element={<AdminTourDetailPage />} />
+            <Route path="tour/edit/:id" element={<AdminTourEditPage />} />
+            <Route path="tour/extend/:id" element={<AdminTourExtendPage />} />
             <Route path="promo" element={<AdminPromosPage />} />
             <Route path="promo/create" element={<AdminPromoFormPage />} />
             <Route path="promo/edit/:id" element={<AdminPromoFormPage />} />

@@ -94,4 +94,25 @@ public interface AdminAnalyticsRepository extends JpaRepository<DatCho, Integer>
     @Query("SELECT d.id, d.idNguoiDung, d.hoTen, d.email, d.soLuong, d.tongGia, d.createdAt " +
             "FROM DatCho d WHERE d.idChuyenDi = :tourId AND " + PAID_FILTER + " ORDER BY d.createdAt DESC")
     List<Object[]> bookingsByTour(@Param("tourId") Integer tourId);
+
+    @Query("SELECT COUNT(d) FROM DatCho d WHERE d.idNguoiDung = :userId AND " + PAID_FILTER)
+    long countPaidByUser(@Param("userId") Integer userId);
+
+    @Query("SELECT COALESCE(SUM(d.tongGia), 0) FROM DatCho d WHERE d.idNguoiDung = :userId AND " + PAID_FILTER)
+    double sumSpendingByUser(@Param("userId") Integer userId);
+
+    @Query("SELECT d.idNguoiDung, COUNT(d), COALESCE(SUM(d.tongGia), 0) FROM DatCho d " +
+            "WHERE " + PAID_FILTER + " AND d.idNguoiDung IN :userIds GROUP BY d.idNguoiDung")
+    List<Object[]> statsByUserIds(@Param("userIds") List<Integer> userIds);
+
+    @Query(value = """
+            SELECT MONTH(COALESCE(d.ngay_dat, DATE(d.created_at))) AS m,
+                   COALESCE(SUM(d.tong_gia), 0) AS revenue
+            FROM dat_cho d
+            WHERE d.id_nguoi_dung = :userId
+              AND d.trang_thai IN ('PAID', 'CONFIRMED')
+              AND YEAR(COALESCE(d.ngay_dat, DATE(d.created_at))) = :year
+            GROUP BY MONTH(COALESCE(d.ngay_dat, DATE(d.created_at)))
+            """, nativeQuery = true)
+    List<Object[]> monthlySpendingByUser(@Param("userId") Integer userId, @Param("year") int year);
 }

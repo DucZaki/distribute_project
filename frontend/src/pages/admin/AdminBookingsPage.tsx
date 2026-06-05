@@ -1,78 +1,90 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { listAdminBookings, type AdminBooking } from '../../api/adminBookings'
-import { AdminPagination } from '../../components/admin/AdminPagination'
-import { formatVnd } from '../../utils/format'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { listAdminBookings, type AdminBooking } from "../../api/adminBookings";
+import { AdminPagination } from "../../components/admin/AdminPagination";
+import { formatVnd } from "../../utils/format";
 
 type InvoiceData = {
-  id: number
-  user: string
-  tour: string
-  people: number
-  total: number
-  date: string
-  status: string
-  userId?: number
-  checkinToken?: string
-}
+  id: number;
+  user: string;
+  tour: string;
+  people: number;
+  total: number;
+  date: string;
+  status: string;
+  userId?: number;
+  checkinToken?: string;
+};
 
 function bookingStatusBadge(status?: string) {
-  if (status === 'PAID' || status === 'CONFIRMED') {
-    return <span className="badge bg-success rounded-pill px-3 py-2">Thành công</span>
+  if (status === "PAID" || status === "CONFIRMED") {
+    return (
+      <span className="badge bg-success rounded-pill px-3 py-2">
+        Thành công
+      </span>
+    );
   }
-  if (status === 'PENDING') {
-    return <span className="badge bg-warning text-dark rounded-pill px-3 py-2">Chờ thanh toán</span>
+  if (status === "PENDING") {
+    return (
+      <span className="badge bg-warning text-dark rounded-pill px-3 py-2">
+        Chờ thanh toán
+      </span>
+    );
   }
-  if (status === 'FAILED' || status === 'CANCELLED') {
-    return <span className="badge bg-danger rounded-pill px-3 py-2">Thất bại</span>
+  if (status === "FAILED" || status === "CANCELLED") {
+    return (
+      <span className="badge bg-danger rounded-pill px-3 py-2">Thất bại</span>
+    );
   }
-  return <span className="badge bg-secondary rounded-pill px-3 py-2">{status}</span>
+  return (
+    <span className="badge bg-secondary rounded-pill px-3 py-2">{status}</span>
+  );
 }
 
 function formatBookingDate(b: AdminBooking) {
-  const raw = b.ngayDat ?? b.createdAt
-  if (!raw) return '—'
+  const raw = b.ngayDat ?? b.createdAt;
+  if (!raw) return "—";
   try {
-    return new Date(raw).toLocaleString('vi-VN')
+    return new Date(raw).toLocaleString("vi-VN");
   } catch {
-    return String(raw)
+    return String(raw);
   }
 }
 
 export function AdminBookingsPage() {
-  const [items, setItems] = useState<AdminBooking[]>([])
-  const [page, setPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [invoice, setInvoice] = useState<InvoiceData | null>(null)
+  const [items, setItems] = useState<AdminBooking[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [invoice, setInvoice] = useState<InvoiceData | null>(null);
 
   function load(p = page) {
     listAdminBookings(undefined, p, 10)
       .then((r) => {
-        setItems(r.data.content ?? [])
-        setTotalPages(r.data.totalPages ?? 0)
-        setPage(r.data.page ?? p)
+        setItems(r.data.content ?? []);
+        setTotalPages(r.data.totalPages ?? 0);
+        setPage(r.data.page ?? p);
       })
-      .catch(() => setItems([]))
+      .catch(() => setItems([]));
   }
 
   useEffect(() => {
-    load(0)
-  }, [])
+    load(0);
+  }, []);
 
   function openInvoice(b: AdminBooking) {
-    const paid = b.trangThai === 'PAID' || b.trangThai === 'CONFIRMED'
-    if (!paid) return
+    const paid = b.trangThai === "PAID" || b.trangThai === "CONFIRMED";
+    if (!paid) return;
     setInvoice({
       id: b.id,
-      user: b.hoTen || 'Khách vãng lai',
+      user: b.hoTen || "Khách vãng lai",
       tour: b.tieuDeTour || `Tour #${b.idChuyenDi}`,
       people: b.soLuong ?? 1,
       total: Number(b.tongGia ?? b.tongTien ?? 0),
       date: formatBookingDate(b),
-      status: b.trangThai === 'CONFIRMED' ? 'PAID' : (b.trangThai ?? 'PAID'),
+      status: b.trangThai === "CONFIRMED" ? "PAID" : (b.trangThai ?? "PAID"),
       userId: b.idNguoiDung,
       checkinToken: b.maCheckIn,
-    })
+    });
   }
 
   return (
@@ -104,31 +116,43 @@ export function AdminBookingsPage() {
               </thead>
               <tbody>
                 {items.map((b) => {
-                  const paid = b.trangThai === 'PAID' || b.trangThai === 'CONFIRMED'
+                  const paid =
+                    b.trangThai === "PAID" || b.trangThai === "CONFIRMED";
                   return (
                     <tr key={b.id}>
                       <td className="px-4 py-3 fw-bold text-muted">#{b.id}</td>
                       <td className="py-3">
                         <div className="fw-bold">
                           {b.idNguoiDung ? (
-                            <Link to={`/admin/user/${b.idNguoiDung}`} className="text-decoration-none text-primary">
+                            <Link
+                              to={`/admin/user/${b.idNguoiDung}`}
+                              className="text-decoration-none text-primary"
+                            >
                               {b.hoTen || `User #${b.idNguoiDung}`}
                             </Link>
                           ) : (
-                            <span>{b.hoTen || 'Khách vãng lai'}</span>
+                            <span>{b.hoTen || "Khách vãng lai"}</span>
                           )}
                         </div>
-                        <div className="text-muted small">{b.email || '—'}</div>
+                        <div className="text-muted small">{b.email || "—"}</div>
                       </td>
-                      <td className="py-3 fw-bold text-primary">{b.tieuDeTour || `Tour #${b.idChuyenDi}`}</td>
+                      <td className="py-3 fw-bold text-primary">
+                        {b.tieuDeTour || `Tour #${b.idChuyenDi}`}
+                      </td>
                       <td className="py-3">
-                        <span className="badge bg-dark rounded-pill px-3">{b.soLuong ?? 0} khách</span>
+                        <span className="badge bg-dark rounded-pill px-3">
+                          {b.soLuong ?? 0} khách
+                        </span>
                       </td>
                       <td className="py-3 fw-bold text-danger">
                         {formatVnd(Number(b.tongGia ?? b.tongTien ?? 0))}
                       </td>
-                      <td className="py-3 text-muted">{formatBookingDate(b)}</td>
-                      <td className="py-3 text-center">{bookingStatusBadge(b.trangThai)}</td>
+                      <td className="py-3 text-muted">
+                        {formatBookingDate(b)}
+                      </td>
+                      <td className="py-3 text-center">
+                        {bookingStatusBadge(b.trangThai)}
+                      </td>
                       <td className="py-3 text-center">
                         {paid && (
                           <button
@@ -142,7 +166,7 @@ export function AdminBookingsPage() {
                         )}
                       </td>
                     </tr>
-                  )
+                  );
                 })}
                 {items.length === 0 && (
                   <tr>
@@ -156,27 +180,51 @@ export function AdminBookingsPage() {
           </div>
         </div>
         <div className="card-footer bg-white border-0 py-3">
-          <AdminPagination page={page} totalPages={totalPages} onPage={(p) => load(p)} />
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            onPage={(p) => load(p)}
+          />
         </div>
       </div>
 
       {invoice && (
-        <div className="modal fade show d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.5)' }} role="dialog">
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          role="dialog"
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 rounded-4 shadow">
               <div className="modal-header border-0 pb-0">
                 <h5 className="fw-bold mb-0">Chi tiết Hoá đơn</h5>
-                <button type="button" className="btn-close" aria-label="Close" onClick={() => setInvoice(null)} />
+                <button
+                  type="button"
+                  className="btn-close"
+                  aria-label="Close"
+                  onClick={() => setInvoice(null)}
+                />
               </div>
               <div className="modal-body p-4">
                 <div className="text-center mb-4">
-                  <div className="display-6 fw-bold text-dark">{formatVnd(invoice.total)}</div>
+                  <div className="display-6 fw-bold text-dark">
+                    {formatVnd(invoice.total)}
+                  </div>
                   <div
                     className={`badge rounded-pill px-3 py-1 mt-2 ${
-                      invoice.status === 'PAID' ? 'bg-success' : invoice.status === 'PENDING' ? 'bg-warning text-dark' : 'bg-danger'
+                      invoice.status === "PAID"
+                        ? "bg-success"
+                        : invoice.status === "PENDING"
+                          ? "bg-warning text-dark"
+                          : "bg-danger"
                     }`}
                   >
-                    {invoice.status === 'PAID' ? 'Thành công' : invoice.status === 'PENDING' ? 'Chờ thanh toán' : 'Thất bại'}
+                    {invoice.status === "PAID"
+                      ? "Thành công"
+                      : invoice.status === "PENDING"
+                        ? "Chờ thanh toán"
+                        : "Thất bại"}
                   </div>
                 </div>
 
@@ -189,7 +237,7 @@ export function AdminBookingsPage() {
                       src={`/api/check-in/${encodeURIComponent(invoice.checkinToken)}/qr?size=160`}
                       alt="QR check-in"
                       className="border rounded-3 p-2 bg-white"
-                      style={{ width: 160, height: 160, objectFit: 'contain' }}
+                      style={{ width: 160, height: 160, objectFit: "contain" }}
                     />
                     <div className="mt-2">
                       <Link
@@ -197,7 +245,8 @@ export function AdminBookingsPage() {
                         target="_blank"
                         className="btn btn-sm btn-outline-warning"
                       >
-                        <i className="bi bi-box-arrow-up-right me-1" /> Mở trang check-in
+                        <i className="bi bi-box-arrow-up-right me-1" /> Mở trang
+                        check-in
                       </Link>
                     </div>
                   </div>
@@ -213,7 +262,11 @@ export function AdminBookingsPage() {
                     <span className="fw-bold">
                       {invoice.user}
                       {invoice.userId && (
-                        <Link to={`/admin/user/${invoice.userId}`} className="btn btn-sm btn-link p-0 ms-1" title="Xem hồ sơ">
+                        <Link
+                          to={`/admin/user/${invoice.userId}`}
+                          className="btn btn-sm btn-link p-0 ms-1"
+                          title="Xem hồ sơ"
+                        >
                           <i className="bi bi-box-arrow-up-right" />
                         </Link>
                       )}
@@ -222,7 +275,9 @@ export function AdminBookingsPage() {
                   <hr />
                   <div className="mb-3">
                     <span className="text-muted d-block mb-1">Tên Tour:</span>
-                    <div className="fw-bold text-primary fs-5">{invoice.tour}</div>
+                    <div className="fw-bold text-primary fs-5">
+                      {invoice.tour}
+                    </div>
                   </div>
                   <div className="d-flex justify-content-between mb-2">
                     <span className="text-muted">Số lượng người:</span>
@@ -239,7 +294,11 @@ export function AdminBookingsPage() {
                 </div>
               </div>
               <div className="modal-footer border-0">
-                <button type="button" className="btn btn-dark rounded-pill w-100 py-2" onClick={() => setInvoice(null)}>
+                <button
+                  type="button"
+                  className="btn btn-dark rounded-pill w-100 py-2"
+                  onClick={() => setInvoice(null)}
+                >
                   Đóng
                 </button>
               </div>
@@ -248,5 +307,5 @@ export function AdminBookingsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

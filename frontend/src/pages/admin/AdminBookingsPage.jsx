@@ -13,11 +13,13 @@ function AdminBookingsPage() {
   const [msg, setMsg] = useState("");
 
   function load(p = page) {
-    listAdminBookings(status || undefined, p, 20).then((r) => {
-      setItems(r.data.content ?? []);
-      setTotalPages(r.data.totalPages ?? 0);
-      setPage(r.data.page ?? p);
-    }).catch(() => setItems([]));
+    listAdminBookings(status || undefined, p, 20)
+      .then((r) => {
+        setItems(r.data.content ?? []);
+        setTotalPages(r.data.totalPages ?? 0);
+        setPage(r.data.page ?? p);
+      })
+      .catch(() => setItems([]));
   }
 
   useEffect(() => {
@@ -43,7 +45,12 @@ function AdminBookingsPage() {
     <div className="container-fluid px-0">
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <h2 className="fw-bold mb-0">Quản lý đặt chỗ</h2>
-        <select className="form-select form-select-sm" style={{ width: 220 }} value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select
+          className="form-select form-select-sm"
+          style={{ width: 220 }}
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
           <option value="">Tất cả trạng thái</option>
           <option value="PENDING">Chờ thanh toán</option>
           <option value="CONFIRMED">Đã xác nhận</option>
@@ -73,14 +80,33 @@ function AdminBookingsPage() {
               {items.map((b) => (
                 <tr key={b.id}>
                   <td className="px-4 fw-bold">#{b.id}</td>
-                  <td>{b.tourTitle ?? b.tenTour ?? `Tour #${b.idChuyenDi ?? b.tourId ?? ""}`}</td>
-                  <td>{b.hoTen ?? b.userName ?? b.email ?? `Người dùng #${b.idNguoiDung ?? b.userId ?? ""}`}</td>
+                  <td>
+                    {b.tourTitle ??
+                      b.tenTour ??
+                      `Tour #${b.idChuyenDi ?? b.tourId ?? ""}`}
+                  </td>
+                  <td>
+                    {b.hoTen ??
+                      b.userName ??
+                      b.email ??
+                      `Người dùng #${b.idNguoiDung ?? b.userId ?? ""}`}
+                  </td>
                   <td>{b.soLuong ?? "—"}</td>
-                  <td className="text-danger fw-bold">{formatVnd(Number(b.tongGia ?? b.totalPrice ?? 0))}</td>
-                  <td><span className="badge bg-secondary-subtle text-dark">{statusLabel(b.trangThai)}</span></td>
+                  <td className="text-danger fw-bold">
+                    {formatVnd(Number(b.tongGia ?? b.totalPrice ?? 0))}
+                  </td>
+                  <td>
+                    <span className="badge bg-secondary-subtle text-dark">
+                      {statusLabel(b.trangThai)}
+                    </span>
+                  </td>
                   <td className="text-center">
                     {(b.trangThai === "PENDING" || b.trangThai === "PAID") && (
-                      <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onCancel(b.id)}>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => onCancel(b.id)}
+                      >
                         Hủy
                       </button>
                     )}
@@ -88,7 +114,11 @@ function AdminBookingsPage() {
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={7} className="text-center text-muted py-4">Chưa có đơn đặt chỗ.</td></tr>
+                <tr>
+                  <td colSpan={7} className="text-center text-muted py-4">
+                    Chưa có đơn đặt chỗ.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
