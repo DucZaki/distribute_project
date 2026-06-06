@@ -25,6 +25,8 @@ import { AdminUserFormPage } from './pages/admin/AdminUserFormPage'
 import { AdminUsersPage } from './pages/admin/AdminUsersPage'
 import { BookingNewPage } from './pages/BookingNewPage'
 import { BookingsPage } from './pages/BookingsPage'
+import { ChangePasswordPage } from './pages/ChangePasswordPage'
+import { EditProfilePage } from './pages/EditProfilePage'
 import { CheckInVerifyPage } from './pages/CheckInVerifyPage'
 import { ContactPage } from './pages/ContactPage'
 import { FavoritesPage } from './pages/FavoritesPage'
@@ -69,8 +71,8 @@ export default function App() {
             <Route path="contact" element={<ContactPage />} />
             <Route path="user/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
             <Route path="user/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="user/edit-profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="user/change-password" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="user/edit-profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+            <Route path="user/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="user/favorite" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
             <Route path="favorites/my-favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
 

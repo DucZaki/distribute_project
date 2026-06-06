@@ -119,6 +119,30 @@ export function getAdminTour(id: number) {
   return apiFetch<TourResponse>(`/admin/tours/${id}`, {}, true)
 }
 
+const API_BASE = import.meta.env.VITE_API_URL ?? '/api'
+
+export async function uploadTourImage(file: File) {
+  const token = localStorage.getItem('accessToken')
+  const body = new FormData()
+  body.append('file', file)
+  const res = await fetch(`${API_BASE}/admin/tours/upload-image`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body,
+  })
+  const json = (await res.json().catch(() => null)) as {
+    success?: boolean
+    message?: string
+    data?: { path?: string }
+  } | null
+  if (!res.ok || json?.success === false) {
+    throw new Error(json?.message ?? `Upload thất bại (${res.status})`)
+  }
+  const path = json?.data?.path
+  if (!path) throw new Error('Không nhận được đường dẫn ảnh')
+  return path
+}
+
 export function createAdminTour(body: CreateTourPayload) {
   return apiFetch<TourResponse>('/admin/tours', { method: 'POST', body: JSON.stringify(body) }, true)
 }

@@ -42,6 +42,7 @@ public class TourService {
     private final PhuongTienRepository phuongTienRepo;
     private final NoiLuuTruRepository noiLuuTruRepo;
     private final NgayKhoiHanhRepository ngayKhoiHanhRepo;
+    private final LichTrinhRepository lichTrinhRepo;
     private final TourMapper mapper;
     private final LichTrinhPresenter lichTrinhPresenter;
     private final ReviewClient reviewClient;
@@ -53,7 +54,7 @@ public class TourService {
         ChuyenDi tour = chuyenDiRepo.findDetailedById(id)
                 .orElseThrow(() -> BusinessException.notFound("Tour", id));
         TourResponse response = mapper.toResponse(tour);
-        response.setLichTrinhs(lichTrinhPresenter.toDtos(tour.getLichTrinhs()));
+        response.setLichTrinhs(loadItineraryDtos(id));
         response.setDiemDons(mapper.toDiemDonDtos(tour.getDiemDons()));
         List<NgayKhoiHanh> bookable = ngayKhoiHanhRepo.findByChuyenDi_IdAndTrangThai(id, "ACTIVE").stream()
                 .filter(n -> !n.getNgayKhoiHanh().isBefore(LocalDate.now()))
@@ -367,11 +368,9 @@ public class TourService {
             }
         }
         if (req.getLichTrinhs() != null) {
-            if (tour.getLichTrinhs() == null) {
-                tour.setLichTrinhs(new ArrayList<>());
-            } else {
-                tour.getLichTrinhs().clear();
-            }
+            List<LichTrinh> current = new ArrayList<>(lichTrinhRepo.findByChuyenDi_IdOrderByNgayThuAsc(id));
+            tour.setLichTrinhs(current);
+            tour.getLichTrinhs().clear();
             req.getLichTrinhs().forEach(lt -> {
                 LichTrinh entity = mapper.fromLichTrinhDto(lt);
                 entity.setChuyenDi(tour);
@@ -380,7 +379,7 @@ public class TourService {
         }
         ChuyenDi saved = chuyenDiRepo.save(tour);
         TourResponse response = mapper.toResponse(saved);
-        response.setLichTrinhs(lichTrinhPresenter.toDtos(saved.getLichTrinhs()));
+        response.setLichTrinhs(loadItineraryDtos(id));
         response.setDiemDons(mapper.toDiemDonDtos(saved.getDiemDons()));
         return response;
     }
@@ -389,7 +388,7 @@ public class TourService {
     public TourFormOptions formOptions() {
         return TourFormOptions.builder()
                 .destinations(diemDenRepo.findAll().stream().map(mapper::toDiemDenSummary).toList())
-                .vehicles(phuongTienRepo.findAll().stream().map(mapper::toPhuongTienSummary).toList())
+                .vehicles(phuongTienRepo.findDistinctLoai().stream().map(mapper::toPhuongTienSummary).toList())
                 .pickups(diemDonRepo.findAll().stream().map(mapper::toDiemDonDto).toList())
                 .accommodations(noiLuuTruRepo.findAll().stream()
                         .map(n -> NoiLuuTruSummary.builder().id(n.getId()).ten(n.getTen()).loai(n.getLoai()).build())
@@ -554,6 +553,10 @@ public class TourService {
                 .totalPages(totalPages)
                 .last(totalPages == 0 || safePage >= totalPages - 1)
                 .build();
+    }
+
+    private List<LichTrinhDto> loadItineraryDtos(Integer tourId) {
+        return lichTrinhPresenter.toDtos(lichTrinhRepo.findByChuyenDi_IdOrderByNgayThuAsc(tourId));
     }
 
     private Sort.Order parseSort(String sort) {

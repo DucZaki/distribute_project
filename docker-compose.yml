@@ -170,6 +170,9 @@ services:
       DB_USER: root
       DB_PASS: root
       REDIS_HOST: redis
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - tour-uploads:/app/uploads
     depends_on:
       mysql: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -311,6 +314,7 @@ services:
 volumes:
   mysql-data:
   grafana-data:
+  tour-uploads:
 
 networks:
   bt-net:

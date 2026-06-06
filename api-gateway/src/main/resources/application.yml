@@ -52,6 +52,13 @@ spring:
           filters:
             - RewritePath=/api/tours/(?<id>[^/]+)/flight-quote, /api/v1/tours/${id}/flight-quote
 
+        # PUBLIC: tour images uploaded by admin
+        - id: tour-uploads
+          uri: lb://tour-service
+          predicates:
+            - Path=/uploads/**
+            - Method=GET
+
         # PUBLIC: read-only tour browse + destinations (/api/tours and /api/tours/**)
         - id: tour-public
           uri: lb://tour-service

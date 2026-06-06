@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createAdminTour } from '../../api/adminTours'
+import { createAdminTour, uploadTourImage } from '../../api/adminTours'
 import { emptyTourForm, TourAdminFormLayout, buildTourPayload } from '../../components/admin/TourAdminForm'
 
 export function AdminTourCreatePage() {
@@ -12,7 +12,12 @@ export function AdminTourCreatePage() {
     e.preventDefault()
     setError('')
     try {
-      const r = await createAdminTour(buildTourPayload(form))
+      if (!form.imageFile) {
+        setError('Vui lòng chọn ảnh đại diện từ máy tính')
+        return
+      }
+      const hinhAnh = await uploadTourImage(form.imageFile)
+      const r = await createAdminTour(buildTourPayload(form, hinhAnh))
       navigate(`/admin/tour/detail/${r.data.id}?source=active`)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Không thể tạo tour')
@@ -53,6 +58,7 @@ export function AdminTourCreatePage() {
         <TourAdminFormLayout
           form={form}
           onChange={setForm}
+          requireImage
           footer={
             <>
               <button type="submit" className="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">

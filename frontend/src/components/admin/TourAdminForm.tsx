@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   getTourFormOptions,
   type DiemDenSummary,
-  type NoiLuuTruSummary,
   type PhuongTienSummary,
   type TourFormOptions,
 } from '../../api/adminTours'
@@ -12,6 +11,7 @@ import {
   countriesForChauLuc,
   inferChauLuc,
 } from '../../utils/tourAdminHelpers'
+import { imageUrl } from '../../utils/format'
 
 export type TourFormState = {
   tieuDe: string
@@ -23,10 +23,10 @@ export type TourFormState = {
   idDiemDen: string
   idPhuongTien: string
   idDiemDon: string
-  idNoiLuuTru: string
   moTa: string
   highlight: string
   hinhAnh: string
+  imageFile: File | null
   noiBat: boolean
 }
 
@@ -40,33 +40,42 @@ export const emptyTourForm = (): TourFormState => ({
   idDiemDen: '',
   idPhuongTien: '',
   idDiemDon: '',
-  idNoiLuuTru: '',
   moTa: '',
   highlight: '',
   hinhAnh: '',
+  imageFile: null,
   noiBat: false,
 })
 
 type Props = {
   form: TourFormState
   onChange: (next: TourFormState) => void
-  showCurrentImage?: string
+  requireImage?: boolean
   footer: ReactNode
 }
 
-export function TourAdminFormLayout({ form, onChange, showCurrentImage, footer }: Props) {
+export function TourAdminFormLayout({ form, onChange, requireImage = false, footer }: Props) {
   const [options, setOptions] = useState<TourFormOptions>({
     destinations: [],
     vehicles: [],
     pickups: [],
-    accommodations: [],
   })
+  const [previewUrl, setPreviewUrl] = useState('')
 
   useEffect(() => {
     getTourFormOptions()
       .then((r) => setOptions(r.data))
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (form.imageFile) {
+      const url = URL.createObjectURL(form.imageFile)
+      setPreviewUrl(url)
+      return () => URL.revokeObjectURL(url)
+    }
+    setPreviewUrl(form.hinhAnh ? imageUrl(form.hinhAnh) : '')
+  }, [form.imageFile, form.hinhAnh])
 
   const countries = useMemo(
     () => (form.chauLuc ? countriesForChauLuc(form.chauLuc, options.destinations) : []),
@@ -77,8 +86,6 @@ export function TourAdminFormLayout({ form, onChange, showCurrentImage, footer }
     () => (form.quocGia ? citiesForCountry(form.quocGia, options.destinations) : []),
     [form.quocGia, options.destinations],
   )
-
-  const accommodations = options.accommodations ?? []
 
   return (
     <div className="row g-4">
@@ -288,22 +295,6 @@ export function TourAdminFormLayout({ form, onChange, showCurrentImage, footer }
                 </select>
               </div>
               <div className="col-12">
-                <label className="form-label fw-semibold text-muted small">Nơi lưu trú</label>
-                <select
-                  className="form-select bg-light"
-                  value={form.idNoiLuuTru}
-                  onChange={(e) => onChange({ ...form, idNoiLuuTru: e.target.value })}
-                >
-                  <option value="">-- Chọn nơi lưu trú --</option>
-                  {accommodations.map((n: NoiLuuTruSummary) => (
-                    <option key={n.id} value={n.id}>
-                      {n.ten}
-                      {n.loai ? ` (${n.loai})` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-12">
                 <hr className="text-muted opacity-25 my-1" />
               </div>
               <div className="col-12">
@@ -348,30 +339,32 @@ export function TourAdminFormLayout({ form, onChange, showCurrentImage, footer }
             </h5>
           </div>
           <div className="card-body p-4">
-            {showCurrentImage && (
+            {previewUrl && (
               <div className="mb-3 text-center">
                 <img
-                  src={showCurrentImage}
-                  alt="Tour"
+                  src={previewUrl}
+                  alt="Xem trước ảnh tour"
                   className="rounded-4 shadow-sm w-100"
                   style={{ height: 180, objectFit: 'cover' }}
                 />
               </div>
             )}
             <label className="form-label small fw-bold text-muted">
-              {showCurrentImage ? 'Thay thế ảnh (URL mới nếu có)' : 'URL ảnh đại diện'}
+              Chọn ảnh từ máy tính {requireImage && <span className="text-danger">*</span>}
             </label>
             <input
+              type="file"
               className="form-control bg-light"
-              placeholder="https://... hoặc /anh/..."
-              value={form.hinhAnh}
-              onChange={(e) => onChange({ ...form, hinhAnh: e.target.value })}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              required={requireImage && !form.hinhAnh}
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null
+                onChange({ ...form, imageFile: file })
+              }}
             />
-            {!showCurrentImage && (
-              <div className="mt-3 text-center p-3 border rounded bg-light text-muted small">
-                Khuyên dùng ảnh chất lượng cao (.jpg, .png) tỉ lệ 16:9
-              </div>
-            )}
+            <div className="mt-3 text-center p-3 border rounded bg-light text-muted small">
+              Khuyên dùng ảnh chất lượng cao (.jpg, .png) tỉ lệ 16:9
+            </div>
           </div>
         </div>
 
@@ -381,7 +374,7 @@ export function TourAdminFormLayout({ form, onChange, showCurrentImage, footer }
   )
 }
 
-export function buildTourPayload(form: TourFormState) {
+export function buildTourPayload(form: TourFormState, hinhAnh?: string) {
   return {
     tieuDe: form.tieuDe.trim(),
     moTa: form.moTa,
@@ -389,8 +382,7 @@ export function buildTourPayload(form: TourFormState) {
     idDiemDen: Number(form.idDiemDen),
     idPhuongTien: form.idPhuongTien ? Number(form.idPhuongTien) : undefined,
     idDiemDonDefault: form.idDiemDon ? Number(form.idDiemDon) : undefined,
-    idNoiLuuTru: form.idNoiLuuTru ? Number(form.idNoiLuuTru) : undefined,
-    hinhAnh: form.hinhAnh || undefined,
+    hinhAnh: (hinhAnh ?? form.hinhAnh) || undefined,
     highlight: form.highlight,
     ngayKhoiHanh: form.ngayKhoiHanh || null,
     ngayKetThuc: form.ngayKetThuc || null,

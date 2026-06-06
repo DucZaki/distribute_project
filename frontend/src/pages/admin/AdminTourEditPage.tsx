@@ -1,20 +1,18 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getAdminTour, updateAdminTour } from '../../api/adminTours'
+import { getAdminTour, updateAdminTour, uploadTourImage } from '../../api/adminTours'
 import {
   emptyTourForm,
   TourAdminFormLayout,
   buildTourPayload,
   cascadeFromDestination,
 } from '../../components/admin/TourAdminForm'
-import { imageUrl } from '../../utils/format'
 
 export function AdminTourEditPage() {
   const { id } = useParams()
   const tourId = Number(id)
   const navigate = useNavigate()
   const [error, setError] = useState('')
-  const [currentImage, setCurrentImage] = useState('')
   const [form, setForm] = useState(emptyTourForm())
 
   useEffect(() => {
@@ -22,7 +20,6 @@ export function AdminTourEditPage() {
     getAdminTour(tourId)
       .then((r) => {
         const t = r.data
-        setCurrentImage(imageUrl(t.hinhAnh))
         const base = {
           tieuDe: t.tieuDe ?? '',
           gia: String(t.gia ?? ''),
@@ -33,10 +30,10 @@ export function AdminTourEditPage() {
             const first = t.diemDons ? [...t.diemDons][0] : undefined
             return first?.id ? String(first.id) : ''
           })(),
-          idNoiLuuTru: t.noiLuuTru?.id ? String(t.noiLuuTru.id) : '',
           moTa: t.moTa ?? '',
           highlight: t.highlight ?? '',
           hinhAnh: t.hinhAnh ?? '',
+          imageFile: null,
           noiBat: !!t.noiBat,
         }
         setForm({
@@ -52,7 +49,15 @@ export function AdminTourEditPage() {
     e.preventDefault()
     setError('')
     try {
-      await updateAdminTour(tourId, buildTourPayload(form))
+      let hinhAnh = form.hinhAnh
+      if (form.imageFile) {
+        hinhAnh = await uploadTourImage(form.imageFile)
+      }
+      if (!hinhAnh) {
+        setError('Vui lòng chọn ảnh đại diện')
+        return
+      }
+      await updateAdminTour(tourId, buildTourPayload(form, hinhAnh))
       navigate(`/admin/tour/detail/${tourId}?source=active`)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Không thể cập nhật')
@@ -93,7 +98,6 @@ export function AdminTourEditPage() {
         <TourAdminFormLayout
           form={form}
           onChange={setForm}
-          showCurrentImage={currentImage}
           footer={
             <button type="submit" className="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
               <i className="bi bi-save me-1" />

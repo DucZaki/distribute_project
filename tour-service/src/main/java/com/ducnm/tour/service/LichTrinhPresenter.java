@@ -6,8 +6,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class LichTrinhPresenter {
@@ -48,6 +51,13 @@ public class LichTrinhPresenter {
             return List.of();
         }
         return entities.stream()
+                .filter(lt -> lt != null)
+                .collect(Collectors.toMap(
+                        lt -> lt.getId() != null ? lt.getId() : System.identityHashCode(lt),
+                        Function.identity(),
+                        (a, b) -> a,
+                        LinkedHashMap::new))
+                .values().stream()
                 .sorted((a, b) -> Integer.compare(
                         a.getNgayThu() != null ? a.getNgayThu() : 0,
                         b.getNgayThu() != null ? b.getNgayThu() : 0))

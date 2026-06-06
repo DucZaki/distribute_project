@@ -1,9 +1,17 @@
 server:
   port: 8082
 
+app:
+  upload:
+    dir: ${UPLOAD_DIR:/app/uploads}
+
 spring:
   application:
     name: tour-service
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   datasource:

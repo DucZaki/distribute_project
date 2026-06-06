@@ -1125,6 +1125,25 @@ a:hover {
     border: 1px solid rgba(92, 107, 192, 0.4);
 }
 
+/* Trang tài khoản user — tránh bị premium-nav-dock che */
+.user-page-shell {
+    padding-top: 150px;
+    padding-bottom: 3rem;
+    min-height: 60vh;
+}
+
+@media (max-width: 991.98px) {
+    .user-page-shell {
+        padding-top: 110px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .user-page-shell {
+        padding-top: 88px;
+    }
+}
+
 /* Progress bar next tier */
 .tier-progress-wrap {
     background: rgba(0, 0, 0, 0.07);

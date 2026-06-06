@@ -9,9 +9,12 @@ import com.ducnm.tour.service.ScheduleService;
 import com.ducnm.tour.service.TourService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/tours")
@@ -20,6 +23,7 @@ public class AdminTourController {
 
     private final TourService tourService;
     private final ScheduleService scheduleService;
+    private final com.ducnm.tour.service.TourImageStorage imageStorage;
 
     @GetMapping
     public ApiResponse<PageResponse<TourSummary>> list(
@@ -41,6 +45,14 @@ public class AdminTourController {
     @GetMapping("/{id}")
     public ApiResponse<TourResponse> get(@PathVariable Integer id) {
         return ApiResponse.ok(tourService.getById(id));
+    }
+
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Map<String, String>> uploadImage(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @RequestParam("file") MultipartFile file) {
+        requireAdmin(roles);
+        return ApiResponse.ok(Map.of("path", imageStorage.store(file)), "Đã tải ảnh lên");
     }
 
     @PostMapping
