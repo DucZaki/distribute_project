@@ -22,6 +22,9 @@ public class ContactController {
                 .hoTen(req.hoTen)
                 .email(req.email)
                 .soDienThoai(req.soDienThoai)
+                .loai(req.loai != null && !req.loai.isBlank() ? req.loai : "OTHER")
+                .diaChi(req.diaChi)
+                .soKhach(req.soKhach)
                 .tieuDe(req.tieuDe)
                 .noiDung(req.noiDung)
                 .build();
@@ -35,7 +38,10 @@ public class ContactController {
         @NotBlank private String hoTen;
         @NotBlank @Email private String email;
         private String soDienThoai;
-        private String tieuDe;
+        private String loai;
+        private String diaChi;
+        private Integer soKhach;
+        @NotBlank private String tieuDe;
         @NotBlank private String noiDung;
     }
 }

@@ -26,6 +26,15 @@ public class Contact {
     @Column(name = "so_dien_thoai", length = 20)
     private String soDienThoai;
 
+    @Column(name = "loai", length = 30)
+    private String loai;
+
+    @Column(name = "dia_chi", length = 500)
+    private String diaChi;
+
+    @Column(name = "so_khach")
+    private Integer soKhach;
+
     @Column(name = "tieu_de", length = 255)
     private String tieuDe;
 

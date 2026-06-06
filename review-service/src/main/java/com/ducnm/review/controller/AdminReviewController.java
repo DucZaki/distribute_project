@@ -4,10 +4,13 @@ import com.ducnm.common.dto.ApiResponse;
 import com.ducnm.common.dto.PageResponse;
 import com.ducnm.common.exception.BusinessException;
 import com.ducnm.common.util.SecurityHeaders;
-import com.ducnm.review.entity.DanhGia;
+import com.ducnm.review.dto.ReviewDtos.ReviewResponse;
+import com.ducnm.review.dto.ReviewDtos.TourReviewSummary;
 import com.ducnm.review.service.AdminReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/reviews")
@@ -16,14 +19,25 @@ public class AdminReviewController {
 
     private final AdminReviewService service;
 
+    @GetMapping("/tours")
+    public ApiResponse<List<TourReviewSummary>> toursWithReviews(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @RequestParam(required = false) String sort) {
+        requireAdmin(roles);
+        return ApiResponse.ok(service.toursWithReviews(sort));
+    }
+
     @GetMapping
-    public ApiResponse<PageResponse<DanhGia>> list(
+    public ApiResponse<PageResponse<ReviewResponse>> list(
             @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
             @RequestParam(required = false) Integer tourId,
+            @RequestParam(required = false) Integer diem,
+            @RequestParam(required = false) String hoTen,
+            @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "10") int size) {
         requireAdmin(roles);
-        return ApiResponse.ok(service.list(tourId, page, size));
+        return ApiResponse.ok(service.list(tourId, diem, hoTen, sort, page, size));
     }
 
     @DeleteMapping("/{id}")

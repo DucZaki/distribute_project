@@ -226,6 +226,39 @@
     box-shadow: 0 0 0 3px rgba(254, 207, 47, 0.25) !important;
 }
 
+/* Monolith-style form fields (contact.html) */
+.contact-form-card .minimal-input-border {
+    border: 2px solid #edf2f7;
+    background-color: #f8fafc;
+    border-radius: 0.75rem;
+    transition: all 0.3s;
+    padding: 0.75rem 1rem;
+}
+
+.contact-form-card .minimal-input-border:focus {
+    border-color: #3498DB;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+}
+
+.contact-form-card .btn-luxury-gradient {
+    background: linear-gradient(135deg, #3498DB 0%, #2E86C1 100%);
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
+.contact-form-card .btn-luxury-gradient:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(52, 152, 219, 0.4);
+    color: #fff;
+}
+
+.contact-form-card .btn-luxury-gradient:disabled {
+    opacity: 0.75;
+}
+
 /* ===================== MAP ===================== */
 .contact-map-wrapper {
     border-radius: 18px;

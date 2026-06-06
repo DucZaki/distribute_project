@@ -9,19 +9,25 @@ function ContactPage() {
 
   async function onSubmit(e) {
     e.preventDefault();
+    const form = e.currentTarget;
     setMsg("");
     setErr("");
     setLoading(true);
-    const fd = new FormData(e.currentTarget);
+    const fd = new FormData(form);
     try {
+      const soKhachRaw = fd.get("soKhach");
       await submitContact({
         hoTen: String(fd.get("hoTen")),
         email: String(fd.get("email")),
+        soDienThoai: String(fd.get("soDienThoai") || "") || undefined,
+        loai: String(fd.get("loai") || "OTHER"),
+        diaChi: String(fd.get("diaChi") || "") || undefined,
+        soKhach: soKhachRaw ? Number(soKhachRaw) : undefined,
+        tieuDe: String(fd.get("tieuDe")),
         noiDung: String(fd.get("noiDung")),
-        tieuDe: "Liên hệ từ website",
       });
-      setMsg("Đã gửi liên hệ thành công. Chúng tôi sẽ phản hồi sớm.");
-      e.currentTarget.reset();
+      setMsg("success");
+      form.reset();
     } catch (ex) {
       setErr(ex instanceof ApiError ? ex.message : "Gửi thất bại");
     } finally {
@@ -199,70 +205,149 @@ function ContactPage() {
           {/* Right Column: Contact Form */}
           <div className="col-lg-7 contact-form-animate">
             <div className="contact-form-card">
-              <h2 className="contact-form-title fw-bold">
+              <h3 className="contact-form-title fw-bolder text-dark mb-2">
                 Gửi tin nhắn cho chúng tôi
-              </h2>
-              <p className="text-muted mb-4">
-                Nếu bạn có bất kỳ câu hỏi, phản hồi hay yêu cầu đặc biệt nào,
-                xin vui lòng gửi tin nhắn. Đội ngũ của chúng tôi sẽ liên hệ lại
-                sớm nhất.
+              </h3>
+              <p className="text-secondary small mb-4 pb-3 border-bottom">
+                Đội ngũ của chúng tôi sẽ phản hồi bạn trong vòng 24 giờ làm việc.
               </p>
 
-              {msg && <div className="alert alert-success">{msg}</div>}
-              {err && <div className="alert alert-danger">{err}</div>}
+              {msg === "success" ? (
+                <div className="alert alert-success rounded-3 shadow-sm border-0 d-flex align-items-center mb-4">
+                  <i className="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                  <div>
+                    <h6 className="alert-heading fw-bold mb-1">Gửi thông tin thành công!</h6>
+                    <p className="mb-0 small">
+                      Cảm ơn bạn đã liên hệ. Chúng tôi sẽ sớm kết nối với bạn.
+                    </p>
+                  </div>
+                </div>
+              ) : err ? (
+                <div className="alert alert-danger rounded-3 shadow-sm border-0 mb-4">{err}</div>
+              ) : null}
 
               <form onSubmit={onSubmit} autoComplete="off">
-                <div className="row g-3">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label fw-bold">Họ và tên</label>
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Họ và tên <span className="text-danger">*</span>
+                    </label>
                     <input
                       name="hoTen"
-                      className="form-control contact-input"
-                      placeholder="Nhập họ và tên..."
+                      type="text"
+                      className="form-control minimal-input-border"
+                      placeholder="Nguyễn Văn A"
                       required
                     />
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label fw-bold">Địa chỉ Email</label>
+                  <div className="col-md-6">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Địa chỉ Email <span className="text-danger">*</span>
+                    </label>
                     <input
                       name="email"
                       type="email"
-                      className="form-control contact-input"
-                      placeholder="example@gmail.com"
+                      className="form-control minimal-input-border"
+                      placeholder="example@email.com"
                       required
                     />
                   </div>
-                </div>
 
-                <div className="mb-4">
-                  <label className="form-label fw-bold">Nội dung liên hệ</label>
-                  <textarea
-                    name="noiDung"
-                    className="form-control contact-input"
-                    rows={5}
-                    placeholder="Nhập nội dung tin nhắn hoặc câu hỏi của bạn tại đây..."
-                    required
-                  ></textarea>
-                </div>
+                  <div className="col-md-6">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Số điện thoại
+                    </label>
+                    <input
+                      name="soDienThoai"
+                      type="text"
+                      className="form-control minimal-input-border"
+                      placeholder="0912 345 678"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Loại nhu cầu liên hệ
+                    </label>
+                    <select name="loai" className="form-select minimal-input-border" defaultValue="TOUR">
+                      <option value="TOUR">Tư vấn Du lịch / Đặt Tour</option>
+                      <option value="SUPPORT">Chăm sóc khách hàng</option>
+                      <option value="OTHER">Thắc mắc khác</option>
+                    </select>
+                  </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100 py-3 shadow-sm fw-bold text-uppercase"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span
-                        className="spinner-border spinner-border-sm me-2"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                      Đang gửi...
-                    </>
-                  ) : (
-                    "Gửi tin nhắn"
-                  )}
-                </button>
+                  <div className="col-md-8">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Địa chỉ của bạn
+                    </label>
+                    <input
+                      name="diaChi"
+                      type="text"
+                      className="form-control minimal-input-border"
+                      placeholder="Quận/Huyện, Tỉnh/Thành phố"
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Số khách dự kiến
+                    </label>
+                    <input
+                      name="soKhach"
+                      type="number"
+                      className="form-control minimal-input-border"
+                      placeholder="Vd: 2"
+                      min="1"
+                    />
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Tiêu đề <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      name="tieuDe"
+                      type="text"
+                      className="form-control minimal-input-border"
+                      placeholder="Nhập tiêu đề cần hỗ trợ"
+                      required
+                    />
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label text-secondary fw-semibold small">
+                      Nội dung chi tiết <span className="text-danger">*</span>
+                    </label>
+                    <textarea
+                      name="noiDung"
+                      className="form-control minimal-input-border"
+                      rows={5}
+                      placeholder="Hãy chia sẻ mong muốn của bạn..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div className="col-12 text-end mt-2">
+                    <button
+                      type="submit"
+                      className="btn btn-luxury-gradient rounded-pill px-5 py-3 fw-bold fs-6"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          Đang gửi...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-send-fill me-2"></i> Gửi Yêu Cầu
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>

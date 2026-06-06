@@ -36,6 +36,7 @@ public class AdminContactService {
         Contact c = repo.findById(id).orElseThrow(() -> BusinessException.notFound("Contact", id));
         if ("NEW".equals(c.getTrangThai())) {
             c.setTrangThai("READ");
+            c = repo.save(c);
         }
         return c;
     }

@@ -11,5 +11,5 @@ public interface TourClient {
     @GetMapping("/api/v1/tours/{id}")
     ApiResponse<TourBrief> getTour(@PathVariable("id") Integer id);
 
-    record TourBrief(Integer id, String tieuDe) {}
+    record TourBrief(Integer id, String tieuDe, String hinhAnh) {}
 }
