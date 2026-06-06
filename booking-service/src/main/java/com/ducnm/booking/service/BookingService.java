@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -62,10 +63,19 @@ public class BookingService {
             BigDecimal discount = BigDecimal.ZERO;
             MaGiamGia promo = null;
             if (req.getMaGiamGia() != null && !req.getMaGiamGia().isBlank()) {
+                PromoApplyResult promoResult = promoService.validateForBooking(
+                        userId,
+                        req.getMaGiamGia(),
+                        subtotal,
+                        req.getIdChuyenDi(),
+                        req.getIdNgayKhoiHanh(),
+                        req.getNgayKhoiHanh());
+                discount = promoResult.getDiscount();
                 promo = promoService.findByCode(req.getMaGiamGia())
                         .orElseThrow(() -> BusinessException.badRequest("Mã giảm giá không hợp lệ"));
-                discount = PromoService.calcDiscount(promo, subtotal);
-                promoService.consume(promo.getId());
+                if (!promoService.consume(promo.getId())) {
+                    throw BusinessException.conflict("Mã này đã hết lượt sử dụng");
+                }
             }
             BigDecimal total = subtotal.subtract(discount).max(BigDecimal.ZERO);
 

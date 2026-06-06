@@ -18,10 +18,17 @@ public class FlightQuoteResponse {
     private BigDecimal giaVeVe;
     private BigDecimal tongGiaVe;
     private String maChuyenBayDi;
+    private String maChuyenBayVe;
     private String gioBayDi;
+    private String gioBayVe;
+    private String gioDenDi;
+    private String gioDenVe;
     private String ngayDi;
     private String ngayVe;
     private String originCode;
     private String destinationCode;
+    /** FLIGHT hoặc BUS */
+    private String transportMode;
+    private String transportLabel;
     private String message;
 }

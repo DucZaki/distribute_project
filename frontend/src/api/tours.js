@@ -1,5 +1,13 @@
 import { apiFetch } from "./client";
 import { parseNgayDi, priceRangeFromKhoangGia } from "../utils/searchFilters";
+
+const LOAI_KEYWORDS = {
+  "gia-dinh": "Family",
+  trekking: "Trek",
+  "nghi-duong": "Resort",
+  "ghep-doan": "Group",
+};
+
 function getFeaturedTours(limit = 3) {
   const cap = Math.min(Math.max(Number(limit) || 3, 1), 12);
   return apiFetch(`/tours/featured?limit=${cap}`);
@@ -7,9 +15,14 @@ function getFeaturedTours(limit = 3) {
 function getFeaturedDestinations() {
   return apiFetch("/tours/destinations/featured");
 }
+function getAllDestinations() {
+  return apiFetch("/tours/destinations");
+}
 function searchTours(params) {
   const q = new URLSearchParams();
-  const keyword = params.keyword ?? params.diemDen ?? params.thanhPho ?? params.quocGia;
+  const loaiKw = params.loai ? LOAI_KEYWORDS[params.loai] : undefined;
+  const keyword =
+    params.keyword ?? loaiKw ?? params.diemDen ?? params.thanhPho ?? params.quocGia;
   if (keyword) q.set("keyword", keyword);
   if (params.sort) q.set("sort", params.sort);
   const ngay = parseNgayDi(params.ngayDi);
@@ -46,6 +59,7 @@ function fetchFlightQuote(tourId, nkhId, diemDonId, refresh = false) {
 }
 export {
   fetchFlightQuote,
+  getAllDestinations,
   getFeaturedDestinations,
   getFeaturedTours,
   getNearbyTours,

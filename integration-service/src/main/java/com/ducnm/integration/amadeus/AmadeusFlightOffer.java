@@ -16,6 +16,8 @@ public class AmadeusFlightOffer {
     private String arrivalTime;
     private String currency;
     private boolean fallback;
+    private String errorCode;
+    private String message;
 
     public Map<String, Object> toMap() {
         return Map.of(
@@ -26,6 +28,8 @@ public class AmadeusFlightOffer {
                 "departureTime", departureTime != null ? departureTime : "",
                 "arrivalTime", arrivalTime != null ? arrivalTime : "",
                 "currency", currency != null ? currency : "VND",
-                "fallback", fallback);
+                "fallback", fallback,
+                "errorCode", errorCode != null ? errorCode : "",
+                "message", message != null ? message : "");
     }
 }

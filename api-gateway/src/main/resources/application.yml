@@ -32,14 +32,25 @@ spring:
           filters:
             - RewritePath=/api/oauth2/(?<seg>.*), /oauth2/${seg}
 
-        # PUBLIC: promo validate (during booking, before full auth)
-        - id: booking-promo-public
+        # PUBLIC: active promo codes for marketing page
+        - id: booking-promo-active-public
           uri: lb://booking-service
           predicates:
-            - Path=/api/bookings/promo/apply
-            - Method=POST
+            - Path=/api/bookings/promo/active
+            - Method=GET
           filters:
             - RewritePath=/api/bookings/(?<seg>.*), /api/v1/bookings/${seg}
+
+        # promo/apply → protected bookings route (cần JWT để giới hạn theo user)
+
+        # PUBLIC: flight quote (Amadeus — có thể mất 5–30s, không dùng circuit breaker)
+        - id: tour-flight-quote
+          uri: lb://tour-service
+          predicates:
+            - Path=/api/tours/*/flight-quote
+            - Method=GET
+          filters:
+            - RewritePath=/api/tours/(?<id>[^/]+)/flight-quote, /api/v1/tours/${id}/flight-quote
 
         # PUBLIC: read-only tour browse + destinations (/api/tours and /api/tours/**)
         - id: tour-public
@@ -179,6 +190,12 @@ eureka:
     prefer-ip-address: true
 
 resilience4j:
+  timelimiter:
+    instances:
+      tourCB:
+        timeoutDuration: 90s
+      bookingCB:
+        timeoutDuration: 60s
   circuitbreaker:
     instances:
       tourCB:

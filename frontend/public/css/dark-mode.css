@@ -587,12 +587,15 @@
     background: rgba(18, 20, 22, 0.95) !important;
 }
 
-[data-theme="dark"] .premium-nav-dock .nav-link {
+[data-theme="dark"] .premium-nav-dock .nav-link,
+[data-theme="dark"] .nav-main-links .nav-link {
     color: rgba(255, 255, 255, 0.65) !important;
 }
 
 [data-theme="dark"] .premium-nav-dock .nav-link:hover,
-[data-theme="dark"] .premium-nav-dock .nav-link.active {
+[data-theme="dark"] .premium-nav-dock .nav-link.active,
+[data-theme="dark"] .nav-main-links .nav-link:hover,
+[data-theme="dark"] .nav-main-links .nav-link.active {
     color: #FECF2F !important;
 }
 
@@ -747,4 +750,36 @@
 
 [data-theme="dark"] .calendar-legend {
     color: #aaa;
+}
+
+[data-theme="dark"] .nav-link-promo {
+    color: #f48c06 !important;
+}
+[data-theme="dark"] .nav-link-promo.active {
+    color: #fecf2f !important;
+}
+[data-theme="dark"] .mega-tour-cat {
+    background: #1e2126;
+    border-color: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .mega-tour-cat:hover {
+    background: #252930;
+}
+[data-theme="dark"] .nav-locale-toggle {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #fff;
+}
+[data-theme="dark"] .promo-card {
+    background: #1e2126;
+    border-color: rgba(254, 207, 47, 0.35);
+}
+[data-theme="dark"] .promo-card-code {
+    color: #e8eaed;
+}
+[data-theme="dark"] .about-hero {
+    background: linear-gradient(180deg, #1a1c1e 0%, #121416 100%);
+}
+[data-theme="dark"] .about-value-card {
+    background: #1e2126;
 }

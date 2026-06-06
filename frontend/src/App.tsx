@@ -31,6 +31,8 @@ import { FavoritesPage } from './pages/FavoritesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { NewsPage } from './pages/NewsPage'
+import { AboutPage } from './pages/AboutPage'
+import { PromotionsPage } from './pages/PromotionsPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
 import { PaymentResultPage } from './pages/PaymentResultPage'
@@ -60,6 +62,8 @@ export default function App() {
             <Route path="tour/:id" element={<TourDetailPage />} />
             <Route path="tour/:id/dat-tour" element={<ProtectedRoute><BookingNewPage /></ProtectedRoute>} />
             <Route path="tin-tuc" element={<NewsPage />} />
+            <Route path="uu-dai" element={<PromotionsPage />} />
+            <Route path="ve-chung-toi" element={<AboutPage />} />
             <Route path="payment/result" element={<PaymentResultPage />} />
             <Route path="check-in/:token" element={<CheckInVerifyPage />} />
             <Route path="contact" element={<ContactPage />} />

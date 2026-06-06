@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -83,18 +84,18 @@ public class AmadeusClient {
                 .map(this::parseCheapest)
                 .onErrorResume(e -> {
                     log.warn("Amadeus cheapest {}-{} {}: {}", origin, destination, date, e.getMessage());
-                    return Mono.just(unavailable(true));
+                    return Mono.just(unavailable(true, errorCode(e), errorMessage(e)));
                 });
     }
 
     @SuppressWarnings("unchecked")
     private AmadeusFlightOffer parseCheapest(Map response) {
         if (response == null) {
-            return unavailable(true);
+            return unavailable(true, "NO_RESPONSE", "Không nhận được phản hồi từ Amadeus.");
         }
         Object dataObj = response.get("data");
         if (!(dataObj instanceof List<?> data) || data.isEmpty()) {
-            return unavailable(Boolean.TRUE.equals(response.get("fallback")));
+            return unavailable(Boolean.TRUE.equals(response.get("fallback")), "NO_FLIGHT", "Không có chuyến bay phù hợp từ Amadeus.");
         }
         Map<String, Object> offer = (Map<String, Object>) data.get(0);
         double price = 0;
@@ -143,12 +144,41 @@ public class AmadeusClient {
                 .build();
     }
 
-    private static AmadeusFlightOffer unavailable(boolean fallback) {
+    private static AmadeusFlightOffer unavailable(boolean fallback, String errorCode, String message) {
         return AmadeusFlightOffer.builder()
                 .available(false)
                 .price(0)
                 .fallback(fallback)
+                .errorCode(errorCode)
+                .message(message)
                 .build();
+    }
+
+    private static String errorCode(Throwable e) {
+        if (e instanceof WebClientResponseException wcre) {
+            return "AMADEUS_HTTP_" + wcre.getStatusCode().value();
+        }
+        if (e instanceof IllegalStateException) {
+            return "AMADEUS_NOT_CONFIGURED";
+        }
+        return "AMADEUS_UNAVAILABLE";
+    }
+
+    private static String errorMessage(Throwable e) {
+        if (e instanceof WebClientResponseException wcre) {
+            int status = wcre.getStatusCode().value();
+            if (status == 429) {
+                return "Amadeus đang giới hạn số lần gọi API. Vui lòng thử lại sau hoặc dùng credential khác.";
+            }
+            if (status == 401 || status == 403) {
+                return "Không xác thực được với Amadeus. Kiểm tra AMADEUS_CLIENT_ID/SECRET.";
+            }
+            return "Amadeus trả lỗi HTTP " + status + ".";
+        }
+        if (e instanceof IllegalStateException) {
+            return "Amadeus chưa được cấu hình. Thiếu AMADEUS_CLIENT_ID/SECRET.";
+        }
+        return "Dịch vụ Amadeus tạm thời không khả dụng.";
     }
 
     @SuppressWarnings("unused")
@@ -160,6 +190,6 @@ public class AmadeusClient {
     @SuppressWarnings("unused")
     private Mono<AmadeusFlightOffer> cheapestFallback(String origin, String destination, String date, Throwable e) {
         log.warn("Amadeus cheapest fallback: {}", e.getMessage());
-        return Mono.just(unavailable(true));
+        return Mono.just(unavailable(true, errorCode(e), errorMessage(e)));
     }
 }

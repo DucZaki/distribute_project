@@ -28,4 +28,12 @@ public interface DatChoRepository extends JpaRepository<DatCho, Integer> {
             WHERE d.idChuyenDi = :tourId AND d.trangThai <> 'CANCELLED'
             """)
     long sumSoLuongByIdChuyenDi(@Param("tourId") Integer tourId);
+
+    @Query("""
+            select count(d) from DatCho d
+             where d.idNguoiDung = :userId
+               and d.idMaGiamGia = :promoId
+               and d.trangThai <> 'CANCELLED'
+            """)
+    long countPromoUsageByUser(@Param("userId") Integer userId, @Param("promoId") Integer promoId);
 }

@@ -15,7 +15,13 @@ function BookingsPage() {
     try {
       await redirectToVnPay(bookingId, true);
     } catch (err) {
-      setPayError(err instanceof ApiError ? err.message : "Không thể mở VNPay");
+      const msg =
+        err instanceof ApiError
+          ? err.status === 401
+            ? "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+            : err.message
+          : "Không thể mở VNPay";
+      setPayError(msg);
       setPayingId(null);
     }
   }

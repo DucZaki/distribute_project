@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { addFavorite, listFavorites, removeFavorite } from '../api/favorites'
 import { getReviewSummary, getTourReviews } from '../api/reviews'
-import { getTour } from '../api/tours'
+import { fetchFlightQuote, getTour } from '../api/tours'
 import { useAuth } from '../auth/AuthContext'
 import type { ReviewItem, TourDetail } from '../types/api'
 import { getThreeMonthTabs, resolveCalendarView } from '../utils/departureCalendar'
@@ -73,6 +73,8 @@ export function TourDetailPage() {
   const [weatherOpen, setWeatherOpen] = useState(true)
   const [weatherLoading, setWeatherLoading] = useState(false)
   const [weatherHtml, setWeatherHtml] = useState('')
+  const [flightQuote, setFlightQuote] = useState<any>(null)
+  const [flightQuoteLoading, setFlightQuoteLoading] = useState(false)
   const selectedScheduleId = Number(searchParams.get('nkhId') || searchParams.get('scheduleId') || 0)
   const selectedDate = searchParams.get('selectedDate') || ''
   const monthParam = Number(searchParams.get('month') || 0)
@@ -121,6 +123,34 @@ export function TourDetailPage() {
     if (selectedScheduleId) return tour.ngayKhoiHanhs?.find((s) => s.id === selectedScheduleId)
     return undefined
   }, [departureByDate, selectedDate, selectedScheduleId, tour])
+
+  const transportKind = inferTransportKind(tour?.phuongTien?.loai)
+  const quoteTransportKind =
+    flightQuote?.transportMode === 'BUS' ? 'bus' : flightQuote?.transportMode === 'FLIGHT' ? 'plane' : transportKind
+  const selectedDiemDonId = tour?.diemDon?.id ?? tour?.diemDons?.[0]?.id
+
+  useEffect(() => {
+    if (!tourId || !selectedSchedule?.id || !selectedDiemDonId) {
+      setFlightQuote(null)
+      setFlightQuoteLoading(false)
+      return
+    }
+    let cancelled = false
+    setFlightQuoteLoading(true)
+    fetchFlightQuote(tourId, selectedSchedule.id, selectedDiemDonId, false)
+      .then((r) => {
+        if (!cancelled) setFlightQuote(r.data)
+      })
+      .catch(() => {
+        if (!cancelled) setFlightQuote(null)
+      })
+      .finally(() => {
+        if (!cancelled) setFlightQuoteLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedDiemDonId, selectedSchedule?.id, tourId, transportKind])
 
   const calendar = useMemo(() => buildCalendar(viewMonth, viewYear), [viewMonth, viewYear])
 
@@ -239,10 +269,9 @@ export function TourDetailPage() {
     )
   }
 
-  const transportKind = inferTransportKind(tour.phuongTien?.loai)
   const diemDonTen = tour.diemDon?.ten || 'Hà Nội'
   const diemDenDisplay = diemDenLabel || 'Đang cập nhật'
-  const defaultDiemDonId = tour?.diemDon?.id ?? tour?.diemDons?.[0]?.id
+  const defaultDiemDonId = selectedDiemDonId
 
   function bookingUrl(tourId: number, scheduleId: number) {
     const q = new URLSearchParams({ nkhId: String(scheduleId) })
@@ -251,13 +280,14 @@ export function TourDetailPage() {
   }
 
   const todayIso = toIsoDate(new Date())
-  const ticketPrice = (Number(selectedSchedule?.giaVeDi ?? 0) || 0) + (Number(selectedSchedule?.giaVeVe ?? 0) || 0)
+  const flightInfo = flightQuote?.available ? flightQuote : selectedSchedule
+  const ticketPrice = (Number(flightInfo?.giaVeDi ?? 0) || 0) + (Number(flightInfo?.giaVeVe ?? 0) || 0)
   const totalPerGuest = Number(tour.gia ?? 0) + ticketPrice
 
   function openTransportModal() {
     const modalEl = document.getElementById('transportModal')
     if (!modalEl) return
-    const kind = transportKind
+    const kind = quoteTransportKind
     const type = tour.phuongTien?.loai ?? ''
     const data: Record<string, { icon: string; title: string; items: [string, string, string][] }> = {
       plane: {
@@ -462,35 +492,46 @@ export function TourDetailPage() {
               <div className="card border-0 shadow-sm">
                 <div className="card-header bg-primary text-white py-3">
                   <h5 className="mb-0 fw-bold">
-                    <i className={`bi ${transportIcon(transportKind)} me-2`} /> THÔNG TIN CHUYẾN
+                    <i className={`bi ${transportIcon(quoteTransportKind)} me-2`} /> THÔNG TIN CHUYẾN
+                    {flightQuote?.transportLabel && (
+                      <span className="badge bg-light text-dark ms-2 small">{flightQuote.transportLabel}</span>
+                    )}
                   </h5>
                 </div>
                 <div className="card-body p-0">
                   <div className="p-4 border-bottom">
+                    {flightQuoteLoading && (
+                      <div className="small text-muted mb-3">
+                        <span className="spinner-border spinner-border-sm me-2" /> Đang lấy giá vận chuyển...
+                      </div>
+                    )}
+                    {!flightQuoteLoading && flightQuote?.message && !flightQuote.available && (
+                      <div className="alert alert-warning py-2 small mb-3">{flightQuote.message}</div>
+                    )}
                     <div className="d-flex align-items-center mb-3">
                       <span className="badge bg-success me-2 px-3 py-2">CHIỀU ĐI</span>
                       <span className="text-muted small">Ngày {selectedSchedule.ngayKhoiHanh}</span>
                     </div>
                     <div className="row align-items-center">
                       <div className="col-md-3 text-center">
-                        <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioBayDi || 'N/A'}</div>
+                        <div className="fs-3 fw-bold text-dark">{flightInfo?.gioBayDi || 'N/A'}</div>
                         <div className="small text-muted">{diemDonTen}</div>
                       </div>
                       <div className="col-md-6 text-center">
                         <div className="d-flex align-items-center justify-content-center">
                           <hr className="flex-grow-1" />
-                          <i className={`bi ${transportIconTimeline(transportKind)} text-primary mx-3 fs-5`} />
+                          <i className={`bi ${transportIconTimeline(quoteTransportKind)} text-primary mx-3 fs-5`} />
                           <hr className="flex-grow-1" />
                         </div>
-                        <div className="small text-muted">Mã: {selectedSchedule.maChuyenBayDi || 'N/A'}</div>
+                        <div className="small text-muted">Mã: {flightInfo?.maChuyenBayDi || 'N/A'}</div>
                       </div>
                       <div className="col-md-3 text-center">
-                        <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioDenDi || 'N/A'}</div>
+                        <div className="fs-3 fw-bold text-dark">{flightInfo?.gioDenDi || 'N/A'}</div>
                         <div className="small text-muted">{diemDenDisplay}</div>
                       </div>
                     </div>
                     <div className="text-end mt-2">
-                      <span className="text-danger fw-bold fs-5">{selectedSchedule.giaVeDi ? formatVnd(Number(selectedSchedule.giaVeDi)) : 'N/A'}</span>
+                      <span className="text-danger fw-bold fs-5">{flightInfo?.giaVeDi ? formatVnd(Number(flightInfo.giaVeDi)) : 'N/A'}</span>
                     </div>
                   </div>
 
@@ -501,24 +542,24 @@ export function TourDetailPage() {
                     </div>
                     <div className="row align-items-center">
                       <div className="col-md-3 text-center">
-                        <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioBayVe || 'N/A'}</div>
+                        <div className="fs-3 fw-bold text-dark">{flightInfo?.gioBayVe || 'N/A'}</div>
                         <div className="small text-muted">{diemDenDisplay}</div>
                       </div>
                       <div className="col-md-6 text-center">
                         <div className="d-flex align-items-center justify-content-center">
                           <hr className="flex-grow-1" />
-                          <i className={`bi ${transportIconTimeline(transportKind)} text-primary mx-3 fs-5`} style={transportKind === 'plane' ? { transform: 'scaleX(-1)' } : undefined} />
+                          <i className={`bi ${transportIconTimeline(quoteTransportKind)} text-primary mx-3 fs-5`} style={quoteTransportKind === 'plane' ? { transform: 'scaleX(-1)' } : undefined} />
                           <hr className="flex-grow-1" />
                         </div>
-                        <div className="small text-muted">Mã: {selectedSchedule.maChuyenBayVe || 'N/A'}</div>
+                        <div className="small text-muted">Mã: {flightInfo?.maChuyenBayVe || 'N/A'}</div>
                       </div>
                       <div className="col-md-3 text-center">
-                        <div className="fs-3 fw-bold text-dark">{selectedSchedule.gioDenVe || 'N/A'}</div>
+                        <div className="fs-3 fw-bold text-dark">{flightInfo?.gioDenVe || 'N/A'}</div>
                         <div className="small text-muted">{diemDonTen}</div>
                       </div>
                     </div>
                     <div className="text-end mt-2">
-                      <span className="text-danger fw-bold fs-5">{selectedSchedule.giaVeVe ? formatVnd(Number(selectedSchedule.giaVeVe)) : 'N/A'}</span>
+                      <span className="text-danger fw-bold fs-5">{flightInfo?.giaVeVe ? formatVnd(Number(flightInfo.giaVeVe)) : 'N/A'}</span>
                     </div>
                   </div>
 
@@ -612,9 +653,9 @@ export function TourDetailPage() {
             </div>
             <div className="col-6 col-lg-3">
               <div className="info-card" onClick={openTransportModal}>
-                <i className={`bi ${transportIcon(transportKind)} fs-3`} style={{ color: '#ffc107' }} />
+                <i className={`bi ${transportIcon(quoteTransportKind)} fs-3`} style={{ color: '#ffc107' }} />
                 <p className="mb-1 fw-bold small mt-1">Phương tiện</p>
-                <p className="small text-muted mb-0">{tour.phuongTien?.ten ?? transportLabel(tour.phuongTien?.loai)}</p>
+                <p className="small text-muted mb-0">{flightQuote?.transportLabel ?? tour.phuongTien?.ten ?? transportLabel(tour.phuongTien?.loai)}</p>
                 <span className="info-card-hint"><i className="bi bi-info-circle me-1" />Xem lưu ý</span>
               </div>
             </div>
@@ -824,16 +865,17 @@ export function TourDetailPage() {
                   <div className="small text-muted mb-3">
                     <span>Vé: </span>
                     <strong>{formatVnd(ticketPrice)}</strong>
+                    {flightQuoteLoading && <span className="ms-1">(đang cập nhật)</span>}
                   </div>
                   <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngày đi: <strong>{selectedSchedule.ngayKhoiHanh}</strong></p>
                   <p className="small text-muted mb-2"><i className="bi bi-calendar3 me-1" /> Ngày về: <strong>{selectedSchedule.ngayKetThuc ?? 'N/A'}</strong></p>
                   <p className="small text-muted mb-2">
-                    <i className={`bi ${transportIcon(transportKind)} me-1`} /> Chuyến đi: <strong>{selectedSchedule.maChuyenBayDi ?? 'N/A'}</strong>
-                    {selectedSchedule.gioBayDi && selectedSchedule.gioDenDi ? ` (${selectedSchedule.gioBayDi} -> ${selectedSchedule.gioDenDi})` : ''}
+                    <i className={`bi ${transportIcon(quoteTransportKind)} me-1`} /> Chuyến đi: <strong>{flightInfo?.maChuyenBayDi ?? 'N/A'}</strong>
+                    {flightInfo?.gioBayDi && flightInfo?.gioDenDi ? ` (${flightInfo.gioBayDi} -> ${flightInfo.gioDenDi})` : ''}
                   </p>
                   <p className="small text-muted mb-3">
-                    <i className={`bi ${transportIcon(transportKind)} me-1`} style={transportKind === 'plane' ? { transform: 'scaleX(-1)', display: 'inline-block' } : undefined} /> Chuyến về: <strong>{selectedSchedule.maChuyenBayVe ?? 'N/A'}</strong>
-                    {selectedSchedule.gioBayVe && selectedSchedule.gioDenVe ? ` (${selectedSchedule.gioBayVe} -> ${selectedSchedule.gioDenVe})` : ''}
+                    <i className={`bi ${transportIcon(quoteTransportKind)} me-1`} style={quoteTransportKind === 'plane' ? { transform: 'scaleX(-1)', display: 'inline-block' } : undefined} /> Chuyến về: <strong>{flightInfo?.maChuyenBayVe ?? 'N/A'}</strong>
+                    {flightInfo?.gioBayVe && flightInfo?.gioDenVe ? ` (${flightInfo.gioBayVe} -> ${flightInfo.gioDenVe})` : ''}
                   </p>
 
                   <button

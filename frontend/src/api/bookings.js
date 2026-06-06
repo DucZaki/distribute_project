@@ -18,10 +18,10 @@ function getBooking(id) {
 function cancelBooking(id) {
   return apiFetch(`/bookings/${id}/cancel`, { method: "POST" }, true);
 }
-function applyPromo(ma, subtotal) {
+function applyPromo(payload) {
   return apiFetch(
     "/bookings/promo/apply",
-    { method: "POST", body: JSON.stringify({ ma, subtotal }) },
+    { method: "POST", body: JSON.stringify(payload) },
     true
   );
 }

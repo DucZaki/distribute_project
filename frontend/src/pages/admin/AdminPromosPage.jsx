@@ -69,11 +69,10 @@ function AdminPromosPage() {
                 "M\xE3",
               ),
               /* @__PURE__ */ React.createElement("th", null, "Lo\u1EA1i"),
-              /* @__PURE__ */ React.createElement(
-                "th",
-                null,
-                "Gi\xE1 tr\u1ECB",
-              ),
+              /* @__PURE__ */ React.createElement("th", null, "Gi\u1EA3m"),
+              /* @__PURE__ */ React.createElement("th", null, "Chi\u1EBFn d\u1ECBch"),
+              /* @__PURE__ */ React.createElement("th", null, "\u0110\u01A1n t\u1ED1i thi\u1EC3u"),
+              /* @__PURE__ */ React.createElement("th", null, "L\u01B0\u1EE3t d\u00F9ng"),
               /* @__PURE__ */ React.createElement(
                 "th",
                 null,
@@ -109,14 +108,33 @@ function AdminPromosPage() {
                 /* @__PURE__ */ React.createElement(
                   "td",
                   null,
-                  p.loai === "AMOUNT" ? "S\u1ED1 ti\u1EC1n" : "%",
+                  p.loai === "AMOUNT" ? "Ti\u1EC1n" : "%",
                 ),
                 /* @__PURE__ */ React.createElement(
                   "td",
                   null,
                   p.loai === "AMOUNT"
                     ? formatVnd(Number(p.giaTri))
-                    : `${p.giaTri}%`,
+                    : `${p.giaTri}%${p.giamToiDa ? ` (max ${formatVnd(Number(p.giamToiDa))})` : ""}`,
+                ),
+                /* @__PURE__ */ React.createElement(
+                  "td",
+                  { className: "small" },
+                  p.kieuChienDich === "EARLY_BIRD"
+                    ? `Early Bird ${p.soNgayDatTruoc ?? ""} ng\u00E0y`
+                    : p.kieuChienDich === "LAST_MINUTE"
+                      ? `Last-min ${p.soGioLastMinute ?? 48}h`
+                      : "Th\u01B0\u1EDDng",
+                ),
+                /* @__PURE__ */ React.createElement(
+                  "td",
+                  null,
+                  p.donToiThieu ? formatVnd(Number(p.donToiThieu)) : "\u2014",
+                ),
+                /* @__PURE__ */ React.createElement(
+                  "td",
+                  { className: "small" },
+                  `${p.soLanDaDung ?? 0}${p.soLanDungToiDa != null ? ` / ${p.soLanDungToiDa}` : ""}`,
                 ),
                 /* @__PURE__ */ React.createElement(
                   "td",
@@ -169,7 +187,7 @@ function AdminPromosPage() {
                 null,
                 /* @__PURE__ */ React.createElement(
                   "td",
-                  { colSpan: 6, className: "text-center py-5 text-muted" },
+                  { colSpan: 9, className: "text-center py-5 text-muted" },
                   "Ch\u01B0a c\xF3 m\xE3.",
                 ),
               ),

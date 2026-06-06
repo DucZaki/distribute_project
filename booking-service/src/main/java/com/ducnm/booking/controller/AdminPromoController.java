@@ -27,6 +27,14 @@ public class AdminPromoController {
         return ApiResponse.ok(service.list(page, size));
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<PromoResponse> getById(
+            @RequestHeader(SecurityHeaders.USER_ROLES) String roles,
+            @PathVariable Integer id) {
+        requireAdmin(roles);
+        return ApiResponse.ok(service.getById(id));
+    }
+
     @PostMapping
     public ApiResponse<PromoResponse> create(
             @RequestHeader(SecurityHeaders.USER_ROLES) String roles,

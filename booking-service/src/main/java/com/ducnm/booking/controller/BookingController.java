@@ -54,7 +54,9 @@ public class BookingController {
     }
 
     @PostMapping("/promo/apply")
-    public ApiResponse<PromoApplyResult> applyPromo(@Valid @RequestBody ApplyPromoRequest req) {
-        return ApiResponse.ok(promoService.apply(req));
+    public ApiResponse<PromoApplyResult> applyPromo(
+            @RequestHeader(SecurityHeaders.USER_ID) Integer userId,
+            @Valid @RequestBody ApplyPromoRequest req) {
+        return ApiResponse.ok(promoService.apply(req, userId));
     }
 }

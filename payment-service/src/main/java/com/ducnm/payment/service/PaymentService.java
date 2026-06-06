@@ -28,6 +28,8 @@ import java.util.Map;
 public class PaymentService {
 
     private static final long MIN_AMOUNT_VND = 5_000L;
+    /** Khớp vnp_ExpireDate trong VnPayUtil (30 phút). */
+    private static final int PAYMENT_WINDOW_MINUTES = 30;
 
     private final PaymentRepository paymentRepo;
     private final VnPayUtil vnPayUtil;
@@ -49,8 +51,8 @@ public class PaymentService {
         if (!"PENDING".equalsIgnoreCase(booking.getTrangThai())) {
             throw BusinessException.badRequest("Đơn không ở trạng thái chờ thanh toán");
         }
-        if (booking.getCreatedAt() != null && booking.getCreatedAt().plusMinutes(15).isBefore(LocalDateTime.now())) {
-            throw BusinessException.badRequest("Đơn hàng đã hết hạn thanh toán (15 phút)");
+        if (booking.getCreatedAt() != null && booking.getCreatedAt().plusMinutes(PAYMENT_WINDOW_MINUTES).isBefore(LocalDateTime.now())) {
+            throw BusinessException.badRequest("Đơn hàng đã hết hạn thanh toán (" + PAYMENT_WINDOW_MINUTES + " phút). Vui lòng đặt tour mới.");
         }
         if (booking.getTongGia() == null) {
             throw BusinessException.badRequest("Đơn chưa có tổng tiền hợp lệ");

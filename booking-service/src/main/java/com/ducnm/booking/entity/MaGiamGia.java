@@ -48,4 +48,29 @@ public class MaGiamGia {
     @Column(name = "active", nullable = false)
     @Builder.Default
     private Boolean active = true;
+
+    /** Trần giảm (VND) khi loai = PERCENT */
+    @Column(name = "giam_toi_da", precision = 12, scale = 2)
+    private BigDecimal giamToiDa;
+
+    /** Đơn hàng tối thiểu để áp dụng */
+    @Column(name = "don_toi_thieu", precision = 12, scale = 2)
+    private BigDecimal donToiThieu;
+
+    /** Số lần tối đa mỗi user; null = không giới hạn */
+    @Column(name = "gioi_han_moi_user")
+    private Integer gioiHanMoiUser;
+
+    /** STANDARD | EARLY_BIRD | LAST_MINUTE */
+    @Column(name = "kieu_chien_dich", length = 30, nullable = false)
+    @Builder.Default
+    private String kieuChienDich = "STANDARD";
+
+    /** Early Bird: phải đặt trước ít nhất X ngày so với ngày khởi hành */
+    @Column(name = "so_ngay_dat_truoc")
+    private Integer soNgayDatTruoc;
+
+    /** Last-minute: khởi hành trong vòng X giờ tới */
+    @Column(name = "so_gio_last_minute")
+    private Integer soGioLastMinute;
 }

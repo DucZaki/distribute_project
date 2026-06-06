@@ -33,6 +33,8 @@ public class BookingDtos {
         private String diaChi;
         private String ghiChu;
         private String maGiamGia;
+        /** Ngày khởi hành — phục vụ kiểm tra mã Early Bird / Last-minute */
+        private LocalDate ngayKhoiHanh;
         @Valid
         private List<ParticipantDto> participants;
     }
@@ -76,6 +78,10 @@ public class BookingDtos {
         private String ma;
         @NotNull
         private BigDecimal subtotal;
+        private Integer idChuyenDi;
+        private Integer idNgayKhoiHanh;
+        /** Ngày khởi hành (yyyy-MM-dd) — dùng cho Early Bird / Last-minute */
+        private LocalDate ngayKhoiHanh;
     }
 
     @Data
@@ -100,5 +106,22 @@ public class BookingDtos {
         private Integer soLuong;
         private LocalDateTime checkedAt;
         private boolean firstTime;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PublicPromoSummary {
+        private Integer id;
+        private String ma;
+        private String moTa;
+        private String loai;
+        private BigDecimal giaTri;
+        private BigDecimal giamToiDa;
+        private BigDecimal donToiThieu;
+        private String kieuChienDich;
+        private LocalDate ngayBatDau;
+        private LocalDate ngayKetThuc;
     }
 }

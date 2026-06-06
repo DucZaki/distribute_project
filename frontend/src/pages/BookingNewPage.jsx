@@ -24,6 +24,7 @@ function BookingNewPage() {
   const [maGiamGia, setMaGiamGia] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoMsg, setPromoMsg] = useState("");
+  const [promoOk, setPromoOk] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const diemDonOptions = useMemo(() => {
@@ -57,23 +58,40 @@ function BookingNewPage() {
       : (tour?.gia ?? 0);
   const subtotal = unitPrice * soLuong;
   const total = Math.max(subtotal - discount, 0);
+  const ngayKhoiHanh =
+    tour?.ngayKhoiHanhs?.find((n) => n.id === nkhId)?.ngayKhoiHanh ??
+    tour?.ngayKhoiHanhs?.find((n) => Number(n.id) === nkhId)?.ngayKhoiHanh ??
+    null;
+
+  useEffect(() => {
+    setDiscount(0);
+    setPromoMsg("");
+    setPromoOk(false);
+  }, [subtotal, tourId, nkhId]);
+
   async function validatePromo() {
-    if (!maGiamGia) return;
+    if (!maGiamGia.trim()) return;
     try {
-      const res = await applyPromo(maGiamGia, subtotal);
+      const res = await applyPromo({
+        ma: maGiamGia.trim(),
+        subtotal,
+        idChuyenDi: tourId,
+        idNgayKhoiHanh: nkhId,
+        ngayKhoiHanh: ngayKhoiHanh || undefined,
+      });
       if (res.data.valid) {
-        setDiscount(res.data.discount ?? 0);
-        setPromoMsg(
-          res.data.message ?? "\xC1p d\u1EE5ng m\xE3 th\xE0nh c\xF4ng",
-        );
+        setDiscount(Number(res.data.discount ?? 0));
+        setPromoOk(true);
+        setPromoMsg(res.data.message ?? "Áp dụng mã thành công");
       } else {
         setDiscount(0);
-        setPromoMsg(res.data.message ?? "M\xE3 kh\xF4ng h\u1EE3p l\u1EC7");
+        setPromoOk(false);
+        setPromoMsg(res.data.message ?? "Mã không hợp lệ");
       }
     } catch {
-      setPromoMsg(
-        "Kh\xF4ng ki\u1EC3m tra \u0111\u01B0\u1EE3c m\xE3 gi\u1EA3m gi\xE1",
-      );
+      setDiscount(0);
+      setPromoOk(false);
+      setPromoMsg("Không kiểm tra được mã giảm giá");
     }
   }
   async function onSubmit(e) {
@@ -91,7 +109,8 @@ function BookingNewPage() {
         hoTen: String(fd.get("hoTen")),
         email: String(fd.get("email")),
         soDienThoai: String(fd.get("soDienThoai")),
-        maGiamGia: maGiamGia || void 0,
+        maGiamGia: promoOk && maGiamGia ? maGiamGia.trim() : void 0,
+        ngayKhoiHanh: ngayKhoiHanh || void 0,
         ghiChu: String(fd.get("ghiChu") ?? "") || void 0,
       });
       const booking = res.data;
@@ -99,11 +118,13 @@ function BookingNewPage() {
         await redirectToVnPay(booking.id);
         return;
       } catch (payErr) {
-        setError(
+        const msg =
           payErr instanceof ApiError
-            ? payErr.message
-            : "Không tạo được link VNPay. Kiểm tra VNP_TMN_CODE / VNP_HASH_SECRET trong .env.",
-        );
+            ? payErr.status === 401
+              ? "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại rồi vào Lịch sử đặt chỗ → Thanh toán ngay."
+              : payErr.message
+            : "Không tạo được link VNPay. Kiểm tra VNP_TMN_CODE / VNP_HASH_SECRET trong .env.";
+        setError(msg);
       }
       navigate("/user/bookings");
     } catch (err) {
@@ -305,41 +326,53 @@ function BookingNewPage() {
                 ),
                 /* @__PURE__ */ React.createElement(
                   "div",
-                  { className: "col-md-8" },
+                  { className: "col-12" },
+                  /* @__PURE__ */ React.createElement("hr", { className: "my-1" }),
                   /* @__PURE__ */ React.createElement(
                     "label",
-                    { className: "form-label" },
-                    "M\xE3 gi\u1EA3m gi\xE1",
+                    { className: "form-label fw-semibold" },
+                    "M\u00E3 gi\u1EA3m gi\u00E1",
                   ),
-                  /* @__PURE__ */ React.createElement("input", {
-                    className: "form-control",
-                    value: maGiamGia,
-                    onChange: (e) => setMaGiamGia(e.target.value),
-                  }),
-                ),
-                /* @__PURE__ */ React.createElement(
-                  "div",
-                  { className: "col-md-4 d-flex align-items-end" },
-                  /* @__PURE__ */ React.createElement(
-                    "button",
-                    {
-                      type: "button",
-                      className: "btn btn-outline-primary w-100",
-                      onClick: validatePromo,
-                    },
-                    "\xC1p d\u1EE5ng",
-                  ),
-                ),
-                promoMsg &&
                   /* @__PURE__ */ React.createElement(
                     "div",
-                    { className: "col-12" },
+                    { className: "input-group" },
+                    /* @__PURE__ */ React.createElement("input", {
+                      className: "form-control text-uppercase",
+                      placeholder: "Nh\u1EADp m\u00E3 coupon",
+                      value: maGiamGia,
+                      onChange: (e) => {
+                        setMaGiamGia(e.target.value);
+                        setPromoOk(false);
+                        setPromoMsg("");
+                        setDiscount(0);
+                      },
+                    }),
                     /* @__PURE__ */ React.createElement(
-                      "small",
-                      { className: "text-muted" },
-                      promoMsg,
+                      "button",
+                      {
+                        type: "button",
+                        className: "btn btn-outline-primary",
+                        onClick: validatePromo,
+                      },
+                      "\u00C1p d\u1EE5ng",
                     ),
                   ),
+                  promoMsg &&
+                    /* @__PURE__ */ React.createElement(
+                      "div",
+                      {
+                        className: `small mt-2 ${promoOk ? "text-success" : "text-danger"}`,
+                      },
+                      promoOk
+                        ? /* @__PURE__ */ React.createElement("i", {
+                            className: "bi bi-check-circle me-1",
+                          })
+                        : /* @__PURE__ */ React.createElement("i", {
+                            className: "bi bi-exclamation-circle me-1",
+                          }),
+                      promoMsg,
+                    ),
+                ),
                 /* @__PURE__ */ React.createElement(
                   "div",
                   { className: "col-12" },
@@ -381,15 +414,15 @@ function BookingNewPage() {
                 /* @__PURE__ */ React.createElement(
                   "div",
                   null,
-                  "V\xE9 m\xE1y bay: ",
+                  quote.transportMode === "BUS" ? "Xe khách: " : "Vé máy bay: ",
                   formatVnd(Number(quote.tongGiaVe ?? 0)),
                 ),
                 /* @__PURE__ */ React.createElement(
                   "div",
                   null,
-                  "Chuy\u1EBFn \u0111i: ",
+                  quote.transportMode === "BUS" ? "Chuyến: " : "Chuyến đi: ",
                   quote.maChuyenBayDi,
-                  " \xB7 ",
+                  " · ",
                   quote.gioBayDi,
                 ),
                 /* @__PURE__ */ React.createElement(
